@@ -105,6 +105,15 @@ Concrete, already-in-tree pieces this view builds on instead of re-implementing:
   and not in another — each `.base` path is its own key. (Decided over "global per vault" and
   "per view instance": per-Base is granular enough for the exclusive-to-this-view intent without
   the fragility of keying on a view/block instance id that Bases does not stably expose.)
+- **Implementation note (2026-09-22): no public API gives a `BasesView` its own `.base` file
+  path** (checked `BasesView`/`QueryController`/`BasesViewConfig`/`BasesViewFactory` in
+  `obsidian.d.ts`). `src/views/sticky-note/ownerBaseFile.ts` finds it through only public API:
+  `Workspace.iterateAllLeaves()` to find the leaf whose `FileView.containerEl` contains this
+  view's, then that `FileView`'s public `.file`. An embedded Base
+  (`![[Foo.base]]` inside another note) resolves to the embedding note's path instead of
+  `Foo.base`'s — accepted as a real, stable scope one level up from ideal in that one case,
+  rather than reaching for an undocumented internal property (this project already avoids that
+  pattern elsewhere — see `backlinks.ts`'s public `resolvedLinks` choice).
 - **Rename safety.** The plugin listens to `vault.on('rename', ...)` and, on every rename event,
   rewrites any matching **note path** across all `pinnedByBase` entries, and any matching
   **Base file path** as a `pinnedByBase` key — so moving/renaming either side of the mapping does

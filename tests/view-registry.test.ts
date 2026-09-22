@@ -143,7 +143,7 @@ describe("ViewRegistry", () => {
 
 describe("WiseViewPlugin.onload view registration", () => {
 	it("registers each Bases view and hover source exactly once, and no command", async () => {
-		const app = { plugins: { plugins: {} } };
+		const app = { plugins: { plugins: {} }, vault: { on: () => ({} as never), getAbstractFileByPath: () => null } };
 		const realPlugin = new WiseViewPlugin(app as never, {} as never);
 		const registeredViews: string[] = [];
 		const registeredHovers: string[] = [];

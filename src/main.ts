@@ -32,6 +32,7 @@ import {
   BASES_STICKY_NOTE_VIEW_ID,
   createStickyNoteViewRegistration,
 } from './views/sticky-note';
+import { migratePath, pruneMissing } from './views/sticky-note/pinStore';
 
 // A Grid view (adopting Dynamic Views) was attempted and removed on 2026-09-19: native testing
 // surfaced repeated, hard-to-diagnose CSS Grid layout failures (oversized covers, then flattened
@@ -51,6 +52,21 @@ export default class WiseViewPlugin extends Plugin {
 
     // Add settings tab
     this.addSettingTab(new WiseViewSettingTab(this.app, this));
+
+    // Sticky Note pin persistence (spec docs/specs/sticky-note.md §5.1): plugin-level, never a
+    // note property. Prune stale entries once at load, then keep both sides of the mapping
+    // (pinned note paths and .base file keys) in sync with renames for the rest of the session.
+    const prunedStickyNote = pruneMissing(this.settings.stickyNote, (path) => this.app.vault.getAbstractFileByPath(path) !== null);
+    if (prunedStickyNote !== this.settings.stickyNote) {
+      this.settings.stickyNote = prunedStickyNote;
+      await this.saveSettings();
+    }
+    this.registerEvent(this.app.vault.on('rename', (file, oldPath) => {
+      const migrated = migratePath(this.settings.stickyNote, oldPath, file.path);
+      if (migrated === this.settings.stickyNote) return;
+      this.settings.stickyNote = migrated;
+      void this.saveSettings();
+    }));
   }
 
   /**
@@ -156,6 +172,11 @@ export default class WiseViewPlugin extends Plugin {
       calendarDefaults: { ...DEFAULT_SETTINGS.calendarDefaults, ...(data.calendarDefaults ?? {}) },
       swimlaneDefaults: { ...DEFAULT_SETTINGS.swimlaneDefaults, ...(data.swimlaneDefaults ?? {}) },
       valueStyles: { ...DEFAULT_SETTINGS.valueStyles, ...(data.valueStyles ?? {}) },
+      stickyNote: {
+        ...DEFAULT_SETTINGS.stickyNote,
+        ...(data.stickyNote ?? {}),
+        pinnedByBase: { ...DEFAULT_SETTINGS.stickyNote.pinnedByBase, ...(data.stickyNote?.pinnedByBase ?? {}) },
+      },
     };
   }
 

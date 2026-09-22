@@ -19,10 +19,20 @@
 	box-sizing: border-box;
 }
 
+.wise-view-sticky-note-section-heading {
+	margin: 0 0 var(--size-4-2) 0;
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-medium);
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
 .wise-view-sticky-note-grid {
 	/* position: relative and an explicit pixel height are set by masonry.ts at runtime, sized to
 	 * the tallest column so the scroll container's scrollHeight is correct. */
 	width: 100%;
+	margin-bottom: var(--size-4-4);
 }
 
 .wise-view-sticky-note-card {
@@ -86,6 +96,38 @@
 
 .wise-view-sticky-note-fit-contain .wise-view-sticky-note-cover img {
 	object-fit: contain;
+}
+
+.wise-view-sticky-note-pin-btn {
+	position: absolute;
+	top: var(--size-4-2);
+	right: var(--size-4-2);
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	color: var(--text-muted);
+	background: var(--background-primary);
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+
+.wise-view-sticky-note-card:hover .wise-view-sticky-note-pin-btn,
+.wise-view-sticky-note-card:focus-within .wise-view-sticky-note-pin-btn,
+.wise-view-sticky-note-pin-btn.is-pinned {
+	opacity: 1;
+}
+
+.wise-view-sticky-note-pin-btn.is-pinned {
+	color: var(--interactive-accent);
+}
+
+.wise-view-sticky-note-pin-btn svg {
+	width: 14px;
+	height: 14px;
 }
 
 .wise-view-sticky-note-title {

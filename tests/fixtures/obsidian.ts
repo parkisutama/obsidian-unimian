@@ -225,6 +225,9 @@ export class Plugin {
 	async saveData(data: unknown): Promise<void> {
 		this.storedData = data;
 	}
+	registerEvent(_eventRef: unknown): void {
+		// No-op: tests that need to assert on event registration inspect the vault mock directly.
+	}
 }
 
 export class PluginSettingTab {

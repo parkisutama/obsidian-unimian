@@ -46,6 +46,14 @@ export interface SwimlaneDefaults {
   showPropertyLabels: boolean;
 }
 
+/**
+ * Sticky Note's plugin-level pinned state (docs/specs/sticky-note.md §5.1). Never a note
+ * property — exclusive to this view, scoped per `.base` file, keyed by note path.
+ */
+export interface StickyNoteData {
+  pinnedByBase: Record<string, string[]>;
+}
+
 /** Shared note template settings used by views that create notes. */
 export interface NoteTemplateDefaults {
   /** Template note path. Blank means create with Bases defaults only. */
@@ -81,6 +89,9 @@ export interface WiseViewSettings {
    * always bypasses the popup and opens the file directly.
    */
   openNotesInPreview: boolean;
+
+  /** Sticky Note's pinned-note state — see `StickyNoteData`. */
+  stickyNote: StickyNoteData;
 }
 
 /**
@@ -116,6 +127,10 @@ export const DEFAULT_SETTINGS: WiseViewSettings = {
   },
 
   openNotesInPreview: true,
+
+  stickyNote: {
+    pinnedByBase: {},
+  },
 
   valueStyles: {
     'note.status': {
