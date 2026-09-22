@@ -35,6 +35,7 @@ the same `dev` branch, instead of one large document that has to move together.
 | Performance | [docs/specs/performance.md](docs/specs/performance.md) | [tasks/performance/plan.md](tasks/performance/plan.md) | [tasks/performance/todo.md](tasks/performance/todo.md) | In progress — Phases 1-3 complete (PERF-001–003); Phase 4 native acceptance (PERF-004) pending |
 | Note Template | [docs/specs/note-template.md](docs/specs/note-template.md) | [tasks/note-template/plan.md](tasks/note-template/plan.md) | [tasks/note-template/todo.md](tasks/note-template/todo.md) | Done 2026-09-21 (native-accepted with waivers: core Templates and no-engine paths unverified) — [record](tasks/note-template/native-acceptance.md) |
 | Periodic Notes | [docs/specs/periodic-notes.md](docs/specs/periodic-notes.md) | [tasks/periodic-notes/plan.md](tasks/periodic-notes/plan.md) | [tasks/periodic-notes/todo.md](tasks/periodic-notes/todo.md) | Done 2026-09-21 (native-accepted with waivers: Templater folder templates, core Templates, no-engine, mobile unverified) — [record](tasks/periodic-notes/native-acceptance.md). Calendar-only, native (no plugin dependencies) |
+| Sticky Note | [docs/specs/sticky-note.md](docs/specs/sticky-note.md) | [tasks/sticky-note/plan.md](tasks/sticky-note/plan.md) | [tasks/sticky-note/todo.md](tasks/sticky-note/todo.md) | Not started — spec drafted 2026-09-22 |
 
 Status values: **Not started**, **In progress**, **Blocked — <reason>**, **Frozen — <reason>**, **Done (native-accepted
 <date>)**. Update this table as the source of truth; do not let an individual workstream's own
@@ -72,6 +73,23 @@ Note Template (general, cross-view; deliberately last — see below)
   view-specific reorganization work would mean rewriting the integration points twice. It also
   waits specifically for Performance (not just the four views) to land first, per the maintainer's
   explicit sequencing decision on 2026-09-19.
+
+## Sticky Note: a deliberate reversal of "no new views" (2026-09-22)
+
+The previous program planned five new view types (Grid, Masonry, Feed, Keep) alongside Timeline.
+Grid shipped, failed native testing three times on CSS layout regressions in the Bases scroll
+container, and was removed — the reason this roadmap's stated priority became "harden what
+already ships before adding another new view type" (see the section above).
+
+**Sticky Note is that same "Keep" entry, reproposed by the maintainer on 2026-09-22** as a
+one-off exception for this specific view, not a resumption of the whole five-view program. It is
+scoped explicitly to avoid Grid's failure mode: CSS multi-column layout instead of
+`display: grid` + `content-visibility`, a mandatory pre-build layout spike/gate (mirroring
+Gantt's Phase 0), and no delete/trash capability (kept read-only, so it cannot regress the
+mutation-guard architecture either). Full rationale: `docs/specs/sticky-note.md` §0, §6, §7.
+
+Grid/Masonry/Feed remain not-planned; reviving any of those still needs its own spec and
+maintainer sign-off, independent of Sticky Note shipping.
 
 ## Follow-ups (not blocking any workstream)
 

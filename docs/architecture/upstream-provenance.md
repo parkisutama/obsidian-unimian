@@ -88,6 +88,34 @@ copied.
   and observed behavior, not from `main.js` source.
 - **Attribution required:** no — no source is copied.
 
+### Mini Notes (masonry layout)
+
+- **Repository:** <https://github.com/rknastenka/obsidian-mini-notes>
+- **Commit:** `main` branch, read 2026-09-22 (not independently native at a Bases-view; a
+  standalone plugin, not a Bases view — read for its masonry algorithm only).
+- **License:** MIT.
+- **Reuse mode:** Design evidence only. No source copied.
+- **Why consulted:** the Sticky Note spike (`tasks/sticky-note/spike-report.md`, STICKY-001)
+  first tried CSS `column-width` multi-column, which native testing found collapses to a single
+  narrow column whenever one card is much taller than the rest — CSS multi-column balances
+  column *height*, not column *count*. `src/utils/masonry.ts` in this repository documents the
+  exact same failure in its own comments and fixes it with JS-driven shortest-column-first
+  placement (breakpoint table → column count from container width; each card placed into
+  whichever column is currently shortest; absolutely positioned so DOM order stays independent
+  of visual placement).
+- **Useful design evidence:** the shortest-column-first placement algorithm's shape, the
+  width-breakpoint-to-column-count table concept, and absolute positioning to decouple DOM order
+  from visual order (kept for keyboard/reading order and future drag-and-drop).
+- **Excluded:** the file's own height-cache/`WeakMap` invalidation scheme (Sticky Note re-measures
+  every relayout at spike scale; revisit only if STICKY-009's large-Base check shows it is too
+  slow), its `dashboard-card`/pin-button/color-dropdown DOM and CSS, and the whole plugin's own
+  UI/drag-and-drop/persistence layer — none of that is Bases-view shaped.
+- **File-level provenance:** none. `src/views/sticky-note-spike/masonry.ts` (spike-only) is
+  written independently from the algorithmic shape described above, not ported from the upstream
+  file.
+- **Attribution required:** no — no source is copied. Recorded here for review traceability per
+  this ledger's own policy.
+
 ### Feed Bases
 
 - **Repository:** <https://github.com/edrickleong/obsidian-feed-bases>
