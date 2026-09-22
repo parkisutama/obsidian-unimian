@@ -7,7 +7,7 @@ import { createEntrySnapshotGroups } from '../../platform/bases/entrySnapshotAda
 import { ViewConfigReader } from '../../platform/bases/ViewConfigReader';
 import { ViewRuntime } from '../../platform/dom/ViewRuntime';
 import { LegacyMutationGateway } from '../../platform/mutations/LegacyMutationGateway';
-import { isActivationKey, openPath, triggerHoverPreview } from '../../platform/navigation/NavigationService';
+import { activateEntry, isActivationKey, openPath, triggerHoverPreview } from '../../platform/navigation/NavigationService';
 import { showOpenFileMenu } from '../../utils/openFile';
 import { dateOnlyFromDayIndex } from '../../core/temporal/TemporalValue';
 import { buildTimelineModel } from './TimelineModel';
@@ -127,7 +127,13 @@ export class BasesTimelineView extends BasesView {
 		const path = this.pathFromEvent(event);
 		if (!path) return;
 		if (event instanceof KeyboardEvent) event.preventDefault();
-		openPath(this.app, path, event as MouseEvent | KeyboardEvent);
+		activateEntry({
+			app: this.app,
+			settings: this.plugin.settings,
+			path,
+			event: event as MouseEvent | KeyboardEvent,
+			openFull: (p, e) => openPath(this.app, p, e),
+		});
 	}
 
 	private showContextMenu(event: Event): void {

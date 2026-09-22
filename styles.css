@@ -260,6 +260,158 @@
 }
 
 /* ==========================================================================
+   6. QUICK PREVIEW MODAL
+   ========================================================================== */
+
+/* `.wise-view-quick-preview` is on `modalEl` (the `.modal` box itself), not `.modal-content` —
+   Obsidian sizes the box via its own width/height, so the override has to target the box, not
+   just its inner padding area, or the box stays at Obsidian's default (much narrower) size. */
+.wise-view-quick-preview.modal {
+	width: min(900px, 80vw);
+	height: min(85vh, 950px);
+	max-width: 80vw;
+	max-height: 90vh;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Page Preview's hover popover (--layer-popover) sits below a modal (--layer-modal) by default,
+   so it renders correctly but invisibly behind this popup when triggered from the embedded leaf.
+   Only bumped while the popup is open (see ACTIVE_CLASS in QuickPreviewModal.ts). */
+body.wise-view-quick-preview-active .hover-popover {
+	z-index: calc(var(--layer-modal, 70) + 5);
+}
+
+.wise-view-quick-preview .modal-content {
+	flex: 1 1 auto;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.wise-view-quick-preview-header {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 12px;
+	padding-right: 32px; /* clears Obsidian's own top-right close (×) button */
+	margin-bottom: 12px;
+}
+
+.wise-view-quick-preview-title {
+	margin: 0 0 12px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wise-view-quick-preview-properties {
+	width: 100%;
+	margin-bottom: 16px;
+	border-collapse: collapse;
+	font-size: var(--font-ui-small);
+}
+
+.wise-view-quick-preview-properties th,
+.wise-view-quick-preview-properties td {
+	padding: 4px 8px 4px 0;
+	text-align: left;
+	vertical-align: top;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.wise-view-quick-preview-properties th {
+	width: 1%;
+	white-space: nowrap;
+	color: var(--text-muted);
+	font-weight: var(--font-medium);
+}
+
+.wise-view-quick-preview-layout {
+	display: flex;
+	gap: 24px;
+	align-items: stretch;
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.wise-view-quick-preview-body {
+	flex: 1 1 auto;
+	min-width: 0;
+	min-height: 0;
+	overflow-y: auto;
+}
+
+/* A reparented WorkspaceLeaf expects its split's flex layout to size it; give it one directly. */
+.wise-view-quick-preview-body--leaf {
+	overflow: hidden;
+	display: flex;
+}
+
+.wise-view-quick-preview-body--leaf .workspace-leaf {
+	height: 100%;
+	width: 100%;
+}
+
+.wise-view-quick-preview-backlinks {
+	flex: 0 0 220px;
+	min-height: 0;
+	overflow-y: auto;
+	padding-left: 16px;
+	border-left: 1px solid var(--background-modifier-border);
+}
+
+.wise-view-quick-preview-backlinks h3 {
+	margin-top: 0;
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+	text-transform: uppercase;
+}
+
+.wise-view-quick-preview-backlinks ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.wise-view-quick-preview-backlinks li {
+	margin-bottom: 6px;
+}
+
+.wise-view-quick-preview-backlink {
+	color: var(--text-normal);
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.wise-view-quick-preview-backlink:hover {
+	color: var(--interactive-accent);
+	text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+	.wise-view-quick-preview.modal {
+		width: 96vw;
+		height: 92vh;
+	}
+
+	.wise-view-quick-preview-layout {
+		flex-direction: column;
+	}
+
+	.wise-view-quick-preview-body {
+		flex: 2 1 0;
+	}
+
+	.wise-view-quick-preview-backlinks {
+		flex: 1 1 0;
+		border-left: none;
+		border-top: 1px solid var(--background-modifier-border);
+		padding-left: 0;
+		padding-top: 12px;
+	}
+}
+/* ==========================================================================
    2. KANBAN VIEW STYLES                            [ACTIVE — Phase 1]
    ========================================================================== */
 

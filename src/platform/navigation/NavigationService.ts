@@ -13,6 +13,8 @@
  */
 
 import { Keymap, type App, type Component, type PaneType, type UserEvent } from 'obsidian';
+import { QuickPreviewModal, type OpenFull } from '../preview/QuickPreviewModal';
+import type { WiseViewSettings } from '../../types/settings';
 
 export type OpenDestination = 'active' | PaneType;
 
@@ -60,4 +62,35 @@ export function triggerHoverPreview(options: HoverPreviewOptions): void {
 /** True for the keys that should activate a focused, keyboard-reachable card/row: Enter or Space. */
 export function isActivationKey(event: KeyboardEvent): boolean {
 	return event.key === 'Enter' || event.key === ' ';
+}
+
+export interface ActivateEntryOptions {
+	app: App;
+	settings: WiseViewSettings;
+	path: string;
+	event?: UserEvent | null;
+	/** Falls back to the view's own pane-opening logic when the popup is skipped or dismissed. */
+	openFull: OpenFull;
+}
+
+/**
+ * Single decision point for card/item clicks across every view: a pane-destination modifier
+ * (Ctrl/Cmd for a new tab, etc.) always means "open the file", same as before this existed.
+ * Otherwise, when the user has quick preview enabled, open the read-only popup instead of
+ * jumping straight into a workspace pane.
+ */
+export function activateEntry(options: ActivateEntryOptions): void {
+	const { app, settings, path, event, openFull } = options;
+
+	if (resolveOpenDestination(event) !== 'active') {
+		openFull(path, event);
+		return;
+	}
+
+	if (settings.openNotesInPreview) {
+		new QuickPreviewModal(app, path, openFull).open();
+		return;
+	}
+
+	openFull(path, event);
 }

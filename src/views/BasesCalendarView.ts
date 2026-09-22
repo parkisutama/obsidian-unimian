@@ -45,6 +45,7 @@ import interactionPlugin from 'fullcalendar/interaction';
 import multiMonthPlugin from 'fullcalendar/multimonth';
 import type WiseViewPlugin from '../main';
 import { openFileInNewTab, showOpenFileMenuWithItems } from '../utils/openFile';
+import { activateEntry } from '../platform/navigation/NavigationService';
 import type { NoteTemplateDefaults, WeekDay } from '../types/settings';
 import { resolvePrettyPropertiesColor } from '../integrations/PrettyPropertiesAdapter';
 import { triggerHoverPreview as dispatchHoverPreview } from '../platform/navigation/NavigationService';
@@ -573,7 +574,14 @@ export class BasesCalendarView extends BasesView {
   private async handleEventClick(info: EventClickInfo): Promise<void> {
     const path = this.getEventPath(info.event.extendedProps);
     if (!path) return;
-    openFileInNewTab(this.app, path);
+    const jsEvent = info.jsEvent instanceof MouseEvent ? info.jsEvent : null;
+    activateEntry({
+      app: this.app,
+      settings: this.plugin.settings,
+      path,
+      event: jsEvent,
+      openFull: (p) => openFileInNewTab(this.app, p),
+    });
   }
 
   private async handleEventDrop(info: EventDropInfo): Promise<void> {

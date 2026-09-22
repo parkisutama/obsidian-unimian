@@ -33,7 +33,7 @@ import type { NormalizedValue } from '../core/entries/NormalizedValue';
 import { createEntrySnapshot } from '../platform/bases/entrySnapshotAdapter';
 import { resolveColor } from '../platform/colors/ColorResolver';
 import { resolvePrettyPropertiesColor } from '../integrations/PrettyPropertiesAdapter';
-import { openPath, triggerHoverPreview as dispatchHoverPreview } from '../platform/navigation/NavigationService';
+import { activateEntry, openPath, triggerHoverPreview as dispatchHoverPreview } from '../platform/navigation/NavigationService';
 import { LegacyMutationGateway } from '../platform/mutations/LegacyMutationGateway';
 import { getContrastColor } from '../utils/colorUtils';
 import { resolveCoverImageSrc } from '../platform/dom/CoverImageResolver';
@@ -625,8 +625,8 @@ export class BasesSwimlaneView extends BasesView {
     // Setup drag handlers
     this.drag.setupCardDragHandlers(card, entry);
 
-    // Click → open in new tab; right-click → location picker
-    card.addEventListener('click', () => { void this.handleCardClick(entry); });
+    // Click → quick preview (or open in new tab per modifier); right-click → location picker
+    card.addEventListener('click', (e) => { this.handleCardClick(entry, e); });
     card.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       showOpenFileMenu(this.plugin.app, entry.path, e);
@@ -745,8 +745,14 @@ export class BasesSwimlaneView extends BasesView {
     return null;
   }
 
-  private handleCardClick(entry: EntrySnapshot): void {
-    openPath(this.plugin.app, entry.path, { ctrlKey: true } as MouseEvent);
+  private handleCardClick(entry: EntrySnapshot, event: MouseEvent): void {
+    activateEntry({
+      app: this.plugin.app,
+      settings: this.plugin.settings,
+      path: entry.path,
+      event,
+      openFull: (path, e) => openPath(this.plugin.app, path, e ?? ({ ctrlKey: true } as MouseEvent)),
+    });
   }
 
   /**

@@ -106,7 +106,7 @@ export function createTimelineHarness(options: TimelineHarnessOptions = {}): Tim
 		},
 		data: { data: [entry, unscheduledEntry], groupedData: [{ entries: [entry, unscheduledEntry], hasKey: () => false }] },
 	};
-	const plugin = { app } as unknown as WiseViewPlugin;
+	const plugin = { app, settings: { openNotesInPreview: false } } as unknown as WiseViewPlugin;
 	const host = document.createElement('div');
 	document.body.appendChild(host);
 	if (options.containerWidth !== undefined) {

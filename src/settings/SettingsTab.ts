@@ -96,6 +96,22 @@ export class WiseViewSettingTab extends PluginSettingTab {
   }
 
   private renderGeneralTab(containerEl: HTMLElement): void {
+    new Setting(containerEl).setName('Clicking a card').setHeading();
+
+    new Setting(containerEl)
+      .setName('Open notes in a quick preview')
+      .setDesc(
+        'Clicking a card or item opens the note for editing in a popup (with a read-only ' +
+        'preview as a fallback), plus its backlinks, instead of a workspace pane. Ctrl/Cmd-click ' +
+        '(or any other pane-opening modifier) always opens the file directly, popup or not.'
+      )
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.openNotesInPreview)
+        .onChange(async (value) => {
+          this.plugin.settings.openNotesInPreview = value;
+          await this.plugin.saveSettings();
+        }));
+
     new Setting(containerEl).setName('Calendar view defaults').setHeading();
 
     new Setting(containerEl)

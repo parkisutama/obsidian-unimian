@@ -87,6 +87,13 @@ export class TFile extends TAbstractFile {
 	}
 }
 
+export class WorkspaceLeaf {
+	containerEl = document.createElement("div");
+	constructor(public app: unknown) {}
+	async openFile(): Promise<void> {}
+	detach(): void {}
+}
+
 export class TFolder extends TAbstractFile {}
 
 export const notices: string[] = [];

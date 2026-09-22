@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Parkis Utama
 
 import { App, Menu, TFile } from 'obsidian';
+import { QuickPreviewModal } from '../platform/preview/QuickPreviewModal';
 
 /**
  * Open a file in a new tab.
@@ -26,6 +27,12 @@ export function addOpenFileMenuItems(
     menu: Menu,
     options: { includeOpen?: boolean } = {},
 ): void {
+    menu.addItem(item =>
+        item.setTitle('Quick preview').setIcon('eye')
+            .onClick(() => new QuickPreviewModal(app, path, p => void app.workspace.openLinkText(p, '', 'tab')).open())
+    );
+    menu.addSeparator();
+
     if (options.includeOpen) {
         menu.addItem(item =>
             item.setTitle('Open').setIcon('file')

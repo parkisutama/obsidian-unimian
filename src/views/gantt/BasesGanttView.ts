@@ -18,7 +18,7 @@ import { computeRenderSignature, type RenderSignatureInput } from '../../platfor
 import { createViewOptionSchema } from '../../platform/bases/viewOptionTypes';
 import type { GrantedMutations } from '../../platform/mutations/grants';
 import { NoteTemplateService } from '../../services/NoteTemplateService';
-import { openPath } from '../../platform/navigation/NavigationService';
+import { activateEntry, openPath } from '../../platform/navigation/NavigationService';
 import { PropertyTypeService } from '../../services/PropertyTypeService';
 import { EchoGate } from './echoGate';
 import { renderGanttDetail, type GanttDetailEntry } from './detailPanel';
@@ -236,7 +236,13 @@ export class BasesGanttView extends BasesView {
 					incomplete: status.incomplete.length, conflicts: status.conflicts.length,
 				};
 			},
-			onOpenNote: (path, event) => { if (entriesByPath.has(path)) openPath(this.app, path, event); },
+			onOpenNote: (path, event) => {
+				if (!entriesByPath.has(path)) return;
+				activateEntry({
+					app: this.app, settings: this.plugin.settings, path, event,
+					openFull: (p, e) => openPath(this.app, p, e),
+				});
+			},
 			onExactDateUpdate: (taskId, boundary, type) => writer.onExactDateUpdate(taskId, boundary, type),
 			onRemoveDependency: removeDependency,
 		});

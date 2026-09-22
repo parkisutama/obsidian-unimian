@@ -73,6 +73,14 @@ export interface WiseViewSettings {
    * For icons, embed emojis directly in your property values.
    */
   valueStyles: Record<string, Record<string, ValueStyle>>;
+
+  /**
+   * When true, clicking a card/item in any view opens a read-only quick preview popup
+   * (rendered note content plus a backlinks panel) instead of jumping straight into a
+   * workspace pane. Holding a pane-destination modifier (Ctrl/Cmd for a new tab, etc.)
+   * always bypasses the popup and opens the file directly.
+   */
+  openNotesInPreview: boolean;
 }
 
 /**
@@ -106,6 +114,8 @@ export const DEFAULT_SETTINGS: WiseViewSettings = {
     freezeHeaders: 'none',
     showPropertyLabels: true,
   },
+
+  openNotesInPreview: true,
 
   valueStyles: {
     'note.status': {
