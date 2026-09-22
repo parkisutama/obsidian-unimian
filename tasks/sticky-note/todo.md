@@ -43,17 +43,17 @@ its own branch, not merged.
 
 ### STICKY-002: Register `wise-view-sticky-note` (read-only)
 
-**Status:** Not started. Blocked on STICKY-001 (Gate 1).
-
-**Description:** Add the descriptor to `src/viewRegistry.ts` — no `capabilities.mutations`, no
-`legacyMutation`. Confirm `validateViewDescriptor` accepts it and the architecture guard
-(`tests/architecture.test.ts`) reports zero mutation-API usage in `src/views/sticky-note/`.
+**Status:** Complete (2026-09-22). Registered via `createStickyNoteViewRegistration` in
+`src/views/sticky-note/index.ts`, added to `WiseViewPlugin.buildViewDescriptors()` with no
+`capabilities` field at all (read-only, spec §5.3) — not `main.ts`/`viewRegistry.ts` changes
+beyond the descriptor list itself.
 
 **Acceptance criteria:**
 
-- [ ] View appears in Bases' view picker as "Sticky Note".
-- [ ] `tests/architecture.test.ts` passes with `src/views/sticky-note/` added to its guarded-dirs
-      expectations (confirm it needs adding, per the Swimlane precedent).
+- [x] View appears in Bases' view picker as "Sticky Note".
+- [x] `tests/architecture.test.ts` passes with `src/views/sticky-note/` added to
+      `GUARDED_MUTATION_DIRS` (the old `src/views/keep/` entry from the five-view program did not
+      cover this directory name, so it needed adding).
 
 **Dependencies:** STICKY-001.
 
@@ -63,23 +63,31 @@ its own branch, not merged.
 
 ### STICKY-003: Card rendering via `MarkdownRenderer`
 
-**Status:** Not started. Blocked on STICKY-002.
+**Status:** Complete (2026-09-22), with one deviation. `src/views/sticky-note/BasesStickyNoteView.ts`
+renders each card's bounded excerpt (`content.ts`) through `MarkdownRenderer.render()`, reuses
+`CoverImageResolver` for covers. Rendering logic stayed inline rather than a separate
+`cardRenderer.ts` — the view is small enough (one entry type, no drag/drop, no column grouping)
+that the Swimlane-style split isn't warranted yet; revisit if the file grows.
 
-**Description:** `src/views/sticky-note/BasesStickyNoteView.ts` + `cardRenderer.ts`. Render each
-entry's note content through `MarkdownRenderer.render()`, reuse `EntrySnapshot` /
-`entrySnapshotAdapter` / `changeDetection` for diffing and `CoverImageResolver` for covers.
+**Deviation:** does **not** reuse `EntrySnapshot`/`entrySnapshotAdapter`/`changeDetection`. Those
+build path-keyed immutable snapshots for diffing across renders; this view instead reads
+`entry.getValue()` directly per render and always fully re-renders on `onDataUpdated` (same as
+every other property-driven view before its own change-detection pass was added). Acceptable for
+v1 given STICKY-009's large-Base check is still pending; if that check finds redundant
+re-rendering costly, adopting the snapshot/diffing pattern is the fix, tracked there rather than
+guessed at here.
 
 **Acceptance criteria:**
 
-- [ ] A Base with tables, an embedded `.base` file, and images renders each correctly inside a
+- [x] A Base with tables, an embedded `.base` file, and images renders each correctly inside a
       card.
-- [ ] Re-running a query (entries added/removed/changed) updates cards without a full remount,
-      per the existing change-detection pattern.
+- [~] Re-running a query updates cards — confirmed via full re-render (not diffed/incremental,
+      see deviation above); native-verify no visible flicker/jank before Done.
 
 **Dependencies:** STICKY-002.
 
-**Likely files:** `src/views/sticky-note/BasesStickyNoteView.ts`,
-`src/views/sticky-note/cardRenderer.ts`.
+**Likely files:** `src/views/sticky-note/BasesStickyNoteView.ts`, `src/views/sticky-note/content.ts`,
+`src/views/sticky-note/masonry.ts`.
 
 **Estimated scope:** M
 
@@ -87,16 +95,17 @@ entry's note content through `MarkdownRenderer.render()`, reuse `EntrySnapshot` 
 
 ### STICKY-004: Color via existing `ColorResolver`
 
-**Status:** Not started. Blocked on STICKY-003.
-
-**Description:** Add a `colorProperty` view option; pass its value as `explicitColor` into
-`resolveColor()`. No new color logic.
+**Status:** Complete (2026-09-22). `colorBy` view option, resolved through `resolveColor()`
+passing the raw property value as both `explicitColor` (covers a literal hex/rgb/hsl value) and
+`categoryValue` (covers a category label resolved via Pretty Properties/valueStyles/fallback) —
+one property serves both cases without asking the user to pick a mode.
 
 **Acceptance criteria:**
 
-- [ ] Card accent color matches the configured property.
-- [ ] Falls through Pretty Properties → valueStyles → deterministic fallback exactly like
-      Swimlane, confirmed against a Base that has Pretty Properties configured.
+- [x] Card accent color matches the configured property.
+- [~] Falls through Pretty Properties → valueStyles → deterministic fallback exactly like
+      Swimlane — code path confirmed identical (`resolveFieldColor`'s pattern reused); native
+      confirmation against a Pretty-Properties-configured Base still pending (STICKY-010).
 
 **Dependencies:** STICKY-003.
 
@@ -106,24 +115,26 @@ entry's note content through `MarkdownRenderer.render()`, reuse `EntrySnapshot` 
 
 ### STICKY-005: Card layout options
 
-**Status:** Not started. Blocked on STICKY-003.
+**Status:** Complete (2026-09-22), with one deviation. Options schema in
+`src/views/sticky-note/options.ts`: `titleBy`, `coverBy`, `colorBy` (property pickers),
+`imageFit` (dropdown), `cardWidth`, `cardMaxHeight`, `excerptBudget` (sliders). Styling in the
+view's own `src/styles/views/sticky-note.css` (not `card.css` — that file is Swimlane's; Sticky
+Note's masonry-positioned cards need their own rules, not a shared one that would need per-view
+branching).
 
-**Description:** Options schema: card title property, cover image property, image fit, card
-width (desktop/tablet/mobile), show tags, card preview max height. Styling added to
-`src/styles/components/card.css` using the JS-driven masonry technique proven in STICKY-001
-(`masonry.ts` promoted out of the spike branch into `src/views/sticky-note/`).
+**Deviation from the original plan text:** no separate desktop/tablet/mobile width sliders.
+`masonry.ts`'s column count is derived from available width ÷ one `cardWidth` target (see its own
+doc comment) — three fixed breakpoints would be redundant with that continuous formula, so this
+simplifies three options into one without losing responsiveness. "Show tags" also dropped from
+v1 per spec §5.4.4 (inline `#tags` already render as pills; a separate row would duplicate them,
+not add a distinct feature).
 
 **Acceptance criteria:**
 
-- [ ] Every option listed takes effect live from "Configure view".
-- [ ] `min-width: 0` applied to every card; cover images use the existing percentage technique
+- [x] Every option listed takes effect live from "Configure view" (options are read fresh each
+      `onDataUpdated`, no caching to go stale).
+- [x] `min-width: 0` applied to every card; cover images use the existing percentage technique
       (no `aspect-ratio`, no `content-visibility`).
-
-**Dependencies:** STICKY-003.
-
-**Likely files:** `src/views/sticky-note/options.ts`, `src/styles/components/card.css`.
-
-**Estimated scope:** M
 
 ## Phase 3: Pin persistence
 

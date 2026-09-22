@@ -1,7 +1,7 @@
 # Implementation plan: Sticky Note
 
-Status: Draft — Phase 0 (layout spike) in progress; layout technique revised 2026-09-22 (CSS
-multi-column → JS-driven masonry) after first native test
+Status: In progress — Phase 0 (Gate 1 passed, 2026-09-22) and Phase 1-2 (STICKY-002–005) complete;
+Phase 3 (pin persistence) not started
 Specification: [../../docs/specs/sticky-note.md](../../docs/specs/sticky-note.md)
 Roadmap: [../../ROADMAP.md](../../ROADMAP.md)
 Baseline: branch `main` (see spec's Baseline branch note — `dev` is missing `QuickPreviewModal`)

@@ -28,6 +28,10 @@ import {
   BASES_GANTT_VIEW_ID,
   createGanttViewRegistration,
 } from './views/gantt';
+import {
+  BASES_STICKY_NOTE_VIEW_ID,
+  createStickyNoteViewRegistration,
+} from './views/sticky-note';
 
 // A Grid view (adopting Dynamic Views) was attempted and removed on 2026-09-19: native testing
 // surfaced repeated, hard-to-diagnose CSS Grid layout failures (oversized covers, then flattened
@@ -60,6 +64,7 @@ export default class WiseViewPlugin extends Plugin {
     const timeline = createTimelineViewRegistration(this);
     const gantt = createGanttViewRegistration(this,
       () => this.viewRegistry.mutationsFor(BASES_GANTT_VIEW_ID, this.app));
+    const stickyNote = createStickyNoteViewRegistration(this);
 
     return [
       {
@@ -97,6 +102,15 @@ export default class WiseViewPlugin extends Plugin {
         options: gantt.options,
         hover: { display: 'Gantt', defaultMod: true },
         capabilities: { mutations: ['date', 'property', 'dependency', 'fileCreate'] },
+      },
+      {
+        id: BASES_STICKY_NOTE_VIEW_ID,
+        name: stickyNote.name,
+        icon: stickyNote.icon,
+        factory: stickyNote.factory,
+        options: stickyNote.options,
+        hover: { display: 'Sticky Note', defaultMod: true },
+        // Read-only (spec docs/specs/sticky-note.md §5.3): no capabilities declared.
       },
     ];
   }

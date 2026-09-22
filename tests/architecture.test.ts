@@ -45,6 +45,7 @@ const GUARDED_MUTATION_DIRS = [
 	"src/views/masonry/",
 	"src/views/feed/",
 	"src/views/keep/",
+	"src/views/sticky-note/",
 	"src/core/",
 	"src/platform/dom/",
 	"src/platform/navigation/",

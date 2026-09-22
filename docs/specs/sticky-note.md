@@ -50,10 +50,13 @@ and §6.
    into their own "Pinned" section above "Others" (matching the reference screenshot's grouping),
    toggled from each card, never written to the note.
 5. **Card layout options.** Base view options (`src/platform/bases/viewOptionTypes.ts` +
-   `ViewConfigReader`) for: card title property, cover image property, image fit, card width
-   (desktop/tablet/mobile), show tags, card preview max height — mirroring the "Configure view"
-   panel already shown for the reference plugin, adapted to Wise View's own options schema
-   conventions (see Gantt/Calendar `options` callbacks for the pattern).
+   `ViewConfigReader`) for: card title property, cover image property, color property, image
+   fit, card width (desktop/tablet/mobile), excerpt character budget — mirroring the "Configure
+   view" panel already shown for the reference plugin, adapted to Wise View's own options schema
+   conventions (see Gantt/Calendar `options` callbacks for the pattern). "Show tags" is *not*
+   part of v1 (§5.4.4 — inline `#tags` already render as pills, so a separate tag row would be
+   genuine duplication, not a distinct feature); revisit only alongside a real design for that
+   row.
 6. **Delete/trash is explicitly out of scope for this spec** — see §5.3.
 
 ## 3. Non-goals

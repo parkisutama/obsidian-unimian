@@ -12,6 +12,7 @@ import { BASES_CALENDAR_VIEW_ID, createCalendarViewRegistration } from "../src/v
 import { BASES_SWIMLANE_VIEW_ID, createSwimlaneViewRegistration } from "../src/views/BasesSwimlaneView";
 import { BASES_TIMELINE_VIEW_ID, createTimelineViewRegistration, getTimelineViewOptions } from "../src/views/timeline";
 import { BASES_GANTT_VIEW_ID, createGanttViewRegistration } from "../src/views/gantt";
+import { BASES_STICKY_NOTE_VIEW_ID } from "../src/views/sticky-note";
 import { DEFAULT_SETTINGS } from "../src/types/settings";
 import WiseViewPlugin from "../src/main";
 
@@ -169,6 +170,7 @@ describe("WiseViewPlugin.onload view registration", () => {
 			BASES_CALENDAR_VIEW_ID,
 			BASES_TIMELINE_VIEW_ID,
 			BASES_GANTT_VIEW_ID,
+			BASES_STICKY_NOTE_VIEW_ID,
 		]);
 		expect(new Set(registeredViews).size).toBe(registeredViews.length);
 		expect(registeredHovers).toEqual([
@@ -176,6 +178,7 @@ describe("WiseViewPlugin.onload view registration", () => {
 			BASES_CALENDAR_VIEW_ID,
 			BASES_TIMELINE_VIEW_ID,
 			BASES_GANTT_VIEW_ID,
+			BASES_STICKY_NOTE_VIEW_ID,
 		]);
 		expect(registeredCommands).toEqual([]);
 	});

@@ -2311,6 +2311,124 @@ body.wise-view-quick-preview-active .hover-popover {
 .wise-view-gantt-chart .gantt-task-bar[style*="--gantt-progress-color"]:not(.summary) {
 	--gantt-progress-color: color-mix(in srgb, var(--gantt-bar-color) 50%, var(--gantt-bar-text-color)) !important;
 }
+/* SPDX-License-Identifier: GPL-3.0-only */
+/* Copyright (C) 2026 Parkis Utama */
+
+/*
+ * Sticky Note view (docs/specs/sticky-note.md §6). JS-driven shortest-column-first masonry
+ * (masonry.ts) — never `display: grid` + `content-visibility` (the combination that flattened
+ * every card in the removed Grid view after three rounds of native testing) and never CSS
+ * `column-width`/`column-count` (found to collapse to one column when a single card is much
+ * taller than the rest — tasks/sticky-note/spike-report.md, STICKY-001).
+ */
+
+.wise-view-sticky-note {
+	display: block;
+	width: 100%;
+	height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: var(--size-4-4);
+	box-sizing: border-box;
+}
+
+.wise-view-sticky-note-grid {
+	/* position: relative and an explicit pixel height are set by masonry.ts at runtime, sized to
+	 * the tallest column so the scroll container's scrollHeight is correct. */
+	width: 100%;
+}
+
+.wise-view-sticky-note-card {
+	/* Defensive baseline from Grid's post-mortem, kept even though this is not a CSS-column
+	 * layout: */
+	min-width: 0;
+	box-sizing: border-box;
+
+	/* top/left/width are set by masonry.ts at runtime (position: absolute). */
+	margin: 0;
+	padding: var(--size-4-3);
+	border-radius: var(--radius-m);
+	background: var(--wise-view-color-bg, var(--background-secondary));
+	border: 1px solid var(--background-modifier-border);
+	transition: top 0.12s ease, left 0.12s ease, box-shadow 0.12s ease;
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+	max-height: var(--wise-view-sticky-note-max-height, 480px);
+}
+
+.wise-view-sticky-note-card:hover,
+.wise-view-sticky-note-card:focus-visible {
+	box-shadow: 0 2px 8px var(--background-modifier-box-shadow);
+	outline: none;
+}
+
+.wise-view-sticky-note-card::after {
+	content: '';
+	position: absolute;
+	inset: auto 0 0 0;
+	height: 48px;
+	background: linear-gradient(to bottom, transparent, var(--wise-view-color-bg, var(--background-secondary)));
+	pointer-events: none;
+}
+
+/* Cover banner: the `height:0`/`padding-top` percentage technique already proven in this
+ * project's Swimlane cover treatment, not `aspect-ratio` (one of Grid's three original failure
+ * modes). */
+.wise-view-sticky-note-cover {
+	position: relative;
+	width: calc(100% + 2 * var(--size-4-3));
+	margin: calc(-1 * var(--size-4-3)) calc(-1 * var(--size-4-3)) var(--size-4-3);
+	height: 0;
+	padding-top: 50%;
+	overflow: hidden;
+	border-radius: var(--radius-m) var(--radius-m) 0 0;
+	background: var(--background-modifier-border);
+}
+
+.wise-view-sticky-note-cover img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.wise-view-sticky-note-fit-cover .wise-view-sticky-note-cover img {
+	object-fit: cover;
+}
+
+.wise-view-sticky-note-fit-contain .wise-view-sticky-note-cover img {
+	object-fit: contain;
+}
+
+.wise-view-sticky-note-title {
+	margin: 0 0 var(--size-4-1) 0;
+	font-size: var(--font-ui-medium);
+	overflow-wrap: break-word;
+}
+
+.wise-view-sticky-note-body {
+	font-size: var(--font-ui-small);
+	overflow-wrap: break-word;
+}
+
+.wise-view-sticky-note-body img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* Obsidian's own table renderer wraps tables in a horizontally-scrollable `.table-wrapper` —
+ * expected/native, not a Sticky Note bug. Just keep it from bursting out of the card's width. */
+.wise-view-sticky-note-body table,
+.wise-view-sticky-note-body .table-wrapper {
+	max-width: 100%;
+}
+
+.wise-view-sticky-note-empty,
+.wise-view-sticky-note-error {
+	color: var(--text-muted);
+	font-style: italic;
+}
 
 /* === BUNDLED CSS IMPORTS === */
 /*! @jaeungkim/gantt-chart v1.5.1 | MIT License | Copyright (c) 2025 jaeungkim | Unmodified; Gantt themes it through --gantt-* tokens in first-party CSS | From: gantt-chart.css */

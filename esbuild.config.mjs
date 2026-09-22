@@ -45,6 +45,7 @@ const FIRST_PARTY_CSS = [
 	"src/styles/views/calendar.css",
 	"src/styles/views/timeline.css",
 	"src/styles/views/gantt.css",
+	"src/styles/views/sticky-note.css",
 ].map((p) => path.resolve(p));
 
 // Merge first-party sources, imported CSS, and the Gantt Chart stylesheet (which nothing imports)
