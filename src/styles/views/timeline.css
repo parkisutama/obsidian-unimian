@@ -29,7 +29,6 @@
 	overflow-x: auto;
 }
 
-.wise-view-timeline__toolbar select,
 .wise-view-timeline__sidebar-row button {
 	border: 0;
 	border-radius: var(--radius-s);
