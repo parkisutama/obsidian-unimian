@@ -349,6 +349,16 @@ export class TimelineRenderer {
 		this.clearQuickSchedule();
 		this.sidebarRows.destroy();
 		this.timelineRows.destroy();
+		// containerEl is Obsidian's own .bases-view element, reused across view-type switches
+		// (Timeline -> Table, Timeline -> Gantt, ...). Leaving our classes on it after unload would
+		// leave the next view type wearing our !important flex/overflow layout.
+		this.containerEl.classList.remove(
+			'wise-view-timeline',
+			'wise-view-timeline--wrap-titles',
+			'wise-view-timeline--unconfigured',
+			'wise-view-timeline--sidebar-collapsed',
+			'wise-view-timeline--narrow',
+		);
 	}
 
 	private reflowAtCenter(): void {

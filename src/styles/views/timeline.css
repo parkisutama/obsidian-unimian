@@ -8,15 +8,26 @@
 /* Timeline view                                                              */
 /* ========================================================================== */
 
+/* Obsidian's .bases-view wrapper is this same element, and its own rules for display/overflow-y
+   win the cascade against ours at equal specificity (confirmed via devtools: computed overflow-y
+   stayed "auto" and .wise-view-timeline__main rendered at full content height — ~22700px instead
+   of the ~645px flex:1 should have given it — meaning `display: flex` here wasn't actually taking
+   effect, so `.main`'s `flex: 1` had no flex container to size against). The properties below are
+   load-bearing for the whole column layout, so they're !important rather than losing quietly. */
 .wise-view-timeline {
 	position: relative;
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	min-height: 0;
+	display: flex !important;
+	flex-direction: column !important;
+	height: 100% !important;
+	min-height: 0 !important;
+	overflow: hidden !important;
 	color: var(--text-normal);
 	background: var(--background-primary);
 	font-family: var(--font-interface);
+}
+
+.bases-view.wise-view-timeline {
+	padding: 0;
 }
 
 .wise-view-timeline__toolbar {
@@ -95,6 +106,7 @@
 
 .wise-view-timeline__main {
 	display: grid;
+	grid-template-rows: minmax(0, 1fr);
 	grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
 	flex: 1;
 	min-height: 0;

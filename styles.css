@@ -1566,15 +1566,26 @@ body.wise-view-quick-preview-active .hover-popover {
 /* Timeline view                                                              */
 /* ========================================================================== */
 
+/* Obsidian's .bases-view wrapper is this same element, and its own rules for display/overflow-y
+   win the cascade against ours at equal specificity (confirmed via devtools: computed overflow-y
+   stayed "auto" and .wise-view-timeline__main rendered at full content height — ~22700px instead
+   of the ~645px flex:1 should have given it — meaning `display: flex` here wasn't actually taking
+   effect, so `.main`'s `flex: 1` had no flex container to size against). The properties below are
+   load-bearing for the whole column layout, so they're !important rather than losing quietly. */
 .wise-view-timeline {
 	position: relative;
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	min-height: 0;
+	display: flex !important;
+	flex-direction: column !important;
+	height: 100% !important;
+	min-height: 0 !important;
+	overflow: hidden !important;
 	color: var(--text-normal);
 	background: var(--background-primary);
 	font-family: var(--font-interface);
+}
+
+.bases-view.wise-view-timeline {
+	padding: 0;
 }
 
 .wise-view-timeline__toolbar {
@@ -1653,6 +1664,7 @@ body.wise-view-quick-preview-active .hover-popover {
 
 .wise-view-timeline__main {
 	display: grid;
+	grid-template-rows: minmax(0, 1fr);
 	grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
 	flex: 1;
 	min-height: 0;
@@ -2025,11 +2037,19 @@ body.wise-view-quick-preview-active .hover-popover {
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* Copyright (C) 2026 Parkis Utama */
 
-.wise-view-gantt {
+/* height: 100% here is only a fallback (no ResizeObserver support). Obsidian's own wrapper around
+   this element never resolves a definite height through plain CSS percentages — its own parent
+   chain ends up auto-sized to content, so height: 100% just cascades into "auto" and the pane
+   grows to fit the chart instead of being clipped to the view. BasesGanttView.onload() mirrors the
+   real scrolling ancestor's pixel height onto this element's inline style instead. Either way,
+   overflow: hidden is what then keeps the toolbar and the chart's sticky timeline header fixed
+   while only the library's own .gantt-scroll-container scrolls. */
+.bases-view.wise-view-gantt {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 	min-height: 0;
+	overflow: hidden;
 	background: var(--background-primary);
 	color: var(--text-normal);
 }
@@ -2058,6 +2078,7 @@ body.wise-view-quick-preview-active .hover-popover {
 .wise-view-gantt-chart {
 	min-height: 0;
 	flex: 1 1 auto;
+	overflow: hidden;
 }
 
 .wise-view-gantt-chart > .gantt-container {

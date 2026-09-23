@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { EntrySnapshot } from '../src/core/entries/EntrySnapshot';
 import { MISSING_VALUE } from '../src/core/entries/NormalizedValue';
@@ -373,6 +375,18 @@ describe('Timeline view interactions', () => {
 		expect(harness.host.childElementCount).toBe(0);
 	});
 
+	// containerEl is Obsidian's own .bases-view element, reused when the user switches the Base to
+	// a different view type (Table, Gantt, ...). Our root class carries !important layout rules
+	// (see "Timeline root layout CSS" below), so leaving it behind after unload corrupts whatever
+	// view reuses the container next — this regressed once already (native Table's column header
+	// row froze mid-scroll after switching away from Timeline).
+	it('removes its own state classes from the shared container on unload', () => {
+		harness = createTimelineHarness();
+		expect(harness.host.classList.contains('wise-view-timeline')).toBe(true);
+		harness.view.onunload();
+		expect(harness.host.className).toBe('');
+	});
+
 	it('centers on today once the container has a real, laid-out width', () => {
 		harness = createTimelineHarness({ containerWidth: 800 });
 		const scroller = harness.host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
@@ -391,5 +405,24 @@ describe('Timeline view interactions', () => {
 		harness = createTimelineHarness();
 		const scroller = harness.host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
 		expect(scroller.scrollLeft).toBe(0);
+	});
+});
+
+describe('Timeline root layout CSS (regression)', () => {
+	// Obsidian's own .bases-view rules for display/overflow-y won the cascade against ours at
+	// equal specificity (confirmed via devtools on a real vault: .wise-view-timeline__main
+	// rendered at full content height — ~22700px for 500+ rows — instead of the ~645px flex:1
+	// should have given it, because `display: flex` on the root wasn't actually taking effect).
+	// That left virtualization nothing to bound against, and let the toolbar/date header scroll
+	// away with the rows instead of staying put. These properties are load-bearing for the whole
+	// column layout, so losing !important here regresses both the lag and the scroll-away bug.
+	it('pins the root flex/overflow layout with !important so Obsidian cannot override it', () => {
+		const cssPath = join(process.cwd(), 'src/styles/views/timeline.css');
+		const css = readFileSync(cssPath, 'utf8');
+		const rootRule = css.match(/^\.wise-view-timeline\s*\{([^}]*)\}/m)?.[1];
+		expect(rootRule).toBeDefined();
+		for (const prop of ['display', 'flex-direction', 'height', 'min-height', 'overflow']) {
+			expect(rootRule).toMatch(new RegExp(`\\b${prop}\\s*:[^;]*!important`));
+		}
 	});
 });
