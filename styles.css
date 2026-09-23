@@ -292,6 +292,16 @@ body.wise-view-quick-preview-active .hover-popover {
 	padding-top: 28px;
 }
 
+/* The embedded leaf's own `.view-header` normally sits against the workspace's tab-bar
+   background, a different shade than the note body — inside this popup that reads as a
+   disconnected white strip instead of one unified surface (maintainer feedback 2026-09-22).
+   Match it to the modal's own background so the toolbar blends into the body beneath it. */
+.wise-view-quick-preview .view-header {
+	background-color: var(--background-primary);
+	border-bottom: none;
+	box-shadow: none;
+}
+
 .wise-view-quick-preview-title {
 	margin: 0 0 12px;
 	overflow: hidden;
