@@ -57,7 +57,17 @@ interface CardEntry {
 const RENDER_WINDOW_SCREENS = 2;
 const MIN_INITIAL_RENDER = 20;
 /** How far ahead of the viewport a placeholder starts promoting, in either scroll direction. */
-const PLACEHOLDER_ROOT_MARGIN_PX = 1000;
+const PLACEHOLDER_ROOT_MARGIN_PX = 500;
+/**
+ * Caps how many placeholders one `flushPromotions()` call builds before yielding to the next
+ * frame. A generous `rootMargin` plus a fast scroll can queue hundreds of placeholders at once;
+ * building all of them in one uninterrupted sequential loop (each doing a file read plus a
+ * `MarkdownRenderer.render()`) took long enough to look permanently stuck rather than merely
+ * slow (maintainer report, 2026-09-23: "yang diatas itu tidak melanjutkan prosesnya" — scrolling
+ * down then back up left the earlier batch looking abandoned, not just delayed). Processing a
+ * bounded batch per frame and re-scheduling the rest keeps forward progress visible.
+ */
+const MAX_PROMOTIONS_PER_FLUSH = 15;
 
 export class BasesStickyNoteView extends BasesView {
 	type = BASES_STICKY_NOTE_VIEW_ID;
@@ -117,6 +127,7 @@ export class BasesStickyNoteView extends BasesView {
 	private placeholderObserver: IntersectionObserver | null = null;
 	private readonly pendingPromotions = new Set<string>();
 	private promoteFrame: number | null = null;
+	private isFlushingPromotions = false;
 	/**
 	 * STICKY-011: Bases calls `onDataUpdated()` far more often than the query's actual result
 	 * changes (confirmed via console logging during native testing, 2026-09-22 — repeated calls
@@ -345,6 +356,10 @@ export class BasesStickyNoteView extends BasesView {
 	/** Queues one entry for promotion, coalescing multiple intersections into one batch/relayout. */
 	private schedulePromote(path: string): void {
 		this.pendingPromotions.add(path);
+		this.scheduleFlush();
+	}
+
+	private scheduleFlush(): void {
 		if (this.promoteFrame !== null) return;
 		this.promoteFrame = this.runtime.requestAnimationFrame(() => {
 			this.promoteFrame = null;
@@ -352,45 +367,64 @@ export class BasesStickyNoteView extends BasesView {
 		});
 	}
 
-	/** Builds a real card for every path queued by `placeholderObserver` since the last flush. */
+	/**
+	 * Builds a real card for up to `MAX_PROMOTIONS_PER_FLUSH` queued paths, then — if more are
+	 * still queued, whether left over from this batch or added while it ran — schedules another
+	 * flush for the next frame instead of looping until the whole queue drains in one go.
+	 * `isFlushingPromotions` additionally rules out two flushes running at once: `flushPromotions`
+	 * is async and awaits per card, so a burst of intersections arriving mid-flush would
+	 * otherwise schedule a second, overlapping call.
+	 */
 	private async flushPromotions(): Promise<void> {
-		const paths = [...this.pendingPromotions];
-		this.pendingPromotions.clear();
-		if (paths.length === 0) return;
-
-		const options = readStickyNoteOptions(new ViewConfigReader(this.config));
-		const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? '';
-		const newlyObserved: HTMLElement[] = [];
-
-		for (const path of paths) {
-			const existing = this.cardsByPath.get(path);
-			if (existing?.kind === 'full') continue;
-			const entry = this.otherEntryByPath.get(path);
-			if (!entry) continue; // Stale — a re-render already dropped this entry.
-			existing?.el.remove();
-			const rebuilt = await this.renderCard(entry, options, basePath, this.othersGridEl);
-			this.cardsByPath.set(path, rebuilt);
-			newlyObserved.push(rebuilt.el);
+		if (this.isFlushingPromotions) {
+			this.scheduleFlush();
+			return;
 		}
-		if (newlyObserved.length === 0) return;
+		if (this.pendingPromotions.size === 0) return;
 
-		// Promoted cards were appended to the end of the grid, not inserted in place — a single
-		// reorder pass afterwards keeps DOM order matching the query's own order for masonry,
-		// cheaper than tracking insertion points per card.
-		for (const entry of this.lastOtherEntries) {
-			const card = this.cardsByPath.get(entry.file.path);
-			if (card) this.othersGridEl.appendChild(card.el);
-		}
-		// Contiguous-from-start recount — see the same logic in `render()`.
-		let fullCount = 0;
-		for (const entry of this.lastOtherEntries) {
-			if (this.cardsByPath.get(entry.file.path)?.kind !== 'full') break;
-			fullCount++;
-		}
-		this.othersRenderedCount = fullCount;
+		this.isFlushingPromotions = true;
+		try {
+			const batch = [...this.pendingPromotions].slice(0, MAX_PROMOTIONS_PER_FLUSH);
+			for (const path of batch) this.pendingPromotions.delete(path);
 
-		for (const observed of newlyObserved) this.cardResizeObserver?.observe(observed);
-		this.scheduleRelayout();
+			const options = readStickyNoteOptions(new ViewConfigReader(this.config));
+			const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? '';
+			const newlyObserved: HTMLElement[] = [];
+
+			for (const path of batch) {
+				const existing = this.cardsByPath.get(path);
+				if (existing?.kind === 'full') continue;
+				const entry = this.otherEntryByPath.get(path);
+				if (!entry) continue; // Stale — a re-render already dropped this entry.
+				existing?.el.remove();
+				const rebuilt = await this.renderCard(entry, options, basePath, this.othersGridEl);
+				this.cardsByPath.set(path, rebuilt);
+				newlyObserved.push(rebuilt.el);
+			}
+
+			if (newlyObserved.length > 0) {
+				// Promoted cards were appended to the end of the grid, not inserted in place —
+				// a single reorder pass afterwards keeps DOM order matching the query's own
+				// order for masonry, cheaper than tracking insertion points per card.
+				for (const entry of this.lastOtherEntries) {
+					const card = this.cardsByPath.get(entry.file.path);
+					if (card) this.othersGridEl.appendChild(card.el);
+				}
+				// Contiguous-from-start recount — see the same logic in `render()`.
+				let fullCount = 0;
+				for (const entry of this.lastOtherEntries) {
+					if (this.cardsByPath.get(entry.file.path)?.kind !== 'full') break;
+					fullCount++;
+				}
+				this.othersRenderedCount = fullCount;
+
+				for (const observed of newlyObserved) this.cardResizeObserver?.observe(observed);
+				this.scheduleRelayout();
+			}
+		} finally {
+			this.isFlushingPromotions = false;
+			if (this.pendingPromotions.size > 0) this.scheduleFlush();
+		}
 	}
 
 	private async render(): Promise<void> {
