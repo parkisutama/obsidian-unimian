@@ -1,7 +1,8 @@
 # Implementation plan: Sticky Note
 
-Status: In progress — Phase 0-3 (STICKY-001–007) complete; Phase 4 (hardening, native acceptance)
-not started, plus STICKY-011 (card reposition jank during interaction) logged and unresolved
+Status: In progress — Phase 0-3 (STICKY-001–007) complete, STICKY-011 (card reposition jank,
+root-caused to missing change-detection) fixed 2026-09-23; Phase 4 (STICKY-008/009/010: nested
+embed guard, large-Base check, native acceptance) not started
 Specification: [../../docs/specs/sticky-note.md](../../docs/specs/sticky-note.md)
 Roadmap: [../../ROADMAP.md](../../ROADMAP.md)
 Baseline: branch `main` (see spec's Baseline branch note — `dev` is missing `QuickPreviewModal`)
