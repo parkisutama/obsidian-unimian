@@ -33,12 +33,6 @@ const ACTIVE_CLASS = 'wise-view-quick-preview-active';
 
 export type OpenFull = (path: string, event?: UserEvent | null) => void;
 
-function formatPropertyValue(value: unknown): string {
-	if (Array.isArray(value)) return value.map(formatPropertyValue).join(', ');
-	if (value === null || value === undefined) return '';
-	return String(value);
-}
-
 export class QuickPreviewModal extends Modal {
 	private renderChild: Component | null = null;
 	private detachedLeaf: DetachedLeaf | null = null;
@@ -67,13 +61,6 @@ export class QuickPreviewModal extends Modal {
 		// second, redundant way to leave the popup.
 		const layout = contentEl.createDiv({ cls: 'wise-view-quick-preview-layout' });
 		const bodyEl = layout.createDiv({ cls: 'wise-view-quick-preview-body' });
-
-		// Rendered unconditionally, above either path (leaf or fallback) — maintainer feedback
-		// 2026-09-23: the embedded leaf's own native Properties widget depends on the user's
-		// global "Properties in document" appearance setting (and, being a reparented/detached
-		// leaf — see detachedLeaf.ts — is undocumented territory to begin with), so it isn't a
-		// reliable way to guarantee properties are visible here. This always shows them instead.
-		this.renderProperties(bodyEl, file);
 
 		const backlinks = getBacklinkPaths(this.app, this.path);
 		if (backlinks.length > 0) {
@@ -119,25 +106,6 @@ export class QuickPreviewModal extends Modal {
 		const raw = await this.app.vault.cachedRead(file);
 		const body = raw.replace(FRONTMATTER_BLOCK, '');
 		await MarkdownRenderer.render(this.app, body, bodyEl, file.path, this.renderChild);
-	}
-
-	/**
-	 * Read-only frontmatter table, rendered at the top of the popup regardless of which content
-	 * path follows (embedded leaf or fallback render) — see the `onOpen()` call site for why
-	 * this is no longer conditional on the fallback path only.
-	 */
-	private renderProperties(bodyEl: HTMLElement, file: TFile): void {
-		const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-		if (!frontmatter) return;
-		const keys = Object.keys(frontmatter);
-		if (keys.length === 0) return;
-
-		const table = bodyEl.createEl('table', { cls: 'wise-view-quick-preview-properties' });
-		for (const key of keys) {
-			const row = table.createEl('tr');
-			row.createEl('th', { text: key });
-			row.createEl('td', { text: formatPropertyValue(frontmatter[key]) });
-		}
 	}
 
 	onClose(): void {

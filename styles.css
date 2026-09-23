@@ -315,28 +315,6 @@ body.wise-view-quick-preview-active .hover-popover {
 	white-space: nowrap;
 }
 
-.wise-view-quick-preview-properties {
-	width: 100%;
-	margin-bottom: 16px;
-	border-collapse: collapse;
-	font-size: var(--font-ui-small);
-}
-
-.wise-view-quick-preview-properties th,
-.wise-view-quick-preview-properties td {
-	padding: 4px 8px 4px 0;
-	text-align: left;
-	vertical-align: top;
-	border-bottom: 1px solid var(--background-modifier-border);
-}
-
-.wise-view-quick-preview-properties th {
-	width: 1%;
-	white-space: nowrap;
-	color: var(--text-muted);
-	font-weight: var(--font-medium);
-}
-
 .wise-view-quick-preview-layout {
 	display: flex;
 	gap: 24px;
@@ -352,23 +330,14 @@ body.wise-view-quick-preview-active .hover-popover {
 	overflow-y: auto;
 }
 
-/* A reparented WorkspaceLeaf expects its split's flex layout to size it; give it one directly.
- * Stacked in a column (not the default row) because the properties table now renders above it
- * unconditionally (maintainer request, 2026-09-23) — a row would put them side by side and let
- * the leaf's height:100% overflow past the properties table instead of sitting below it. */
+/* A reparented WorkspaceLeaf expects its split's flex layout to size it; give it one directly. */
 .wise-view-quick-preview-body--leaf {
 	overflow: hidden;
 	display: flex;
-	flex-direction: column;
-}
-
-.wise-view-quick-preview-body--leaf .wise-view-quick-preview-properties {
-	flex: 0 0 auto;
 }
 
 .wise-view-quick-preview-body--leaf .workspace-leaf {
-	flex: 1 1 auto;
-	min-height: 0;
+	height: 100%;
 	width: 100%;
 }
 
