@@ -9,10 +9,12 @@
 
 import { BasesView, Component, MarkdownRenderer, setIcon, type BasesEntry, type BasesPropertyId, type QueryController } from 'obsidian';
 import type WiseViewPlugin from '../../main';
+import { computeRenderSignature, type RenderSignatureInput } from '../../platform/bases/changeDetection';
 import { normalizeValue } from '../../platform/bases/entrySnapshotAdapter';
 import { ViewConfigReader } from '../../platform/bases/ViewConfigReader';
 import { resolveColor } from '../../platform/colors/ColorResolver';
 import { resolveCoverImageSrc } from '../../platform/dom/CoverImageResolver';
+import { RenderScheduler } from '../../platform/dom/RenderScheduler';
 import { ViewRuntime } from '../../platform/dom/ViewRuntime';
 import { activateEntry, openPath } from '../../platform/navigation/NavigationService';
 import { resolvePrettyPropertiesColor } from '../../integrations/PrettyPropertiesAdapter';
@@ -57,6 +59,14 @@ export class BasesStickyNoteView extends BasesView {
 	private relayoutFrame: number | null = null;
 	private safetyNetTimer: number | null = null;
 	private currentCardWidth = 240;
+	/**
+	 * STICKY-011: Bases calls `onDataUpdated()` far more often than the query's actual result
+	 * changes (confirmed via console logging during native testing, 2026-09-22 — repeated calls
+	 * with identical entries/config fired during plain hover/click interaction). Without this,
+	 * every one of those calls tore down and rebuilt every card's DOM from scratch, which read
+	 * as cards visibly "reorganizing" on interaction. Same fix Calendar already uses (PERF-002).
+	 */
+	private readonly renderScheduler = new RenderScheduler();
 
 	constructor(controller: QueryController, private readonly containerEl: HTMLElement, private readonly plugin: WiseViewPlugin) {
 		super(controller);
@@ -77,7 +87,30 @@ export class BasesStickyNoteView extends BasesView {
 	}
 
 	onDataUpdated(): void {
+		const decision = this.renderScheduler.decide(computeRenderSignature(this.buildRenderSignatureInput()));
+		if (decision === 'skip') return;
 		void this.render();
+	}
+
+	/** Only the primitives that affect this view's rendered output (spec docs/specs/sticky-note.md §5.4). */
+	private buildRenderSignatureInput(): RenderSignatureInput {
+		const entries = (this.data?.groupedData ?? []).flatMap((group) =>
+			group.entries.map((entry) => ({ path: entry.file.path, mtime: entry.file.stat?.mtime ?? 0 })));
+		const options = readStickyNoteOptions(new ViewConfigReader(this.config));
+		return {
+			entries,
+			order: [],
+			groupKeys: [],
+			config: {
+				titleProperty: options.titleProperty,
+				coverProperty: options.coverProperty,
+				colorProperty: options.colorProperty,
+				imageFit: options.imageFit,
+				cardWidth: options.cardWidth,
+				cardMaxHeight: options.cardMaxHeight,
+				excerptBudget: options.excerptBudget,
+			},
+		};
 	}
 
 	onunload(): void {

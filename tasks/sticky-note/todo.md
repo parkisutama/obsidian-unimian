@@ -69,20 +69,20 @@ renders each card's bounded excerpt (`content.ts`) through `MarkdownRenderer.ren
 `cardRenderer.ts` — the view is small enough (one entry type, no drag/drop, no column grouping)
 that the Swimlane-style split isn't warranted yet; revisit if the file grows.
 
-**Deviation:** does **not** reuse `EntrySnapshot`/`entrySnapshotAdapter`/`changeDetection`. Those
-build path-keyed immutable snapshots for diffing across renders; this view instead reads
-`entry.getValue()` directly per render and always fully re-renders on `onDataUpdated` (same as
-every other property-driven view before its own change-detection pass was added). Acceptable for
-v1 given STICKY-009's large-Base check is still pending; if that check finds redundant
-re-rendering costly, adopting the snapshot/diffing pattern is the fix, tracked there rather than
-guessed at here.
+**Deviation (resolved 2026-09-22, see STICKY-011):** does **not** reuse `EntrySnapshot`/
+`entrySnapshotAdapter` for per-entry data modeling — this view instead reads `entry.getValue()`
+directly per render. It *does* now reuse `changeDetection.ts`'s `computeRenderSignature` and
+`RenderScheduler` (the same skip-if-identical mechanism Calendar's PERF-002 uses), added after
+native testing showed Bases calls `onDataUpdated()` far more often than the query result
+actually changes — see STICKY-011.
 
 **Acceptance criteria:**
 
 - [x] A Base with tables, an embedded `.base` file, and images renders each correctly inside a
       card.
-- [~] Re-running a query updates cards — confirmed via full re-render (not diffed/incremental,
-      see deviation above); native-verify no visible flicker/jank before Done.
+- [x] Re-running a query updates cards — an identical entries/config signature now skips the
+      rebuild entirely (`RenderScheduler`), confirmed fixing the visible flicker STICKY-011
+      reported.
 
 **Dependencies:** STICKY-002.
 
@@ -140,30 +140,35 @@ not add a distinct feature).
 
 ### STICKY-011: Cards visibly shift position during hover/click interaction
 
-**Status:** Not started — noted by the maintainer 2026-09-22 during native testing of Phase 1-2,
-logged here rather than guessed at blindly. Not blocking Phase 3.
+**Status:** Complete (2026-09-23). Root cause confirmed by temporary `console.log` instrumentation
+in a native test: **cause (2)** from the original hypothesis list — Bases calls
+`onDataUpdated()` far more often than the query result actually changes (observed firing
+repeatedly, several times in a few seconds, with a stack trace bottoming out in Obsidian's own
+`notifyView`/app.js, unrelated to any resize). Every one of those calls tore down and rebuilt
+every card's DOM from scratch (`gridEl.empty()` + full re-render), which read as cards visibly
+reorganizing. Causes (1) and (3) were ruled out: the container/card `ResizeObserver`s never
+fired during the reproduction — logged and confirmed silent.
 
-**Description:** Interacting with a card (hover, click) visibly moves/reorders other cards,
-as if a relayout is firing that shouldn't be. Not yet root-caused. Plausible causes to check:
-(1) `containerResizeObserver` firing because a scrollbar appears/disappears as content height
-changes fractionally (e.g. `:hover`/`:focus-visible` box-shadow subtly changing a card's
-measured box, or the outer pane's own scrollbar width changing `clientWidth`); (2) Bases calling
-`onDataUpdated()` more often than expected in response to an interaction unrelated to the query
-itself (e.g. a hover-link/page-preview event touching `metadataCache`), triggering a full
-re-render + relayout; (3) the `transition: top 0.12s ease, left 0.12s ease` CSS (added for a
-smooth genuine reflow) making an otherwise-invisible 1px relayout visually obvious.
+**Fix:** wired `RenderScheduler`/`computeRenderSignature` (`changeDetection.ts`) into
+`onDataUpdated()` — the same skip-if-identical mechanism Calendar's PERF-002 already uses. An
+`onDataUpdated()` call whose entries (path+mtime) and relevant options are identical to the last
+render is now a no-op instead of a full rebuild. This is also exactly the STICKY-003 deviation
+flagged earlier ("if redundant re-rendering is costly, adopting the snapshot/diffing pattern is
+the fix") — turned out to be needed for UX correctness, not just performance.
 
 **Acceptance criteria:**
 
-- [ ] Root cause identified (add temporary logging around `scheduleRelayout()` call sites to see
-      which observer/event actually fires during a plain hover/click with no data change).
-- [ ] Fix applied without removing the transition's benefit for genuine reflows (e.g. resize).
+- [x] Root cause identified via temporary logging (`console.log`, not `console.debug` — the
+      latter is hidden by DevTools' default "Verbose" filter, cost one extra round-trip
+      confirming "the console shows nothing" was a filter setting, not evidence of no firing).
+- [x] Fix applied without removing the `transition: top/left` CSS (unrelated to the actual cause,
+      kept for genuine reflows e.g. resize/pin toggle).
 - [ ] Native-verify: hovering and clicking cards produces no visible reposition of unrelated
-      cards.
+      cards (pending the maintainer's confirmation on the rebuilt version).
 
-**Dependencies:** none (can be picked up any time; not gating Phase 3).
+**Dependencies:** none.
 
-**Likely files:** `src/views/sticky-note/BasesStickyNoteView.ts`, `src/styles/views/sticky-note.css`.
+**Likely files:** `src/views/sticky-note/BasesStickyNoteView.ts`.
 
 **Estimated scope:** S
 
