@@ -75,6 +75,16 @@ export class BasesGanttView extends BasesView {
 	private notePaths: ReadonlySet<string> = new Set();
 	private readonly echoGate: EchoGate;
 	private activeScale: GanttOptions['scale'] | null = null;
+	/**
+	 * Obsidian's Bases wrapper (the same element as containerEl) never resolves a definite height
+	 * through plain CSS percentages here — its own parent chain ends up auto-sized to content, so
+	 * `height: 100%` just cascades into "auto" and the whole pane grows to fit the chart instead of
+	 * being clipped to the view. That leaves the toolbar and the chart's own sticky timeline header
+	 * nothing to stay fixed against: the pane itself scrolls and carries them off-screen. Mirroring
+	 * the real scrolling ancestor's pixel height here breaks that cycle (same technique as Timeline's
+	 * BasesTimelineView).
+	 */
+	private scrollAncestor: HTMLElement | null = null;
 
 	constructor(
 		controller: QueryController,
@@ -106,6 +116,38 @@ export class BasesGanttView extends BasesView {
 			clearTimeout: id => this.runtime.win.clearTimeout(id),
 			now: () => Date.now(),
 		}, () => this.onDataUpdated());
+	}
+
+	onload(): void {
+		const ResizeObserverCtor = (this.runtime.win as Window & { ResizeObserver?: typeof ResizeObserver }).ResizeObserver;
+		if (!ResizeObserverCtor) return;
+		this.scrollAncestor = this.findScrollAncestor();
+		if (!this.scrollAncestor) return;
+		const syncHeight = (): void => {
+			if (!this.scrollAncestor) return;
+			this.containerEl.style.height = `${this.scrollAncestor.clientHeight}px`;
+		};
+		const heightObserver = new ResizeObserverCtor(syncHeight);
+		heightObserver.observe(this.scrollAncestor);
+		this.runtime.observe(heightObserver);
+		syncHeight();
+	}
+
+	/**
+	 * Walks up from containerEl to find the nearest ancestor Obsidian actually scrolls (identified
+	 * by its own overflow-y, not by measuring current scroll overflow — at initial mount, before our
+	 * content has inflated anything, scrollHeight/clientHeight can still be equal even on the right
+	 * element). Same technique as Timeline's BasesTimelineView.findScrollAncestor().
+	 */
+	private findScrollAncestor(): HTMLElement | null {
+		const view = this.runtime.win;
+		let el = this.containerEl.parentElement;
+		while (el) {
+			const overflowY = view.getComputedStyle(el).overflowY;
+			if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') return el;
+			el = el.parentElement;
+		}
+		return null;
 	}
 
 	onDataUpdated(): void {

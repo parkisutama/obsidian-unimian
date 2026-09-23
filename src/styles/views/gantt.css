@@ -1,12 +1,13 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* Copyright (C) 2026 Parkis Utama */
 
-/* Paired with Obsidian's own .bases-view (applied to this same element) to bind height to the
-   pane instead of the content, and overflow: hidden so the pane never scrolls as a whole — only
-   the library's own .gantt-scroll-container does, which is what keeps the toolbar below and the
-   chart's sticky timeline header fixed while the rows scroll. Without this pairing, height: 100%
-   here has no bounded ancestor to resolve against, so this element grows with its content and the
-   outer pane scrolls instead, taking the toolbar and header with it. */
+/* height: 100% here is only a fallback (no ResizeObserver support). Obsidian's own wrapper around
+   this element never resolves a definite height through plain CSS percentages — its own parent
+   chain ends up auto-sized to content, so height: 100% just cascades into "auto" and the pane
+   grows to fit the chart instead of being clipped to the view. BasesGanttView.onload() mirrors the
+   real scrolling ancestor's pixel height onto this element's inline style instead. Either way,
+   overflow: hidden is what then keeps the toolbar and the chart's sticky timeline header fixed
+   while only the library's own .gantt-scroll-container scrolls. */
 .bases-view.wise-view-gantt {
 	display: flex;
 	flex-direction: column;
