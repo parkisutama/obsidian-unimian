@@ -19,8 +19,20 @@ const WIKILINK_EMBED = /!\[\[([^\]]+)\]\]\n?/g;
 const MARKDOWN_IMAGE = /!\[[^\]]*\]\([^)]*\)\n?/g;
 const IMAGE_EXTENSION = /\.(png|jpe?g|gif|webp|svg|bmp)(\|[^\]]*)?$/i;
 
-/** Extensions whose raw text is never meaningful as a rendered excerpt (spec §5.4.2). */
-export const EMBED_ONLY_EXTENSIONS = new Set(['base', 'canvas']);
+/**
+ * Extensions whose raw file content is actual prose, safe to read via `cachedRead()` and
+ * excerpt. Everything else — `.base`/`.canvas` (spec §5.4.2), and critically any binary format
+ * (`.png`/`.jpg`/`.pdf`/etc.) — must render as a real embed instead: reading an image file's
+ * raw bytes as text and handing them to `MarkdownRenderer` produces garbled binary-as-text
+ * (confirmed in native testing, 2026-09-23 — a Base whose query matched image files showed raw
+ * PNG chunk data as card content). A positive list is deliberately safer here than an
+ * ever-growing negative list of "extensions known to be binary".
+ */
+export const TEXT_EXCERPT_EXTENSIONS = new Set(['md', 'markdown', 'txt']);
+
+export function isTextExcerptExtension(extension: string): boolean {
+	return TEXT_EXCERPT_EXTENSIONS.has(extension.toLowerCase());
+}
 
 export function stripFrontmatter(raw: string): string {
 	return raw.replace(FRONTMATTER_BLOCK, '');

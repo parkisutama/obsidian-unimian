@@ -18,10 +18,10 @@ import { RenderScheduler } from '../../platform/dom/RenderScheduler';
 import { ViewRuntime } from '../../platform/dom/ViewRuntime';
 import { activateEntry, openPath } from '../../platform/navigation/NavigationService';
 import { resolvePrettyPropertiesColor } from '../../integrations/PrettyPropertiesAdapter';
-import { buildCardExcerpt, EMBED_ONLY_EXTENSIONS } from './content';
+import { buildCardExcerpt, isTextExcerptExtension } from './content';
 import { layoutMasonrySection } from './masonry';
 import { findOwningBaseFile } from './ownerBaseFile';
-import { readStickyNoteOptions, type StickyNoteOptions } from './options';
+import { readStickyNoteOptions, STICKY_NOTE_CSS_ONLY_KEYS, type StickyNoteOptions } from './options';
 import { isPinned, togglePin } from './pinStore';
 
 export const BASES_STICKY_NOTE_VIEW_ID = 'wise-view-sticky-note';
@@ -39,6 +39,15 @@ function propertyText(entry: BasesEntry, propertyId: BasesPropertyId | null): st
 	}
 }
 
+interface CardEntry {
+	el: HTMLElement;
+	mtime: number;
+	pinned: boolean;
+	/** Owns whatever `MarkdownRenderer.render()` registered for this one card — unloaded only
+	 * when this specific card is replaced or removed, never the whole view's cards at once. */
+	component: Component;
+}
+
 export class BasesStickyNoteView extends BasesView {
 	type = BASES_STICKY_NOTE_VIEW_ID;
 	private readonly runtime: ViewRuntime;
@@ -46,7 +55,16 @@ export class BasesStickyNoteView extends BasesView {
 	private readonly pinnedGridEl: HTMLElement;
 	private readonly othersHeadingEl: HTMLElement;
 	private readonly othersGridEl: HTMLElement;
-	private renderChild: Component | null = null;
+	/**
+	 * STICKY-009: keyed by entry path, so `render()` can reuse a card whose content hasn't
+	 * changed (same mtime) instead of tearing down and rebuilding every card on every
+	 * `onDataUpdated()` — confirmed necessary at real scale (515-note Base, maintainer report
+	 * 2026-09-23: a single file's mtime bump, e.g. from a linter autofix on save, was rebuilding
+	 * all 515 cards for one changed note).
+	 */
+	private readonly cardsByPath = new Map<string, CardEntry>();
+	/** Forces a full rebuild of every cached card when a content-affecting option changes. */
+	private lastOptionsKey: string | null = null;
 	private containerResizeObserver: ResizeObserver | null = null;
 	/**
 	 * Watches every card's own box size, not just the container — image `load` alone misses
@@ -116,8 +134,8 @@ export class BasesStickyNoteView extends BasesView {
 	onunload(): void {
 		if (this.relayoutFrame !== null) this.runtime.win.cancelAnimationFrame(this.relayoutFrame);
 		if (this.safetyNetTimer !== null) this.runtime.win.clearTimeout(this.safetyNetTimer);
-		this.renderChild?.unload();
-		this.renderChild = null;
+		for (const { component } of this.cardsByPath.values()) component.unload();
+		this.cardsByPath.clear();
 		this.runtime.dispose();
 	}
 
@@ -144,10 +162,12 @@ export class BasesStickyNoteView extends BasesView {
 		return resolved.source === 'fallback' ? undefined : resolved.background;
 	}
 
-	private async renderCard(entry: BasesEntry, options: StickyNoteOptions, basePath: string, child: Component, parent: HTMLElement): Promise<HTMLElement> {
+	private async renderCard(entry: BasesEntry, options: StickyNoteOptions, basePath: string, parent: HTMLElement): Promise<CardEntry> {
 		const file = entry.file;
 		const title = propertyText(entry, options.titleProperty) ?? file.basename;
 		const pinned = isPinned(this.plugin.settings.stickyNote, basePath, file.path);
+		const child = new Component();
+		child.load();
 
 		const card = parent.createDiv({ cls: `wise-view-sticky-note-card wise-view-sticky-note-fit-${options.imageFit}` });
 		const color = this.resolveCardColor(options, entry);
@@ -194,17 +214,20 @@ export class BasesStickyNoteView extends BasesView {
 		card.createEl('h4', { text: title, cls: 'wise-view-sticky-note-title' });
 		const body = card.createDiv({ cls: 'wise-view-sticky-note-body' });
 		try {
-			if (EMBED_ONLY_EXTENSIONS.has(file.extension)) {
-				if (file.path === basePath) {
+			if (!isTextExcerptExtension(file.extension)) {
+				if (file.extension === 'base' && file.path === basePath) {
 					// STICKY-008: a Base's own query can list the Base file itself as an entry
 					// (seen in native testing). Embedding it here would recurse into this same
 					// Sticky Note view rendering its own entries again — a real infinite-loop
 					// risk, not a hypothetical. Placeholder instead of an embed for this one
-					// case; other `.base`/`.canvas` entries still embed normally.
+					// case; every other non-text entry (other `.base`/`.canvas` files, images,
+					// PDFs, ...) still embeds normally.
 					body.createDiv({ text: 'This Base — open to view.', cls: 'wise-view-sticky-note-embed-placeholder' });
 				} else {
-					// spec §5.4.2: a `.base`/`.canvas` entry's raw text is never meaningful as
-					// prose — render it as a real embed instead of dumping YAML/JSON.
+					// A binary file's raw bytes are never meaningful as prose (spec §5.4.2 for
+					// `.base`/`.canvas`, generalized 2026-09-23 after native testing showed an
+					// image entry's raw PNG bytes rendered as garbled text) — embed instead of
+					// reading it as text.
 					await MarkdownRenderer.render(this.plugin.app, `![[${file.path}]]`, body, file.path, child);
 				}
 			} else {
@@ -216,7 +239,7 @@ export class BasesStickyNoteView extends BasesView {
 			body.createDiv({ text: 'Could not render preview.', cls: 'wise-view-sticky-note-error' });
 		}
 
-		return card;
+		return { el: card, mtime: file.stat?.mtime ?? 0, pinned, component: child };
 	}
 
 	private async render(): Promise<void> {
@@ -225,23 +248,38 @@ export class BasesStickyNoteView extends BasesView {
 		this.currentCardWidth = options.cardWidth;
 		const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? '';
 
-		this.renderChild?.unload();
-		const child = new Component();
-		child.load();
-		this.renderChild = child;
-
-		this.cardResizeObserver?.disconnect();
 		if (this.safetyNetTimer !== null) this.runtime.win.clearTimeout(this.safetyNetTimer);
-		this.pinnedGridEl.empty();
-		this.othersGridEl.empty();
 		for (const gridEl of [this.pinnedGridEl, this.othersGridEl]) {
 			gridEl.style.setProperty('--wise-view-sticky-note-max-height', `${options.cardMaxHeight}px`);
+		}
+
+		// Only content-affecting options invalidate cached cards — cardWidth/cardMaxHeight/
+		// imageFit (STICKY_NOTE_CSS_ONLY_KEYS) are excluded so dragging the "Card width" slider
+		// (Bases calls onDataUpdated() on every tick while dragging) doesn't rebuild every
+		// card's markdown content, only reflows via masonry. The per-path mtime check below
+		// can't catch a content-option change on its own, since the file itself didn't change.
+		const contentOptions = Object.fromEntries(
+			Object.entries(options).filter(([key]) => !(STICKY_NOTE_CSS_ONLY_KEYS as readonly string[]).includes(key)));
+		const optionsKey = JSON.stringify(contentOptions);
+		if (optionsKey !== this.lastOptionsKey) {
+			this.lastOptionsKey = optionsKey;
+			for (const { el, component } of this.cardsByPath.values()) {
+				component.unload();
+				el.remove();
+			}
+			this.cardsByPath.clear();
 		}
 
 		const entries = (this.data?.groupedData ?? []).flatMap((group) => group.entries);
 		if (entries.length === 0) {
 			this.pinnedHeadingEl.hide();
 			this.othersHeadingEl.hide();
+			for (const { el, component } of this.cardsByPath.values()) {
+				component.unload();
+				el.remove();
+			}
+			this.cardsByPath.clear();
+			this.cardResizeObserver?.disconnect();
 			this.othersGridEl.createDiv({ text: 'No entries match this Base.', cls: 'wise-view-sticky-note-empty' });
 			return;
 		}
@@ -252,17 +290,56 @@ export class BasesStickyNoteView extends BasesView {
 		this.pinnedHeadingEl.toggle(pinnedEntries.length > 0);
 		this.othersHeadingEl.toggle(pinnedEntries.length > 0);
 
-		// Cards are built one at a time (each `await MarkdownRenderer.render()` yields to the
-		// event loop), so observing each card's ResizeObserver as soon as it's created would let
-		// the observer's initial fire — and the relayout it schedules — happen mid-batch,
-		// against a still-growing card set. That produced a visible "cards keep shifting as more
-		// appear" effect during the initial render of a larger Base (maintainer report,
-		// 2026-09-23). Observing every card only after the whole batch is built means the
-		// initial-fire storm is one coalesced relayout, not several partial ones.
-		const cards: HTMLElement[] = [];
-		for (const entry of pinnedEntries) cards.push(await this.renderCard(entry, options, basePath, child, this.pinnedGridEl));
-		for (const entry of otherEntries) cards.push(await this.renderCard(entry, options, basePath, child, this.othersGridEl));
-		for (const card of cards) this.cardResizeObserver?.observe(card);
+		// STICKY-009: reuse a card whose content hasn't changed instead of tearing every card
+		// down and rebuilding it on every onDataUpdated() — see the `cardsByPath` field comment.
+		// Cards are still built one at a time for genuinely new/changed entries (each
+		// `await MarkdownRenderer.render()` yields to the event loop), so their
+		// ResizeObserver.observe() is deferred to a final batch pass, same reasoning as before:
+		// observing each one as soon as it's built would let the observer's initial fire (and
+		// the relayout it schedules) run mid-batch, against a still-growing/still-reordering set.
+		const seenPaths = new Set<string>();
+		const newlyObserved: HTMLElement[] = [];
+
+		for (const [gridEl, list] of [[this.pinnedGridEl, pinnedEntries], [this.othersGridEl, otherEntries]] as const) {
+			for (const entry of list) {
+				const path = entry.file.path;
+				seenPaths.add(path);
+				const mtime = entry.file.stat?.mtime ?? 0;
+				const pinned = gridEl === this.pinnedGridEl;
+				const existing = this.cardsByPath.get(path);
+
+				if (existing && existing.mtime === mtime) {
+					if (existing.pinned !== pinned) {
+						const pinBtn = existing.el.querySelector('.wise-view-sticky-note-pin-btn');
+						pinBtn?.classList.toggle('is-pinned', pinned);
+						pinBtn?.setAttribute('aria-label', pinned ? 'Unpin note' : 'Pin note');
+						existing.pinned = pinned;
+					}
+					// `imageFit` is excluded from the content-invalidation key above (CSS-only),
+					// but still needs syncing on a reused card — cheap class toggle, not a rebuild.
+					existing.el.className = `wise-view-sticky-note-card wise-view-sticky-note-fit-${options.imageFit}`;
+					gridEl.appendChild(existing.el); // Cheap even if already the right parent — keeps DOM order matching the query's order for masonry.
+					continue;
+				}
+
+				if (existing) {
+					existing.component.unload();
+					existing.el.remove();
+				}
+				const rebuilt = await this.renderCard(entry, options, basePath, gridEl);
+				this.cardsByPath.set(path, rebuilt);
+				newlyObserved.push(rebuilt.el);
+			}
+		}
+
+		for (const [path, { el, component }] of this.cardsByPath) {
+			if (seenPaths.has(path)) continue;
+			component.unload();
+			el.remove();
+			this.cardsByPath.delete(path);
+		}
+
+		for (const el of newlyObserved) this.cardResizeObserver?.observe(el);
 
 		this.scheduleRelayout();
 		// Safety net for height changes neither the card ResizeObserver nor an image `load`

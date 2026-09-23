@@ -178,15 +178,16 @@ either project):
    limit. CSS `max-height`/`overflow: hidden` remains as a defensive backstop (a single unbroken
    long line, or Markdown that expands unpredictably — e.g. a large table — could still overflow
    the character budget's visual height), not the primary truncation mechanism.
-2. **`.base`/`.canvas` entries are never raw-dumped.** Detect the entry's extension before
-   reading it as prose: a `.base` file renders as a real embed (`MarkdownRenderer` already
-   resolves `![[Path.base]]` embed syntax against Obsidian's own Bases-embed support — feed it an
-   embed reference, not the file's raw YAML text) or a clearly-labeled "Base file — open to view"
-   placeholder if embedding proves impractical inside a card's bounded height; a `.canvas` file
-   gets the equivalent placeholder (canvases have no meaningful bounded-height inline preview).
-   Exact embed-vs-placeholder choice is an implementation-time call for STICKY-003/STICKY-008,
-   not fixed here — either is acceptable as long as raw YAML/JSON is never shown as if it were
-   prose.
+2. **Only text-file extensions are read as prose; everything else embeds.** `content.ts`'s
+   `TEXT_EXCERPT_EXTENSIONS` (`md`/`markdown`/`txt`) is a positive list, not a negative one —
+   revised 2026-09-23 after native testing at 515 entries found an image (`.png`) entry's raw
+   bytes rendered as garbled binary-as-text (a negative list of "known binary extensions" would
+   have needed to enumerate every image/PDF/etc. format; a positive list of "known text formats"
+   is the safer default). `.base`/`.canvas` and any binary format render as a real embed
+   (`![[path]]` — `MarkdownRenderer` already resolves this against Obsidian's own embed support)
+   except the one case guarded by STICKY-008 (a `.base` entry that is the view's own owning Base
+   file, to avoid self-embed recursion), which gets a "Base file — open to view" placeholder
+   instead.
 3. **Title de-duplication.** If the note body's first block is a level-1 heading whose text
    matches the card's title (from the configured title property, or the filename), that heading
    is skipped when rendering the excerpt — the card's own title element already shows it once.

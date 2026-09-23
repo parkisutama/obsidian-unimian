@@ -251,36 +251,47 @@ rather than silently assumed solved; revisit if native testing (STICKY-010) surf
 
 ### STICKY-009: Large-Base masonry reflow check
 
-**Status:** In progress. Maintainer reported the view "feels heavy, glitchy" with visible
-movement during initial load — two real causes found and fixed 2026-09-23, virtualization
-decision still open.
+**Status:** In progress. Maintainer tested against a real 515-note Base and reported: heavy/
+glitchy feel, delay on first open and on opening Quick Preview, visible movement during initial
+load, jank during editing (specifically when a linter plugin's autofix touches a file), and one
+entry rendering as garbled binary text. Four real causes found and fixed 2026-09-22–23;
+virtualization decision still open.
 
 **Fixes landed:**
-1. **Layout thrashing in `masonry.ts`.** `layoutMasonrySection` wrote a card's `top`/`left`/
-   `width` then immediately read the *next* card's height in the same loop iteration — a
-   write-then-read-then-write pattern that forces a synchronous browser reflow on every single
-   card, not once per relayout. Restructured into three passes: write every card's width, read
-   every card's height once (a single reflow), compute the column assignment in pure JS, then
-   write every card's position. `getColumnCount` unit-tested
-   (`tests/sticky-note-masonry.test.ts`); the full batched layout isn't (this project's Vitest
-   config has no DOM environment — see the test file's own scope note).
-2. **Premature `ResizeObserver.observe()` during the initial render batch**, in
-   `BasesStickyNoteView.render()`. Cards are built one at a time (`await MarkdownRenderer.render()`
-   yields to the event loop per card); observing each card as soon as it existed let the
-   observer's guaranteed initial fire — and the relayout it schedules — run mid-batch, against a
-   still-growing card set, producing exactly the "cards keep shifting as more appear during
-   initial load" the maintainer described. Now every card is built first, then all are observed
-   in one pass, so the initial-fire storm coalesces into one relayout instead of several partial
-   ones.
+1. **Layout thrashing in `masonry.ts`** — write-then-read-then-write per card forced a
+   synchronous reflow on every single card. Restructured into three passes (write all widths,
+   read all heights once, compute placement in pure JS, write all positions).
+2. **Premature `ResizeObserver.observe()` during the initial render batch** — observing each
+   card as soon as it existed let the observer's initial fire (and the relayout it schedules)
+   run mid-batch against a still-growing set. Now every card is observed in one pass after the
+   whole batch is built.
+3. **No incremental re-render** (the STICKY-003 deviation flagged early on, now confirmed to
+   matter at real scale). At 515 notes, a *single* file's mtime bump — e.g. a linter plugin
+   reformatting a file on save — was rebuilding all 515 cards from scratch, which is exactly the
+   "jank while editing" the maintainer reported. `BasesStickyNoteView` now keeps a
+   `cardsByPath: Map<path, CardEntry>` and only rebuilds a card whose `mtime` actually changed;
+   everything else is reused (just re-parented to the correct grid/pin-button state if its
+   pinned status flipped). A content-affecting option change (title/cover/color property,
+   excerpt budget) still forces a full rebuild via a separate `lastOptionsKey` check — a
+   CSS-only option change (card width, max height, image fit) does not, so dragging a slider
+   doesn't re-render 515 notes' markdown on every tick.
+4. **A `.png`/binary entry rendered as garbled text** — `content.ts` previously special-cased
+   only `.base`/`.canvas` as "never read as prose"; every other extension, including images,
+   went through `cachedRead()` + excerpt + `MarkdownRenderer`, so an image file's raw bytes were
+   rendered as if they were Markdown (screenshot: literal `PNG`/`IHDR`/chunk data as card text).
+   Flipped to a positive list (`TEXT_EXCERPT_EXTENSIONS = md/markdown/txt`) — everything else now
+   embeds via `![[path]]` instead of being read as text. The `.base` self-embed guard (STICKY-008)
+   is now scoped specifically to `file.extension === 'base'`, since it doesn't apply to images/PDFs.
 
-**Still open:** whether these two fixes are enough at genuinely large counts (200+), or whether
-virtualization (spec §7's flagged gap — `linearVirtualRange.ts` doesn't fit a wrapping masonry
-grid directly) is still needed. Decision deferred to the maintainer's own 50+/200+-entry retest
-on the rebuilt version, not guessed at here.
+**Still open:** whether these fixes are enough at 515+ entries for the *first* open (all-new
+cards still render sequentially the first time there's nothing to reuse yet) and for Quick
+Preview's own delay (shared component, not investigated here). Virtualization (spec §7's flagged
+gap) remains undecided — deferred to the maintainer's retest on the rebuilt version.
 
 **Dependencies:** STICKY-005.
 
-**Estimated scope:** S
+**Estimated scope:** M (grew from S — the incremental-render change was a real architecture
+addition, not a small tweak)
 
 ### STICKY-010: Native acceptance
 
