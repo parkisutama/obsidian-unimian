@@ -40,8 +40,8 @@ body.wise-view-quick-preview-active .hover-popover {
    leaf (detachedLeaf.ts) is always "active" — confirmed via DevTools inspection, 2026-09-22. */
 .wise-view-quick-preview .view-header {
 	background-color: var(--background-primary) !important;
-	border-bottom: none;
-	box-shadow: none;
+	border-bottom: none !important;
+	box-shadow: none !important;
 }
 
 .wise-view-quick-preview-title {
