@@ -283,10 +283,27 @@ virtualization decision still open.
    embeds via `![[path]]` instead of being read as text. The `.base` self-embed guard (STICKY-008)
    is now scoped specifically to `file.extension === 'base'`, since it doesn't apply to images/PDFs.
 
-**Still open:** whether these fixes are enough at 515+ entries for the *first* open (all-new
-cards still render sequentially the first time there's nothing to reuse yet) and for Quick
-Preview's own delay (shared component, not investigated here). Virtualization (spec §7's flagged
-gap) remains undecided — deferred to the maintainer's retest on the rebuilt version.
+**Retest findings (2026-09-23, real 515-note Base) and fixes:**
+- Quick Preview now "feels natural, faster than before" — confirms its earlier reported delay
+  was downstream contention from the Sticky Note view's own render cost, not a separate bug in
+  Quick Preview itself. Nothing further changed there.
+- **FOUC:** for 1-2 seconds on open, cards showed as a raw, unstyled stacked list before
+  "becoming" the masonry grid — expected given cards render in normal document flow until their
+  first `position: absolute` placement lands, and building the first batch of 515 takes a
+  visible moment. Fixed by hiding each grid (`opacity: 0`) until its first relayout completes,
+  then fading in once (`.is-ready` class, added permanently after the first successful layout —
+  not re-hidden on later updates).
+- **A `.canvas` entry showed no useful preview in the card**, only once opened in Quick Preview.
+  Spec §5.4.2 already called for a placeholder here ("canvases have no meaningful bounded-height
+  inline preview") but it was never implemented — only the `.base` self-reference case got one.
+  Added the same placeholder treatment for every `.canvas` entry.
+- **Cards visibly reposition when Quick Preview closes at the same time as a linter autofix** —
+  maintainer confirmed this is expected/acceptable (comparable to Google Keep recalculating
+  positions when content genuinely changes), not something to suppress.
+- **Typing inside Quick Preview feels less responsive, with background cards moving** — noted,
+  not yet root-caused or fixed. Plausible cause: periodic autosave during typing bumps the
+  active file's mtime repeatedly, each bump doing a full masonry relayout (515 cards) that
+  competes with keystroke handling on the main thread. Deferred — no fix landed for this one.
 
 **Dependencies:** STICKY-005.
 

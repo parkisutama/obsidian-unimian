@@ -77,6 +77,7 @@ export class BasesStickyNoteView extends BasesView {
 	private relayoutFrame: number | null = null;
 	private safetyNetTimer: number | null = null;
 	private currentCardWidth = 240;
+	private hasCompletedFirstLayout = false;
 	/**
 	 * STICKY-011: Bases calls `onDataUpdated()` far more often than the query's actual result
 	 * changes (confirmed via console logging during native testing, 2026-09-22 — repeated calls
@@ -145,6 +146,17 @@ export class BasesStickyNoteView extends BasesView {
 			this.relayoutFrame = null;
 			layoutMasonrySection(this.pinnedGridEl, this.currentCardWidth);
 			layoutMasonrySection(this.othersGridEl, this.currentCardWidth);
+			// Cards render in normal document flow (stacked, unstyled) until their first
+			// `position: absolute` placement lands — at a real Base size (515 entries,
+			// maintainer report 2026-09-23) building that first batch takes long enough for the
+			// unstyled stack to be visibly seen for a second or two before "becoming" the
+			// masonry grid. Hidden via CSS opacity until the first layout completes, once, then
+			// left visible for every later relayout — not re-hidden on every update.
+			if (!this.hasCompletedFirstLayout) {
+				this.hasCompletedFirstLayout = true;
+				this.pinnedGridEl.addClass('is-ready');
+				this.othersGridEl.addClass('is-ready');
+			}
 		});
 	}
 
@@ -215,13 +227,19 @@ export class BasesStickyNoteView extends BasesView {
 		const body = card.createDiv({ cls: 'wise-view-sticky-note-body' });
 		try {
 			if (!isTextExcerptExtension(file.extension)) {
-				if (file.extension === 'base' && file.path === basePath) {
+				if (file.extension === 'canvas') {
+					// spec §5.4.2: a canvas has no meaningful bounded-height inline preview —
+					// embedding it via MarkdownRenderer renders nothing useful inside a small
+					// card (native testing, 2026-09-23; the real preview only appeared once
+					// opened in Quick Preview's own live leaf).
+					body.createDiv({ text: 'Canvas — open to view.', cls: 'wise-view-sticky-note-embed-placeholder' });
+				} else if (file.extension === 'base' && file.path === basePath) {
 					// STICKY-008: a Base's own query can list the Base file itself as an entry
 					// (seen in native testing). Embedding it here would recurse into this same
 					// Sticky Note view rendering its own entries again — a real infinite-loop
 					// risk, not a hypothetical. Placeholder instead of an embed for this one
-					// case; every other non-text entry (other `.base`/`.canvas` files, images,
-					// PDFs, ...) still embeds normally.
+					// case; every other non-text entry (other `.base` files, images, PDFs, ...)
+					// still embeds normally.
 					body.createDiv({ text: 'This Base — open to view.', cls: 'wise-view-sticky-note-embed-placeholder' });
 				} else {
 					// A binary file's raw bytes are never meaningful as prose (spec §5.4.2 for
@@ -280,6 +298,7 @@ export class BasesStickyNoteView extends BasesView {
 			}
 			this.cardsByPath.clear();
 			this.cardResizeObserver?.disconnect();
+			this.othersGridEl.addClass('is-ready'); // No relayout will run to add this — the empty state has no cards to hide behind a fade-in.
 			this.othersGridEl.createDiv({ text: 'No entries match this Base.', cls: 'wise-view-sticky-note-empty' });
 			return;
 		}
