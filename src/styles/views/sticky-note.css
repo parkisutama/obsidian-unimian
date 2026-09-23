@@ -71,13 +71,38 @@
 }
 
 /* STICKY-009: a lightweight stand-in for an entry outside the initial render window, promoted
- * to a real card once the user scrolls near it — no content, no interaction, no fade overlay. */
+ * to a real card once the user scrolls near it — no content, no interaction, no fade overlay.
+ * A fast scroll can queue far more placeholders for promotion at once than the sequential
+ * render loop gets through immediately (each one reads a file and runs MarkdownRenderer), so a
+ * still-blank placeholder can be genuinely on-screen for a moment — a subtle shimmer marks that
+ * as "loading", not "stuck" (maintainer report, 2026-09-23: a fast scroll up-and-down left a
+ * visible block of blank cards with no indication they were still on their way). */
 .wise-view-sticky-note-card-placeholder {
 	cursor: default;
+	background: linear-gradient(
+		100deg,
+		var(--background-secondary) 40%,
+		var(--background-modifier-border) 50%,
+		var(--background-secondary) 60%
+	);
+	background-size: 200% 100%;
+	animation: wise-view-sticky-note-shimmer 1.4s ease-in-out infinite;
 }
 
 .wise-view-sticky-note-card-placeholder:hover {
 	box-shadow: none;
+}
+
+@keyframes wise-view-sticky-note-shimmer {
+	from { background-position: 150% 0; }
+	to { background-position: -50% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wise-view-sticky-note-card-placeholder {
+		animation: none;
+		background: var(--background-secondary);
+	}
 }
 
 .wise-view-sticky-note-card-placeholder::after {
