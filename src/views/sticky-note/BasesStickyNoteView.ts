@@ -56,7 +56,8 @@ interface CardEntry {
  * "roughly enough cards to cover a couple of screens" is the goal, not a precise virtual-list. */
 const RENDER_WINDOW_SCREENS = 2;
 const MIN_INITIAL_RENDER = 20;
-const SCROLL_PROMOTE_MARGIN_PX = 600;
+/** How far ahead of the viewport a placeholder starts promoting, in either scroll direction. */
+const PLACEHOLDER_ROOT_MARGIN_PX = 1000;
 
 export class BasesStickyNoteView extends BasesView {
 	type = BASES_STICKY_NOTE_VIEW_ID;
@@ -97,8 +98,25 @@ export class BasesStickyNoteView extends BasesView {
 	 */
 	private lastOtherEntries: readonly BasesEntry[] = [];
 	private othersRenderedCount = 0;
-	private isPromoting = false;
-	private scrollCheckFrame: number | null = null;
+	/**
+	 * Path → entry, rebuilt each render — lets the `IntersectionObserver` callback (which only
+	 * knows a placeholder's DOM element and its `data-sticky-path`) find the `BasesEntry` to
+	 * actually render.
+	 */
+	private otherEntryByPath = new Map<string, BasesEntry>();
+	/**
+	 * Promotes a placeholder the moment it comes within `PLACEHOLDER_ROOT_MARGIN_PX` of the
+	 * viewport — not a `scroll`-event distance check. A first attempt measured distance to the
+	 * bottom of the *whole* page (which includes every not-yet-promoted placeholder's estimated
+	 * height), so it only ever fired once the user neared the very end of all 515 entries; a
+	 * fast scroll straight past the initial window's real cards landed on bare placeholders with
+	 * nothing promoting them (maintainer report, 2026-09-23 — "lazy load nya too lazy saat di
+	 * scroll cepat"). `IntersectionObserver` tracks actual element geometry regardless of how
+	 * the viewport got there, so a fast scroll/jump is caught correctly, not just a slow one.
+	 */
+	private placeholderObserver: IntersectionObserver | null = null;
+	private readonly pendingPromotions = new Set<string>();
+	private promoteFrame: number | null = null;
 	/**
 	 * STICKY-011: Bases calls `onDataUpdated()` far more often than the query's actual result
 	 * changes (confirmed via console logging during native testing, 2026-09-22 — repeated calls
@@ -124,8 +142,17 @@ export class BasesStickyNoteView extends BasesView {
 		this.runtime.observe(this.containerResizeObserver);
 		this.cardResizeObserver = new ResizeObserver(() => this.scheduleRelayout());
 		this.runtime.observe(this.cardResizeObserver);
-		// STICKY-009: promotes placeholders into full cards as the user scrolls near them.
-		this.runtime.addEventListener(this.containerEl, 'scroll', () => this.scheduleScrollCheck());
+		// STICKY-009: promotes a placeholder to a full card once it comes within
+		// PLACEHOLDER_ROOT_MARGIN_PX of the viewport, regardless of scroll speed/distance.
+		this.placeholderObserver = new IntersectionObserver((entries) => {
+			for (const entry of entries) {
+				if (!entry.isIntersecting) continue;
+				const path = (entry.target as HTMLElement).dataset.stickyPath;
+				if (path) this.schedulePromote(path);
+				this.placeholderObserver?.unobserve(entry.target);
+			}
+		}, { root: this.containerEl, rootMargin: `${PLACEHOLDER_ROOT_MARGIN_PX}px 0px` });
+		this.runtime.observe(this.placeholderObserver);
 	}
 
 	onDataUpdated(): void {
@@ -157,7 +184,7 @@ export class BasesStickyNoteView extends BasesView {
 
 	onunload(): void {
 		if (this.relayoutFrame !== null) this.runtime.win.cancelAnimationFrame(this.relayoutFrame);
-		if (this.scrollCheckFrame !== null) this.runtime.win.cancelAnimationFrame(this.scrollCheckFrame);
+		if (this.promoteFrame !== null) this.runtime.win.cancelAnimationFrame(this.promoteFrame);
 		if (this.safetyNetTimer !== null) this.runtime.win.clearTimeout(this.safetyNetTimer);
 		for (const { component } of this.cardsByPath.values()) component?.unload();
 		this.cardsByPath.clear();
@@ -284,10 +311,16 @@ export class BasesStickyNoteView extends BasesView {
 		return { el: card, mtime: file.stat?.mtime ?? 0, pinned, component: child, kind: 'full' };
 	}
 
-	/** Cheap fixed-height stand-in for an entry outside the initial render window (STICKY-009). */
+	/**
+	 * Cheap fixed-height stand-in for an entry outside the initial render window (STICKY-009).
+	 * `data-sticky-path` is how the `IntersectionObserver` callback identifies which entry to
+	 * promote once this element nears the viewport — see `placeholderObserver`.
+	 */
 	private createPlaceholder(entry: BasesEntry, parent: HTMLElement, estimatedHeight: number): CardEntry {
 		const el = parent.createDiv({ cls: 'wise-view-sticky-note-card wise-view-sticky-note-card-placeholder' });
 		el.style.height = `${estimatedHeight}px`;
+		el.dataset.stickyPath = entry.file.path;
+		this.placeholderObserver?.observe(el);
 		return { el, mtime: entry.file.stat?.mtime ?? 0, pinned: false, component: null, kind: 'placeholder' };
 	}
 
@@ -309,54 +342,55 @@ export class BasesStickyNoteView extends BasesView {
 		return Math.max(MIN_INITIAL_RENDER, columns * rows);
 	}
 
-	private scheduleScrollCheck(): void {
-		if (this.scrollCheckFrame !== null) return;
-		this.scrollCheckFrame = this.runtime.requestAnimationFrame(() => {
-			this.scrollCheckFrame = null;
-			void this.promoteNextBatch();
+	/** Queues one entry for promotion, coalescing multiple intersections into one batch/relayout. */
+	private schedulePromote(path: string): void {
+		this.pendingPromotions.add(path);
+		if (this.promoteFrame !== null) return;
+		this.promoteFrame = this.runtime.requestAnimationFrame(() => {
+			this.promoteFrame = null;
+			void this.flushPromotions();
 		});
 	}
 
-	/** Promotes the next batch of placeholders to full cards once scrolling gets near them. */
-	private async promoteNextBatch(): Promise<void> {
-		if (this.isPromoting) return;
-		const el = this.containerEl;
-		const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
-		if (remaining > SCROLL_PROMOTE_MARGIN_PX) return;
-		if (this.othersRenderedCount >= this.lastOtherEntries.length) return;
+	/** Builds a real card for every path queued by `placeholderObserver` since the last flush. */
+	private async flushPromotions(): Promise<void> {
+		const paths = [...this.pendingPromotions];
+		this.pendingPromotions.clear();
+		if (paths.length === 0) return;
 
-		this.isPromoting = true;
-		try {
-			const options = readStickyNoteOptions(new ViewConfigReader(this.config));
-			const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? '';
-			const batchSize = this.computeWindowCount(options.cardMaxHeight);
-			const slice = this.lastOtherEntries.slice(this.othersRenderedCount, this.othersRenderedCount + batchSize);
+		const options = readStickyNoteOptions(new ViewConfigReader(this.config));
+		const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? '';
+		const newlyObserved: HTMLElement[] = [];
 
-			const newlyObserved: HTMLElement[] = [];
-			for (const entry of slice) {
-				const path = entry.file.path;
-				const existing = this.cardsByPath.get(path);
-				if (existing?.kind === 'full') continue;
-				existing?.el.remove();
-				const rebuilt = await this.renderCard(entry, options, basePath, this.othersGridEl);
-				this.cardsByPath.set(path, rebuilt);
-				newlyObserved.push(rebuilt.el);
-			}
-			this.othersRenderedCount += slice.length;
-
-			// Promoted cards were appended to the end of the grid, not inserted in place — a
-			// single reorder pass afterwards keeps DOM order matching the query's own order for
-			// masonry, cheaper than tracking insertion points per card.
-			for (const entry of this.lastOtherEntries) {
-				const card = this.cardsByPath.get(entry.file.path);
-				if (card) this.othersGridEl.appendChild(card.el);
-			}
-
-			for (const observed of newlyObserved) this.cardResizeObserver?.observe(observed);
-			this.scheduleRelayout();
-		} finally {
-			this.isPromoting = false;
+		for (const path of paths) {
+			const existing = this.cardsByPath.get(path);
+			if (existing?.kind === 'full') continue;
+			const entry = this.otherEntryByPath.get(path);
+			if (!entry) continue; // Stale — a re-render already dropped this entry.
+			existing?.el.remove();
+			const rebuilt = await this.renderCard(entry, options, basePath, this.othersGridEl);
+			this.cardsByPath.set(path, rebuilt);
+			newlyObserved.push(rebuilt.el);
 		}
+		if (newlyObserved.length === 0) return;
+
+		// Promoted cards were appended to the end of the grid, not inserted in place — a single
+		// reorder pass afterwards keeps DOM order matching the query's own order for masonry,
+		// cheaper than tracking insertion points per card.
+		for (const entry of this.lastOtherEntries) {
+			const card = this.cardsByPath.get(entry.file.path);
+			if (card) this.othersGridEl.appendChild(card.el);
+		}
+		// Contiguous-from-start recount — see the same logic in `render()`.
+		let fullCount = 0;
+		for (const entry of this.lastOtherEntries) {
+			if (this.cardsByPath.get(entry.file.path)?.kind !== 'full') break;
+			fullCount++;
+		}
+		this.othersRenderedCount = fullCount;
+
+		for (const observed of newlyObserved) this.cardResizeObserver?.observe(observed);
+		this.scheduleRelayout();
 	}
 
 	private async render(): Promise<void> {
@@ -399,6 +433,7 @@ export class BasesStickyNoteView extends BasesView {
 			this.cardsByPath.clear();
 			this.othersRenderedCount = 0;
 			this.lastOtherEntries = [];
+			this.otherEntryByPath.clear();
 			this.cardResizeObserver?.disconnect();
 			this.othersGridEl.addClass('is-ready'); // No relayout will run to add this — the empty state has no cards to hide behind a fade-in.
 			this.othersGridEl.createDiv({ text: 'No entries match this Base.', cls: 'wise-view-sticky-note-empty' });
@@ -408,6 +443,7 @@ export class BasesStickyNoteView extends BasesView {
 		const pinnedEntries = entries.filter((entry) => isPinned(this.plugin.settings.stickyNote, basePath, entry.file.path));
 		const otherEntries = entries.filter((entry) => !isPinned(this.plugin.settings.stickyNote, basePath, entry.file.path));
 		this.lastOtherEntries = otherEntries;
+		this.otherEntryByPath = new Map(otherEntries.map((entry) => [entry.file.path, entry]));
 
 		this.pinnedHeadingEl.toggle(pinnedEntries.length > 0);
 		this.othersHeadingEl.toggle(pinnedEntries.length > 0);
@@ -422,9 +458,9 @@ export class BasesStickyNoteView extends BasesView {
 		//
 		// The "Others" section is additionally windowed: only the first `windowCount` entries
 		// (plus anything already promoted past that by scrolling — `existing?.kind === 'full'`)
-		// get a real card; the rest get a cheap placeholder (createPlaceholder) that
-		// `promoteNextBatch` upgrades as the user scrolls near them. "Pinned" is assumed small
-		// and always fully rendered.
+		// get a real card; the rest get a cheap placeholder (createPlaceholder), observed by
+		// `placeholderObserver` and promoted once the user scrolls near it. "Pinned" is assumed
+		// small and always fully rendered.
 		const windowCount = this.computeWindowCount(options.cardMaxHeight);
 		const estimatedHeight = this.estimateCardHeight(options.cardMaxHeight);
 		const seenPaths = new Set<string>();
@@ -492,7 +528,9 @@ export class BasesStickyNoteView extends BasesView {
 		for (const el of newlyObserved) this.cardResizeObserver?.observe(el);
 
 		this.scheduleRelayout();
-		this.scheduleScrollCheck(); // In case the initial window doesn't fill a tall viewport.
+		// `placeholderObserver` fires its own initial callback for any placeholder that is
+		// already within the viewport/root-margin the moment `observe()` is called on it (no
+		// manual "did the initial window fill the viewport?" check needed).
 		// Safety net for height changes neither the card ResizeObserver nor an image `load`
 		// catches in time (e.g. an embed whose own async content-loading doesn't resize the
 		// card element itself until several ticks later).
