@@ -251,11 +251,12 @@ rather than silently assumed solved; revisit if native testing (STICKY-010) surf
 
 ### STICKY-009: Large-Base masonry reflow check
 
-**Status:** In progress. Maintainer tested against a real 515-note Base and reported: heavy/
-glitchy feel, delay on first open and on opening Quick Preview, visible movement during initial
-load, jank during editing (specifically when a linter plugin's autofix touches a file), and one
-entry rendering as garbled binary text. Four real causes found and fixed 2026-09-22–23;
-virtualization decision still open.
+**Status:** Complete (2026-09-23), pending the maintainer's own final retest. Maintainer tested
+against a real 515-note Base and reported: heavy/glitchy feel, delay on first open and on
+opening Quick Preview, visible movement during initial load, jank during editing (specifically
+when a linter plugin's autofix touches a file), and one entry rendering as garbled binary text.
+Five real causes found and fixed 2026-09-22–23, ending with the virtualization decision the
+maintainer explicitly asked for.
 
 **Fixes landed:**
 1. **Layout thrashing in `masonry.ts`** — write-then-read-then-write per card forced a
@@ -300,15 +301,25 @@ virtualization decision still open.
 - **Cards visibly reposition when Quick Preview closes at the same time as a linter autofix** —
   maintainer confirmed this is expected/acceptable (comparable to Google Keep recalculating
   positions when content genuinely changes), not something to suppress.
-- **Typing inside Quick Preview feels less responsive, with background cards moving** — noted,
-  not yet root-caused or fixed. Plausible cause: periodic autosave during typing bumps the
-  active file's mtime repeatedly, each bump doing a full masonry relayout (515 cards) that
-  competes with keystroke handling on the main thread. Deferred — no fix landed for this one.
+- **Typing inside Quick Preview feels less responsive, with background cards moving** —
+  maintainer confirmed **fixed** after the incremental-render change (fix 3 above) landed;
+  re-tested and reported "sekarang mengetik sudah cukup responsif" (typing is now responsive
+  enough). The one nearby card still shifting when the edited note's height changes is expected
+  (same reasoning as the linter-autofix case above).
+- **Initial-load delay at 515 entries, still not "instant" (cards still don't appear
+  immediately as cards)** — maintainer confirmed noticeably faster than before but still
+  present, then explicitly asked to proceed with virtualization rather than accept it. Fixed:
+  `BasesStickyNoteView`'s "Others" section now only fully renders roughly the first two screens'
+  worth of entries up front (`computeWindowCount()`); the rest get a cheap fixed-height
+  placeholder (`createPlaceholder()`, no `MarkdownRenderer`, no `Component`) promoted to a real
+  card as the user scrolls near it (`promoteNextBatch()`, triggered by a `scroll` listener). A
+  card, once promoted, is never demoted — see `src/views/sticky-note/BasesStickyNoteView.ts`'s
+  own field comments for the exact mechanism. "Pinned" is not windowed (assumed small).
 
 **Dependencies:** STICKY-005.
 
-**Estimated scope:** M (grew from S — the incremental-render change was a real architecture
-addition, not a small tweak)
+**Estimated scope:** M (grew from S — the incremental-render change and the virtualization pass
+were both real architecture additions, not small tweaks)
 
 ### STICKY-010: Native acceptance
 
