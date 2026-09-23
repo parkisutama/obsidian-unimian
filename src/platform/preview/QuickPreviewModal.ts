@@ -68,6 +68,13 @@ export class QuickPreviewModal extends Modal {
 		const layout = contentEl.createDiv({ cls: 'wise-view-quick-preview-layout' });
 		const bodyEl = layout.createDiv({ cls: 'wise-view-quick-preview-body' });
 
+		// Rendered unconditionally, above either path (leaf or fallback) — maintainer feedback
+		// 2026-09-23: the embedded leaf's own native Properties widget depends on the user's
+		// global "Properties in document" appearance setting (and, being a reparented/detached
+		// leaf — see detachedLeaf.ts — is undocumented territory to begin with), so it isn't a
+		// reliable way to guarantee properties are visible here. This always shows them instead.
+		this.renderProperties(bodyEl, file);
+
 		const backlinks = getBacklinkPaths(this.app, this.path);
 		if (backlinks.length > 0) {
 			const panel = layout.createDiv({ cls: 'wise-view-quick-preview-backlinks' });
@@ -105,7 +112,6 @@ export class QuickPreviewModal extends Modal {
 		}
 
 		bodyEl.createEl('h2', { text: file.basename, cls: 'wise-view-quick-preview-title' });
-		this.renderProperties(bodyEl, file);
 
 		this.renderChild = new Component();
 		this.renderChild.load();
@@ -116,9 +122,9 @@ export class QuickPreviewModal extends Modal {
 	}
 
 	/**
-	 * Read-only frontmatter table for the fallback render path only — the primary embedded-leaf
-	 * path already shows Obsidian's own (editable) Properties widget, per the user's global
-	 * "Properties in document" setting; there is nothing for this plugin to add there.
+	 * Read-only frontmatter table, rendered at the top of the popup regardless of which content
+	 * path follows (embedded leaf or fallback render) — see the `onOpen()` call site for why
+	 * this is no longer conditional on the fallback path only.
 	 */
 	private renderProperties(bodyEl: HTMLElement, file: TFile): void {
 		const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
