@@ -1,6 +1,6 @@
 # Spec: Sticky Note view
 
-Status: Draft
+Status: Done (native-accepted 2026-09-23) — [record](../../tasks/sticky-note/native-acceptance.md)
 Baseline branch: `main` (not `dev` — `QuickPreviewModal`, which §5.4.6 depends on, only exists on
 `main` as of 2026-09-22; `dev` is one commit behind)
 Prepared: 2026-09-22

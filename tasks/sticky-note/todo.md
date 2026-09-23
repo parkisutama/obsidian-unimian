@@ -333,11 +333,10 @@ were both real architecture additions, not small tweaks)
 
 ### STICKY-010: Native acceptance
 
-**Status:** Not started. Blocked on all above.
-
-**Description:** Full pass per spec §8.3 in a real vault; record in
-`tasks/sticky-note/native-acceptance.md`. Update `ROADMAP.md`'s Sticky Note row to
-**Done (native-accepted YYYY-MM-DD)**.
+**Status:** Complete (2026-09-23). Maintainer confirmed the workstream done after extensive
+real-vault testing (515-note Base) across every phase above — record in
+[native-acceptance.md](native-acceptance.md). `ROADMAP.md`'s Sticky Note row updated to
+**Done (native-accepted 2026-09-23)**.
 
 **Dependencies:** STICKY-004, STICKY-005, STICKY-007, STICKY-008, STICKY-009.
 
