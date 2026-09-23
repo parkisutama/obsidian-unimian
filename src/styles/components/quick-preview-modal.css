@@ -26,15 +26,9 @@ body.wise-view-quick-preview-active .hover-popover {
 	min-height: 0;
 	display: flex;
 	flex-direction: column;
-}
-
-.wise-view-quick-preview-header {
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: 12px;
-	padding-right: 32px; /* clears Obsidian's own top-right close (×) button */
-	margin-bottom: 12px;
+	/* No header row any more (the "Open in tab" button was removed) — clear Obsidian's own
+	   top-right close (×) button directly instead. */
+	padding-top: 28px;
 }
 
 .wise-view-quick-preview-title {

@@ -61,13 +61,10 @@ export class QuickPreviewModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 
-		const header = contentEl.createDiv({ cls: 'wise-view-quick-preview-header' });
-		const openButton = header.createEl('button', { text: 'Open in tab', cls: 'mod-cta' });
-		openButton.addEventListener('click', () => {
-			this.onOpenFull(this.path);
-			this.close();
-		});
-
+		// No "Open in tab" button: the embedded leaf path already exposes Obsidian's own "..."
+		// menu (which includes opening a real tab) and clicking a linked-mention item below
+		// chains straight into that note's own quick preview instead — nothing here needs a
+		// second, redundant way to leave the popup.
 		const layout = contentEl.createDiv({ cls: 'wise-view-quick-preview-layout' });
 		const bodyEl = layout.createDiv({ cls: 'wise-view-quick-preview-body' });
 
@@ -78,11 +75,18 @@ export class QuickPreviewModal extends Modal {
 			const list = panel.createEl('ul');
 			for (const backlink of backlinks) {
 				const item = list.createEl('li');
-				const link = item.createEl('a', { text: backlink.basename, cls: 'wise-view-quick-preview-backlink' });
+				const link = item.createEl('a', {
+					text: backlink.basename,
+					cls: 'wise-view-quick-preview-backlink',
+					attr: { title: backlink.path },
+				});
 				link.addEventListener('click', (event) => {
 					event.preventDefault();
-					this.onOpenFull(backlink.path);
+					// Chains to the linked note's own quick preview instead of closing out to a
+					// full tab — clicking a "Linked mention" should feel like navigating within
+					// the preview, not leaving it.
 					this.close();
+					new QuickPreviewModal(this.app, backlink.path, this.onOpenFull).open();
 				});
 			}
 		}

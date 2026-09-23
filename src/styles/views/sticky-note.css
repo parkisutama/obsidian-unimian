@@ -146,11 +146,40 @@
 	height: auto;
 }
 
+/* Normalize excerpt content to the card's own compact scale instead of full reading-view sizes
+ * (maintainer feedback 2026-09-22, referencing the reference plugin's own card typography):
+ * a heading or table rendered at document scale reads as visual noise at card width. */
+.wise-view-sticky-note-body :is(h1, h2, h3, h4, h5, h6) {
+	margin: var(--size-4-2) 0 var(--size-4-1) 0;
+	font-size: var(--font-ui-medium);
+	font-weight: var(--font-semibold);
+	line-height: var(--line-height-tight);
+}
+
+.wise-view-sticky-note-body :is(h1, h2, h3, h4, h5, h6):first-child {
+	margin-top: 0;
+}
+
+.wise-view-sticky-note-body p {
+	margin: 0 0 var(--size-4-2) 0;
+}
+
 /* Obsidian's own table renderer wraps tables in a horizontally-scrollable `.table-wrapper` —
- * expected/native, not a Sticky Note bug. Just keep it from bursting out of the card's width. */
+ * expected/native, not a Sticky Note bug. Just keep it from bursting out of the card's width,
+ * and shrink it to the card's own compact scale (a full-size table header wraps awkwardly at
+ * card width otherwise). */
 .wise-view-sticky-note-body table,
 .wise-view-sticky-note-body .table-wrapper {
 	max-width: 100%;
+}
+
+.wise-view-sticky-note-body table {
+	font-size: var(--font-ui-smaller);
+}
+
+.wise-view-sticky-note-body table th,
+.wise-view-sticky-note-body table td {
+	padding: var(--size-2-1) var(--size-2-2);
 }
 
 .wise-view-sticky-note-empty,
