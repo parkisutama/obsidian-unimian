@@ -282,6 +282,7 @@ user opts in). A development-build base saved with `type: wise-view-gantt-beta` 
 | Links that name no note | Reported once per link with a Notice ("could not find N dependency links"); links to notes merely filtered out of the Base are not errors. |
 | Formula-backed properties | A property that is a formula has no frontmatter field, so edits that need it (move, resize, progress, link, reorder, add task) are disabled up front instead of failing after the drag. |
 | Missing template note | `NoteTemplateService` shows "Template note not found" and creates the note without a template body. |
+| Start date and End date mapped to the same property | Every task silently collapses to a one-day bar; the note's real End property, if any, is never read, which reads as data corruption rather than a config mistake. Reported once per property with a Notice ("Start date and End date are both mapped to..."). Leaving End date unmapped is the supported way to get single-day tasks — it does not warn. |
 | Single maintainer, fast release cadence | Exact version pin, provenance ledger entry, characterization tests around the adapter before any upgrade. |
 
 ## 6. Shared code policy

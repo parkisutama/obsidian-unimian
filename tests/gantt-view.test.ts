@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ComponentChild, VNode } from 'preact';
 import { render as renderPreact } from 'preact/compat';
 import type { GanttHandle } from '@jaeungkim/gantt-chart';
-import { DateValue, StringValue } from './fixtures/obsidian';
+import { DateValue, notices, StringValue } from './fixtures/obsidian';
 import { BasesGanttView, BASES_GANTT_VIEW_ID, createGanttViewRegistration } from '../src/views/gantt';
 import { localTodayOffsetPx } from '../src/views/gantt/BasesGanttView';
 import type { ChartRender } from '../src/views/gantt/chartHost';
@@ -302,6 +302,42 @@ describe('Gantt skeleton (GBETA-004)', () => {
 		// The view's timers belong to the happy-dom window, so wait out the real settle window.
 		await new Promise(resolve => setTimeout(resolve, 500));
 		expect(harness.renders.length).toBe(afterWrite + 1);
+		harness.view.onunload();
+	});
+
+	it('warns once when Start date and End date are mapped to the same property, instead of silently collapsing every task to one day', () => {
+		notices.length = 0;
+		const harness = mount({ ganttEnd: 'note.start' });
+
+		expect(notices).toEqual([
+			'Gantt: Start date and End date are both mapped to "note.start". Every task will show as one day until End date points to a different property.',
+		]);
+
+		harness.view.onDataUpdated();
+		expect(notices).toHaveLength(1);
+		harness.view.onunload();
+	});
+
+	it('warns again if the same-property mistake is fixed and then reintroduced, but not on an unrelated config change in between', () => {
+		notices.length = 0;
+		const harness = mount({ ganttEnd: 'note.start' });
+		expect(notices).toHaveLength(1);
+
+		harness.setConfig('ganttEnd', 'note.end');
+		harness.view.onDataUpdated();
+		expect(notices).toHaveLength(1);
+
+		harness.setConfig('ganttEnd', 'note.start');
+		harness.view.onDataUpdated();
+		expect(notices).toHaveLength(2);
+		harness.view.onunload();
+	});
+
+	it('does not warn when End date is left unmapped, the normal way to get single-day tasks', () => {
+		notices.length = 0;
+		const harness = mount();
+
+		expect(notices).toEqual([]);
 		harness.view.onunload();
 	});
 });

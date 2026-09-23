@@ -55,6 +55,15 @@ export class BasesGanttView extends BasesView {
 	private readonly toolbar: GanttToolbar;
 	private reportedCycles = new Set<string>();
 	private reportedUnresolved = new Set<string>();
+	/**
+	 * Start date and End date mapped to the same property id — always a misconfiguration, never a
+	 * legitimate way to get single-day tasks (leaving End date unmapped already does that). Left
+	 * unnoticed, every task's bar collapses to one day while its own End property (a different one,
+	 * never read) still shows its real value in the detail panel, which reads as a data-corruption
+	 * bug rather than the property-mapping mistake it actually is. Tracks the last warned property id
+	 * so a fix-then-repeat of the same mistake warns again, but one config doesn't spam every render.
+	 */
+	private reportedSameStartEnd: string | null = null;
 	private legacyOptionsChecked = false;
 	/** PERF-002: decides skip/css-only/full for repeated `onDataUpdated()` calls, reusing the same infrastructure Timeline's tests exercise. */
 	private readonly renderScheduler = new RenderScheduler();
@@ -218,6 +227,14 @@ export class BasesGanttView extends BasesView {
 			const shown = freshUnresolved.slice(0, 5).map(link => `[[${link.target}]] in ${link.path}`).join('; ');
 			const more = freshUnresolved.length > 5 ? ` (and ${freshUnresolved.length - 5} more)` : '';
 			new Notice(`Gantt could not find ${freshUnresolved.length} dependency link${freshUnresolved.length === 1 ? '' : 's'}: ${shown}${more}`);
+		}
+		if (options.start && options.end && options.start === options.end) {
+			if (this.reportedSameStartEnd !== options.start) {
+				this.reportedSameStartEnd = options.start;
+				new Notice(`Gantt: Start date and End date are both mapped to "${this.config.getDisplayName(options.start)}". Every task will show as one day until End date points to a different property.`);
+			}
+		} else {
+			this.reportedSameStartEnd = null;
 		}
 		const mutationProperties = this.mutationProperties(groups, options);
 		this.currentStartType = mutationProperties.start?.type ?? 'date';
