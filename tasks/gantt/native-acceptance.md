@@ -162,3 +162,19 @@ Tidak ada bug kehilangan atau kerusakan data yang diketahui terbuka. Dua bug pen
 (zona waktu pada Date & time, dan kurung wikilink yang terus bertambah) sudah diperbaiki dan punya
 test regresi.
 
+## Follow-up native (2026-09-21 s.d. 2026-09-23)
+
+- **Toolbar dan header timeline tidak sticky saat scroll** — diperbaiki. Penyebabnya `height: 100%`
+  di elemen root tidak pernah resolve ke nilai pasti pada pembungkus Bases milik Obsidian (leluhurnya
+  auto-sized mengikuti isi), sehingga seluruh pane ikut membesar dan scroll, membawa toolbar dan
+  header ikut naik-turun. `BasesGanttView.onload()` kini menyalin `clientHeight` leluhur scroll asli
+  ke `style.height` lewat `ResizeObserver`, teknik yang sama dengan `BasesTimelineView`. Dikonfirmasi
+  maintainer: sudah sticky (commit `29fdfab`, `8497792`).
+- **Ctrl/Cmd + wheel zoom "tidak berfungsi"** — bukan bug. Toggle **Zoom with Ctrl/Cmd + wheel** di
+  pengaturan view defaultnya mati; setelah dinyalakan, zoom bekerja normal. Dikonfirmasi maintainer
+  2026-09-23.
+- Performa dirasakan maintainer sedikit membaik dibanding sebelumnya (konsisten dengan perbaikan
+  scan kuadratik di GBETA-016).
+
+Ditutup sementara oleh maintainer 2026-09-23: cukup untuk saat ini, lanjut nanti kalau ada temuan baru.
+
