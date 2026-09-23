@@ -251,7 +251,8 @@ rather than silently assumed solved; revisit if native testing (STICKY-010) surf
 
 ### STICKY-009: Large-Base masonry reflow check
 
-**Status:** Complete (2026-09-23), pending the maintainer's own final retest. Maintainer tested
+**Status:** Complete (2026-09-23). Maintainer confirmed after the batching/`IntersectionObserver`
+fixes: "oke sekarang jauh lebih baik ... bisa dianggap close soal peforma view". Maintainer tested
 against a real 515-note Base and reported: heavy/glitchy feel, delay on first open and on
 opening Quick Preview, visible movement during initial load, jank during editing (specifically
 when a linter plugin's autofix touches a file), and one entry rendering as garbled binary text.
