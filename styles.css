@@ -2506,7 +2506,8 @@ body.wise-view-quick-preview-active .hover-popover {
 }
 
 .wise-view-sticky-note-empty,
-.wise-view-sticky-note-error {
+.wise-view-sticky-note-error,
+.wise-view-sticky-note-embed-placeholder {
 	color: var(--text-muted);
 	font-style: italic;
 }

@@ -195,9 +195,18 @@ export class BasesStickyNoteView extends BasesView {
 		const body = card.createDiv({ cls: 'wise-view-sticky-note-body' });
 		try {
 			if (EMBED_ONLY_EXTENSIONS.has(file.extension)) {
-				// spec §5.4.2: a `.base`/`.canvas` entry's raw text is never meaningful as
-				// prose — render it as a real embed instead of dumping YAML/JSON.
-				await MarkdownRenderer.render(this.plugin.app, `![[${file.path}]]`, body, file.path, child);
+				if (file.path === basePath) {
+					// STICKY-008: a Base's own query can list the Base file itself as an entry
+					// (seen in native testing). Embedding it here would recurse into this same
+					// Sticky Note view rendering its own entries again — a real infinite-loop
+					// risk, not a hypothetical. Placeholder instead of an embed for this one
+					// case; other `.base`/`.canvas` entries still embed normally.
+					body.createDiv({ text: 'This Base — open to view.', cls: 'wise-view-sticky-note-embed-placeholder' });
+				} else {
+					// spec §5.4.2: a `.base`/`.canvas` entry's raw text is never meaningful as
+					// prose — render it as a real embed instead of dumping YAML/JSON.
+					await MarkdownRenderer.render(this.plugin.app, `![[${file.path}]]`, body, file.path, child);
+				}
 			} else {
 				const raw = await this.plugin.app.vault.cachedRead(file);
 				const excerpt = buildCardExcerpt(raw, title, options.excerptBudget);

@@ -233,12 +233,19 @@ actually changed.
 
 ### STICKY-008: Nested `.base` embed recursion guard
 
-**Status:** Not started. Blocked on STICKY-003.
-
-**Description:** Regression test: a card whose note embeds the same `.base` file it is rendered
-from does not infinite-loop or crash.
+**Status:** Complete (2026-09-23), narrower than originally scoped. The concrete risk found in
+native testing (a Base's own query listing the Base file itself as an entry — seen in earlier
+screenshots) is guarded: `renderCard()` in `BasesStickyNoteView.ts` compares the entry's path
+against `findOwningBaseFile()`'s path and renders a "This Base — open to view." placeholder
+instead of an embed for that one case, avoiding a direct self-embed recursion into this same
+view. **Not covered:** indirect/mutual cycles (Base A lists Base B, Base B's default view is
+also Sticky Note and lists Base A) — no generic embed-depth tracking was added; relies on
+whatever depth guard Obsidian's own embed renderer has, unverified. Flagged as a known gap
+rather than silently assumed solved; revisit if native testing (STICKY-010) surfaces it.
 
 **Dependencies:** STICKY-003.
+
+**Likely files:** `src/views/sticky-note/BasesStickyNoteView.ts`, `src/styles/views/sticky-note.css`.
 
 **Estimated scope:** S
 
