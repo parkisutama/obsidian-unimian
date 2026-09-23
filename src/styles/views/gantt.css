@@ -1,11 +1,18 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* Copyright (C) 2026 Parkis Utama */
 
-.wise-view-gantt {
+/* Paired with Obsidian's own .bases-view (applied to this same element) to bind height to the
+   pane instead of the content, and overflow: hidden so the pane never scrolls as a whole — only
+   the library's own .gantt-scroll-container does, which is what keeps the toolbar below and the
+   chart's sticky timeline header fixed while the rows scroll. Without this pairing, height: 100%
+   here has no bounded ancestor to resolve against, so this element grows with its content and the
+   outer pane scrolls instead, taking the toolbar and header with it. */
+.bases-view.wise-view-gantt {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 	min-height: 0;
+	overflow: hidden;
 	background: var(--background-primary);
 	color: var(--text-normal);
 }
@@ -34,6 +41,7 @@
 .wise-view-gantt-chart {
 	min-height: 0;
 	flex: 1 1 auto;
+	overflow: hidden;
 }
 
 .wise-view-gantt-chart > .gantt-container {
