@@ -251,11 +251,32 @@ rather than silently assumed solved; revisit if native testing (STICKY-010) surf
 
 ### STICKY-009: Large-Base masonry reflow check
 
-**Status:** Not started. Blocked on STICKY-005.
+**Status:** In progress. Maintainer reported the view "feels heavy, glitchy" with visible
+movement during initial load — two real causes found and fixed 2026-09-23, virtualization
+decision still open.
 
-**Description:** Manual check with 50+ and 200+ entry Bases; record reflow cost. Explicitly
-decide and document whether virtualization is needed now or deferred (spec §7) — do not let it
-slip by silently.
+**Fixes landed:**
+1. **Layout thrashing in `masonry.ts`.** `layoutMasonrySection` wrote a card's `top`/`left`/
+   `width` then immediately read the *next* card's height in the same loop iteration — a
+   write-then-read-then-write pattern that forces a synchronous browser reflow on every single
+   card, not once per relayout. Restructured into three passes: write every card's width, read
+   every card's height once (a single reflow), compute the column assignment in pure JS, then
+   write every card's position. `getColumnCount` unit-tested
+   (`tests/sticky-note-masonry.test.ts`); the full batched layout isn't (this project's Vitest
+   config has no DOM environment — see the test file's own scope note).
+2. **Premature `ResizeObserver.observe()` during the initial render batch**, in
+   `BasesStickyNoteView.render()`. Cards are built one at a time (`await MarkdownRenderer.render()`
+   yields to the event loop per card); observing each card as soon as it existed let the
+   observer's guaranteed initial fire — and the relayout it schedules — run mid-batch, against a
+   still-growing card set, producing exactly the "cards keep shifting as more appear during
+   initial load" the maintainer described. Now every card is built first, then all are observed
+   in one pass, so the initial-fire storm coalesces into one relayout instead of several partial
+   ones.
+
+**Still open:** whether these two fixes are enough at genuinely large counts (200+), or whether
+virtualization (spec §7's flagged gap — `linearVirtualRange.ts` doesn't fit a wrapping masonry
+grid directly) is still needed. Decision deferred to the maintainer's own 50+/200+-entry retest
+on the rebuilt version, not guessed at here.
 
 **Dependencies:** STICKY-005.
 

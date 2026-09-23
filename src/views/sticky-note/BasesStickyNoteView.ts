@@ -144,7 +144,7 @@ export class BasesStickyNoteView extends BasesView {
 		return resolved.source === 'fallback' ? undefined : resolved.background;
 	}
 
-	private async renderCard(entry: BasesEntry, options: StickyNoteOptions, basePath: string, child: Component, parent: HTMLElement): Promise<void> {
+	private async renderCard(entry: BasesEntry, options: StickyNoteOptions, basePath: string, child: Component, parent: HTMLElement): Promise<HTMLElement> {
 		const file = entry.file;
 		const title = propertyText(entry, options.titleProperty) ?? file.basename;
 		const pinned = isPinned(this.plugin.settings.stickyNote, basePath, file.path);
@@ -216,7 +216,7 @@ export class BasesStickyNoteView extends BasesView {
 			body.createDiv({ text: 'Could not render preview.', cls: 'wise-view-sticky-note-error' });
 		}
 
-		this.cardResizeObserver?.observe(card);
+		return card;
 	}
 
 	private async render(): Promise<void> {
@@ -252,8 +252,17 @@ export class BasesStickyNoteView extends BasesView {
 		this.pinnedHeadingEl.toggle(pinnedEntries.length > 0);
 		this.othersHeadingEl.toggle(pinnedEntries.length > 0);
 
-		for (const entry of pinnedEntries) await this.renderCard(entry, options, basePath, child, this.pinnedGridEl);
-		for (const entry of otherEntries) await this.renderCard(entry, options, basePath, child, this.othersGridEl);
+		// Cards are built one at a time (each `await MarkdownRenderer.render()` yields to the
+		// event loop), so observing each card's ResizeObserver as soon as it's created would let
+		// the observer's initial fire — and the relayout it schedules — happen mid-batch,
+		// against a still-growing card set. That produced a visible "cards keep shifting as more
+		// appear" effect during the initial render of a larger Base (maintainer report,
+		// 2026-09-23). Observing every card only after the whole batch is built means the
+		// initial-fire storm is one coalesced relayout, not several partial ones.
+		const cards: HTMLElement[] = [];
+		for (const entry of pinnedEntries) cards.push(await this.renderCard(entry, options, basePath, child, this.pinnedGridEl));
+		for (const entry of otherEntries) cards.push(await this.renderCard(entry, options, basePath, child, this.othersGridEl));
+		for (const card of cards) this.cardResizeObserver?.observe(card);
 
 		this.scheduleRelayout();
 		// Safety net for height changes neither the card ResizeObserver nor an image `load`

@@ -49,26 +49,42 @@ export function layoutMasonrySection(section: HTMLElement, targetCardWidth: numb
 	const columnCount = getColumnCount(containerWidth, targetCardWidth, gap);
 	const colWidth = (containerWidth - gap * (columnCount - 1)) / columnCount;
 
-	const columnHeights: number[] = new Array<number>(columnCount).fill(0);
-
+	// Batched write/read/write, not interleaved per card: writing a card's geometry then
+	// immediately reading another card's height forces a synchronous reflow on every iteration
+	// (layout thrashing) — expensive enough at large card counts to read as visible jank
+	// (maintainer report, native testing 2026-09-23). Every card gets the same `colWidth`
+	// regardless of which column it lands in, so height never depends on column assignment —
+	// width can be written for all cards, then every height read once, before any position is
+	// decided or written.
 	for (const card of cards) {
+		card.style.position = 'absolute';
+		card.style.width = `${colWidth}px`;
+	}
+
+	const heights = cards.map((card) => card.getBoundingClientRect().height);
+
+	const columnHeights: number[] = new Array<number>(columnCount).fill(0);
+	const placements: { card: HTMLElement; left: number; top: number }[] = [];
+
+	cards.forEach((card, i) => {
 		let target = 0;
 		let shortest = columnHeights[0] ?? 0;
-		for (let i = 1; i < columnCount; i++) {
-			const height = columnHeights[i] ?? 0;
+		for (let c = 1; c < columnCount; c++) {
+			const height = columnHeights[c] ?? 0;
 			if (height < shortest) {
 				shortest = height;
-				target = i;
+				target = c;
 			}
 		}
 
 		const top = shortest;
-		card.style.position = 'absolute';
-		card.style.width = `${colWidth}px`;
-		card.style.left = `${target * (colWidth + gap)}px`;
-		card.style.top = `${top}px`;
+		placements.push({ card, left: target * (colWidth + gap), top });
+		columnHeights[target] = top + (heights[i] ?? 0) + gap;
+	});
 
-		columnHeights[target] = top + card.getBoundingClientRect().height + gap;
+	for (const { card, left, top } of placements) {
+		card.style.left = `${left}px`;
+		card.style.top = `${top}px`;
 	}
 
 	section.style.position = 'relative';
