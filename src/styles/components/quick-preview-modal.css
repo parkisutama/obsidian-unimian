@@ -34,9 +34,12 @@ body.wise-view-quick-preview-active .hover-popover {
 /* The embedded leaf's own `.view-header` normally sits against the workspace's tab-bar
    background, a different shade than the note body — inside this popup that reads as a
    disconnected white strip instead of one unified surface (maintainer feedback 2026-09-22).
-   Match it to the modal's own background so the toolbar blends into the body beneath it. */
+   Match it to the modal's own background so the toolbar blends into the body beneath it.
+   `!important`: Obsidian's own `.is-focused .workspace-leaf.mod-active .view-header` rule
+   outranks a plain `.wise-view-quick-preview .view-header` on specificity, and the reparented
+   leaf (detachedLeaf.ts) is always "active" — confirmed via DevTools inspection, 2026-09-22. */
 .wise-view-quick-preview .view-header {
-	background-color: var(--background-primary);
+	background-color: var(--background-primary) !important;
 	border-bottom: none;
 	box-shadow: none;
 }
