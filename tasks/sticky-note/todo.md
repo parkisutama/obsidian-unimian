@@ -312,9 +312,18 @@ maintainer explicitly asked for.
   `BasesStickyNoteView`'s "Others" section now only fully renders roughly the first two screens'
   worth of entries up front (`computeWindowCount()`); the rest get a cheap fixed-height
   placeholder (`createPlaceholder()`, no `MarkdownRenderer`, no `Component`) promoted to a real
-  card as the user scrolls near it (`promoteNextBatch()`, triggered by a `scroll` listener). A
-  card, once promoted, is never demoted — see `src/views/sticky-note/BasesStickyNoteView.ts`'s
-  own field comments for the exact mechanism. "Pinned" is not windowed (assumed small).
+  card as the user scrolls near it. A card, once promoted, is never demoted — see
+  `src/views/sticky-note/BasesStickyNoteView.ts`'s own field comments for the exact mechanism.
+  "Pinned" is not windowed (assumed small).
+  - **Follow-up fix:** the first version promoted on a `scroll`-event distance check
+    (`promoteNextBatch()`), measured against the bottom of the *whole* page — including every
+    not-yet-promoted placeholder's estimated height — so it only fired near the very end of all
+    515 entries. A fast scroll past the initial window landed on bare placeholders with nothing
+    promoting them ("lazy load nya too lazy saat di scroll cepat"). Replaced with an
+    `IntersectionObserver` (`placeholderObserver`) observing each placeholder directly with a
+    generous `rootMargin` — it tracks actual element geometry regardless of scroll speed/distance,
+    so a fast scroll or jump is caught correctly. `schedulePromote()`/`flushPromotions()` coalesce
+    intersections into one batch/relayout via rAF.
 
 **Dependencies:** STICKY-005.
 
