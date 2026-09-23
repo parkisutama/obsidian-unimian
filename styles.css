@@ -2393,6 +2393,20 @@ body.wise-view-quick-preview-active .hover-popover {
 	outline: none;
 }
 
+/* STICKY-009: a lightweight stand-in for an entry outside the initial render window, promoted
+ * to a real card once the user scrolls near it — no content, no interaction, no fade overlay. */
+.wise-view-sticky-note-card-placeholder {
+	cursor: default;
+}
+
+.wise-view-sticky-note-card-placeholder:hover {
+	box-shadow: none;
+}
+
+.wise-view-sticky-note-card-placeholder::after {
+	display: none;
+}
+
 .wise-view-sticky-note-card::after {
 	content: '';
 	position: absolute;

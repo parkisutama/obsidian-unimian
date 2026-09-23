@@ -19,7 +19,7 @@ import { ViewRuntime } from '../../platform/dom/ViewRuntime';
 import { activateEntry, openPath } from '../../platform/navigation/NavigationService';
 import { resolvePrettyPropertiesColor } from '../../integrations/PrettyPropertiesAdapter';
 import { buildCardExcerpt, isTextExcerptExtension } from './content';
-import { layoutMasonrySection } from './masonry';
+import { getColumnCount, layoutMasonrySection } from './masonry';
 import { findOwningBaseFile } from './ownerBaseFile';
 import { readStickyNoteOptions, STICKY_NOTE_CSS_ONLY_KEYS, type StickyNoteOptions } from './options';
 import { isPinned, togglePin } from './pinStore';
@@ -44,9 +44,19 @@ interface CardEntry {
 	mtime: number;
 	pinned: boolean;
 	/** Owns whatever `MarkdownRenderer.render()` registered for this one card — unloaded only
-	 * when this specific card is replaced or removed, never the whole view's cards at once. */
-	component: Component;
+	 * when this specific card is replaced or removed, never the whole view's cards at once.
+	 * `null` for a placeholder (STICKY-009 virtualization), which renders no content. */
+	component: Component | null;
+	/** `'placeholder'` cards are cheap, fixed-height boxes standing in for an entry outside the
+	 * initial render window (STICKY-009) — promoted to `'full'` as the user scrolls near them. */
+	kind: 'full' | 'placeholder';
 }
+
+/** Windowing constants (STICKY-009). Deliberately rough heuristics, not exact measurement —
+ * "roughly enough cards to cover a couple of screens" is the goal, not a precise virtual-list. */
+const RENDER_WINDOW_SCREENS = 2;
+const MIN_INITIAL_RENDER = 20;
+const SCROLL_PROMOTE_MARGIN_PX = 600;
 
 export class BasesStickyNoteView extends BasesView {
 	type = BASES_STICKY_NOTE_VIEW_ID;
@@ -79,6 +89,17 @@ export class BasesStickyNoteView extends BasesView {
 	private currentCardWidth = 240;
 	private hasCompletedFirstLayout = false;
 	/**
+	 * STICKY-009 virtualization: only the "Others" section is windowed (Pinned is assumed small
+	 * — always fully rendered). `othersRenderedCount` is how many of `lastOtherEntries`, in
+	 * order, are currently promoted to full cards; the rest are placeholders. A card, once
+	 * promoted, is never demoted back — bounded by however many the user actually scrolls
+	 * through in one session, not by vault size.
+	 */
+	private lastOtherEntries: readonly BasesEntry[] = [];
+	private othersRenderedCount = 0;
+	private isPromoting = false;
+	private scrollCheckFrame: number | null = null;
+	/**
 	 * STICKY-011: Bases calls `onDataUpdated()` far more often than the query's actual result
 	 * changes (confirmed via console logging during native testing, 2026-09-22 — repeated calls
 	 * with identical entries/config fired during plain hover/click interaction). Without this,
@@ -103,6 +124,8 @@ export class BasesStickyNoteView extends BasesView {
 		this.runtime.observe(this.containerResizeObserver);
 		this.cardResizeObserver = new ResizeObserver(() => this.scheduleRelayout());
 		this.runtime.observe(this.cardResizeObserver);
+		// STICKY-009: promotes placeholders into full cards as the user scrolls near them.
+		this.runtime.addEventListener(this.containerEl, 'scroll', () => this.scheduleScrollCheck());
 	}
 
 	onDataUpdated(): void {
@@ -134,8 +157,9 @@ export class BasesStickyNoteView extends BasesView {
 
 	onunload(): void {
 		if (this.relayoutFrame !== null) this.runtime.win.cancelAnimationFrame(this.relayoutFrame);
+		if (this.scrollCheckFrame !== null) this.runtime.win.cancelAnimationFrame(this.scrollCheckFrame);
 		if (this.safetyNetTimer !== null) this.runtime.win.clearTimeout(this.safetyNetTimer);
-		for (const { component } of this.cardsByPath.values()) component.unload();
+		for (const { component } of this.cardsByPath.values()) component?.unload();
 		this.cardsByPath.clear();
 		this.runtime.dispose();
 	}
@@ -257,7 +281,82 @@ export class BasesStickyNoteView extends BasesView {
 			body.createDiv({ text: 'Could not render preview.', cls: 'wise-view-sticky-note-error' });
 		}
 
-		return { el: card, mtime: file.stat?.mtime ?? 0, pinned, component: child };
+		return { el: card, mtime: file.stat?.mtime ?? 0, pinned, component: child, kind: 'full' };
+	}
+
+	/** Cheap fixed-height stand-in for an entry outside the initial render window (STICKY-009). */
+	private createPlaceholder(entry: BasesEntry, parent: HTMLElement, estimatedHeight: number): CardEntry {
+		const el = parent.createDiv({ cls: 'wise-view-sticky-note-card wise-view-sticky-note-card-placeholder' });
+		el.style.height = `${estimatedHeight}px`;
+		return { el, mtime: entry.file.stat?.mtime ?? 0, pinned: false, component: null, kind: 'placeholder' };
+	}
+
+	/**
+	 * Rough estimate of a typical card's rendered height, for sizing the initial render window
+	 * and placeholders — not a measurement. Exact accuracy doesn't matter: it only decides how
+	 * many cards to build eagerly versus lazily, not anything visually final (a placeholder is
+	 * replaced with a real card, at its real height, well before it's likely to be seen).
+	 */
+	private estimateCardHeight(cardMaxHeight: number): number {
+		return Math.max(120, cardMaxHeight * 0.5);
+	}
+
+	private computeWindowCount(cardMaxHeight: number): number {
+		const containerHeight = this.containerEl.clientHeight || 800;
+		const containerWidth = this.othersGridEl.clientWidth || this.containerEl.clientWidth || 800;
+		const columns = getColumnCount(containerWidth, this.currentCardWidth);
+		const rows = Math.max(1, Math.ceil((containerHeight * RENDER_WINDOW_SCREENS) / this.estimateCardHeight(cardMaxHeight)));
+		return Math.max(MIN_INITIAL_RENDER, columns * rows);
+	}
+
+	private scheduleScrollCheck(): void {
+		if (this.scrollCheckFrame !== null) return;
+		this.scrollCheckFrame = this.runtime.requestAnimationFrame(() => {
+			this.scrollCheckFrame = null;
+			void this.promoteNextBatch();
+		});
+	}
+
+	/** Promotes the next batch of placeholders to full cards once scrolling gets near them. */
+	private async promoteNextBatch(): Promise<void> {
+		if (this.isPromoting) return;
+		const el = this.containerEl;
+		const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
+		if (remaining > SCROLL_PROMOTE_MARGIN_PX) return;
+		if (this.othersRenderedCount >= this.lastOtherEntries.length) return;
+
+		this.isPromoting = true;
+		try {
+			const options = readStickyNoteOptions(new ViewConfigReader(this.config));
+			const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? '';
+			const batchSize = this.computeWindowCount(options.cardMaxHeight);
+			const slice = this.lastOtherEntries.slice(this.othersRenderedCount, this.othersRenderedCount + batchSize);
+
+			const newlyObserved: HTMLElement[] = [];
+			for (const entry of slice) {
+				const path = entry.file.path;
+				const existing = this.cardsByPath.get(path);
+				if (existing?.kind === 'full') continue;
+				existing?.el.remove();
+				const rebuilt = await this.renderCard(entry, options, basePath, this.othersGridEl);
+				this.cardsByPath.set(path, rebuilt);
+				newlyObserved.push(rebuilt.el);
+			}
+			this.othersRenderedCount += slice.length;
+
+			// Promoted cards were appended to the end of the grid, not inserted in place — a
+			// single reorder pass afterwards keeps DOM order matching the query's own order for
+			// masonry, cheaper than tracking insertion points per card.
+			for (const entry of this.lastOtherEntries) {
+				const card = this.cardsByPath.get(entry.file.path);
+				if (card) this.othersGridEl.appendChild(card.el);
+			}
+
+			for (const observed of newlyObserved) this.cardResizeObserver?.observe(observed);
+			this.scheduleRelayout();
+		} finally {
+			this.isPromoting = false;
+		}
 	}
 
 	private async render(): Promise<void> {
@@ -282,10 +381,11 @@ export class BasesStickyNoteView extends BasesView {
 		if (optionsKey !== this.lastOptionsKey) {
 			this.lastOptionsKey = optionsKey;
 			for (const { el, component } of this.cardsByPath.values()) {
-				component.unload();
+				component?.unload();
 				el.remove();
 			}
 			this.cardsByPath.clear();
+			this.othersRenderedCount = 0;
 		}
 
 		const entries = (this.data?.groupedData ?? []).flatMap((group) => group.entries);
@@ -293,10 +393,12 @@ export class BasesStickyNoteView extends BasesView {
 			this.pinnedHeadingEl.hide();
 			this.othersHeadingEl.hide();
 			for (const { el, component } of this.cardsByPath.values()) {
-				component.unload();
+				component?.unload();
 				el.remove();
 			}
 			this.cardsByPath.clear();
+			this.othersRenderedCount = 0;
+			this.lastOtherEntries = [];
 			this.cardResizeObserver?.disconnect();
 			this.othersGridEl.addClass('is-ready'); // No relayout will run to add this — the empty state has no cards to hide behind a fade-in.
 			this.othersGridEl.createDiv({ text: 'No entries match this Base.', cls: 'wise-view-sticky-note-empty' });
@@ -305,6 +407,7 @@ export class BasesStickyNoteView extends BasesView {
 
 		const pinnedEntries = entries.filter((entry) => isPinned(this.plugin.settings.stickyNote, basePath, entry.file.path));
 		const otherEntries = entries.filter((entry) => !isPinned(this.plugin.settings.stickyNote, basePath, entry.file.path));
+		this.lastOtherEntries = otherEntries;
 
 		this.pinnedHeadingEl.toggle(pinnedEntries.length > 0);
 		this.othersHeadingEl.toggle(pinnedEntries.length > 0);
@@ -316,44 +419,72 @@ export class BasesStickyNoteView extends BasesView {
 		// ResizeObserver.observe() is deferred to a final batch pass, same reasoning as before:
 		// observing each one as soon as it's built would let the observer's initial fire (and
 		// the relayout it schedules) run mid-batch, against a still-growing/still-reordering set.
+		//
+		// The "Others" section is additionally windowed: only the first `windowCount` entries
+		// (plus anything already promoted past that by scrolling — `existing?.kind === 'full'`)
+		// get a real card; the rest get a cheap placeholder (createPlaceholder) that
+		// `promoteNextBatch` upgrades as the user scrolls near them. "Pinned" is assumed small
+		// and always fully rendered.
+		const windowCount = this.computeWindowCount(options.cardMaxHeight);
+		const estimatedHeight = this.estimateCardHeight(options.cardMaxHeight);
 		const seenPaths = new Set<string>();
 		const newlyObserved: HTMLElement[] = [];
 
 		for (const [gridEl, list] of [[this.pinnedGridEl, pinnedEntries], [this.othersGridEl, otherEntries]] as const) {
-			for (const entry of list) {
+			const isOthers = gridEl === this.othersGridEl;
+			for (let i = 0; i < list.length; i++) {
+				const entry = list[i]!;
 				const path = entry.file.path;
 				seenPaths.add(path);
 				const mtime = entry.file.stat?.mtime ?? 0;
 				const pinned = gridEl === this.pinnedGridEl;
 				const existing = this.cardsByPath.get(path);
+				const wantFull = !isOthers || i < windowCount || existing?.kind === 'full';
 
-				if (existing && existing.mtime === mtime) {
-					if (existing.pinned !== pinned) {
-						const pinBtn = existing.el.querySelector('.wise-view-sticky-note-pin-btn');
-						pinBtn?.classList.toggle('is-pinned', pinned);
-						pinBtn?.setAttribute('aria-label', pinned ? 'Unpin note' : 'Pin note');
-						existing.pinned = pinned;
+				if (existing && existing.mtime === mtime
+					&& ((wantFull && existing.kind === 'full') || (!wantFull && existing.kind === 'placeholder'))) {
+					if (existing.kind === 'full') {
+						if (existing.pinned !== pinned) {
+							const pinBtn = existing.el.querySelector('.wise-view-sticky-note-pin-btn');
+							pinBtn?.classList.toggle('is-pinned', pinned);
+							pinBtn?.setAttribute('aria-label', pinned ? 'Unpin note' : 'Pin note');
+							existing.pinned = pinned;
+						}
+						// `imageFit` is excluded from the content-invalidation key above
+						// (CSS-only), but still needs syncing on a reused card — cheap class
+						// toggle, not a rebuild.
+						existing.el.className = `wise-view-sticky-note-card wise-view-sticky-note-fit-${options.imageFit}`;
 					}
-					// `imageFit` is excluded from the content-invalidation key above (CSS-only),
-					// but still needs syncing on a reused card — cheap class toggle, not a rebuild.
-					existing.el.className = `wise-view-sticky-note-card wise-view-sticky-note-fit-${options.imageFit}`;
 					gridEl.appendChild(existing.el); // Cheap even if already the right parent — keeps DOM order matching the query's order for masonry.
 					continue;
 				}
 
-				if (existing) {
-					existing.component.unload();
-					existing.el.remove();
+				existing?.component?.unload();
+				existing?.el.remove();
+
+				if (wantFull) {
+					const rebuilt = await this.renderCard(entry, options, basePath, gridEl);
+					this.cardsByPath.set(path, rebuilt);
+					newlyObserved.push(rebuilt.el);
+				} else {
+					this.cardsByPath.set(path, this.createPlaceholder(entry, gridEl, estimatedHeight));
 				}
-				const rebuilt = await this.renderCard(entry, options, basePath, gridEl);
-				this.cardsByPath.set(path, rebuilt);
-				newlyObserved.push(rebuilt.el);
 			}
 		}
 
+		// Contiguous-from-start by construction (initial window and every promotion both start
+		// at the current `othersRenderedCount` and move forward) — the first non-full entry
+		// marks where placeholders begin.
+		let fullCount = 0;
+		for (const entry of otherEntries) {
+			if (this.cardsByPath.get(entry.file.path)?.kind !== 'full') break;
+			fullCount++;
+		}
+		this.othersRenderedCount = fullCount;
+
 		for (const [path, { el, component }] of this.cardsByPath) {
 			if (seenPaths.has(path)) continue;
-			component.unload();
+			component?.unload();
 			el.remove();
 			this.cardsByPath.delete(path);
 		}
@@ -361,6 +492,7 @@ export class BasesStickyNoteView extends BasesView {
 		for (const el of newlyObserved) this.cardResizeObserver?.observe(el);
 
 		this.scheduleRelayout();
+		this.scheduleScrollCheck(); // In case the initial window doesn't fill a tall viewport.
 		// Safety net for height changes neither the card ResizeObserver nor an image `load`
 		// catches in time (e.g. an embed whose own async content-loading doesn't resize the
 		// card element itself until several ticks later).
