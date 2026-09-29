@@ -53,6 +53,13 @@ describe("locale weeks (gggg / ww)", () => {
 
 describe("tokens", () => {
 	const date = d(2026, 9, 5); // Saturday
+	const allTokens: Array<[string, string]> = [
+		["YYYY", "2026"], ["GGGG", "2026"], ["gggg", "2026"], ["MMMM", "September"],
+		["dddd", "Saturday"], ["MMM", "Sep"], ["ddd", "Sat"], ["YY", "26"],
+		["MM", "09"], ["DD", "05"], ["WW", "36"], ["ww", "36"], ["M", "9"],
+		["D", "5"], ["Q", "3"], ["W", "36"], ["w", "36"],
+	];
+
 	it.each([
 		["YYYY-MM-DD", "2026-09-05"],
 		["YY/M/D", "26/9/5"],
@@ -65,6 +72,15 @@ describe("tokens", () => {
 		["[unclosed YYYY", "[unclosed 2026"],
 	])("%s -> %s", (pattern, expected) => {
 		expect(formatPeriodicTokens(pattern, date)).toBe(expected);
+	});
+
+	it.each(allTokens)("formats supported token %s", (token, expected) => {
+		expect(formatPeriodicTokens(token, date)).toBe(expected);
+	});
+
+	it.each(allTokens)("keeps supported token %s literal inside ordinary words", (token) => {
+		const word = `prefix${token}suffix`;
+		expect(formatPeriodicTokens(word, date)).toBe(word);
 	});
 
 	it("pads a year below 1000 to four digits", () => {

@@ -60,8 +60,9 @@ already organized by it works without moving files.
     4 January). Preset patterns, root supplied by the user: day `YYYY/YYYY-MM/YYYY-MM-DD`, week
     `GGGG/GGGG-[W]WW`, month `YYYY/YYYY-MM`, quarter `YYYY/YYYY-[Q]Q` (ISO 8601 has no quarter
     form; this is the common convention), year `YYYY`. Locale week tokens (`gggg`/`ww`) stay
-    supported as a second option with a configurable first weekday. The preset is a set of example
-    patterns filled in on request, not a reader of Notebook Navigator.
+    supported as a second option with a configurable first weekday. Calendar shows an example in
+    each path field's placeholder; users can enter any vault-relative path, including a custom root.
+    It does not read Notebook Navigator settings.
 11. **Templater is the preferred engine.** It is already first in `detectTemplateEngine`. Decision
     7 is withdrawn: Wise View does not resolve date tokens in period templates; templates read the
     date from the file name (`tp.file.title`), as the maintainer's do. Core Templates users get the
@@ -184,8 +185,9 @@ types. Layout and styling were not visible there, so placement is confirmed nati
    are new and must avoid Bases-reserved view-config keys.
 2. **Path patterns using moment-style tokens** (`YYYY`, `MM`, `DD`, `ddd`, `gggg`, `[W]ww`, `Q`,
    with `[...]` literals), so a folder pattern such as `Journal/YYYY/MM` and a name pattern such as
-   `YYYY-MM-DD` can be set to match Notebook Navigator's layout. Exact token table is fixed by
-   PN-001.
+   `YYYY-MM-DD` can be set to match Notebook Navigator's layout. Tokens embedded in ordinary words
+   are treated as literal text; bracket literals remain available for explicit escaping. Exact
+   token table is fixed by PN-001.
 3. **One resolver** `resolvePeriodicPath(date, period, config)` returning folder + name + full
    path. Pure, no `obsidian` import, unit-testable.
 4. **Calendar integration:**

@@ -98,23 +98,35 @@ function tokenValue(token: string, date: Date, rule: WeekRule): string {
 /** Substitutes tokens in `pattern`; `[text]` is copied literally, anything else passes through. */
 export function formatPeriodicTokens(pattern: string, date: Date, rule: WeekRule = ISO_WEEK): string {
   let out = '';
+  let previousWasToken = false;
   for (let i = 0; i < pattern.length;) {
     if (pattern[i] === '[') {
       const close = pattern.indexOf(']', i + 1);
       if (close !== -1) {
         out += pattern.slice(i + 1, close);
         i = close + 1;
+        previousWasToken = false;
         continue;
       }
     }
     const token = TOKENS.find((candidate) => pattern.startsWith(candidate, i));
     if (token) {
-      out += tokenValue(token, date, rule);
-      i += token.length;
-    } else {
-      out += pattern[i];
-      i += 1;
+      const previous = pattern[i - 1];
+      const nextIndex = i + token.length;
+      const next = pattern[nextIndex];
+      const previousIsLetter = previous !== undefined && /\p{L}/u.test(previous);
+      const nextIsLetter = next !== undefined && /\p{L}/u.test(next);
+      const nextStartsToken = next !== undefined && TOKENS.some((candidate) => pattern.startsWith(candidate, nextIndex));
+      if ((previousWasToken || !previousIsLetter) && (!nextIsLetter || nextStartsToken)) {
+        out += tokenValue(token, date, rule);
+        i = nextIndex;
+        previousWasToken = true;
+        continue;
+      }
     }
+    out += pattern[i];
+    i += 1;
+    previousWasToken = false;
   }
   return out;
 }

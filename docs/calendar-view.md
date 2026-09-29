@@ -134,9 +134,10 @@ Satu file `.base` adalah satu journal: setiap Base mengatur periodical notes-nya
 plugin lain. Pengaturannya ada di grup **Daily notes**, **Weekly notes**, **Monthly notes**,
 **Quarterly notes**, dan **Yearly notes**. Tiap grup punya dua opsi:
 
-- **Path pattern**: folder dan nama file dalam satu pola, dipisah `/`, memakai token gaya moment.
-  Contoh: `timeline/YYYY/YYYY-MM/YYYY-MM-DD`. Periode tanpa pola dianggap tidak dikonfigurasi dan
-  tidak mendapat link.
+- **Path pattern**: pola folder dan nama file, dipisah `/`, memakai token gaya moment. Placeholder
+  menampilkan contoh sesuai periode, misalnya `timeline/YYYY/YYYY-MM/YYYY-MM-DD`. Tambahkan root
+  vault sendiri bila perlu, seperti `persona/Karyawan IAT/timeline/YYYY/YYYY-MM/YYYY-MM-DD`.
+  Periode tanpa pola dianggap tidak dikonfigurasi dan tidak mendapat link.
 - **Template note**: template yang dipakai saat note dibuat.
 
 Token yang didukung: `YYYY YY MMMM MMM MM M DD D dddd ddd Q`, minggu ISO 8601 `GGGG WW W`, minggu

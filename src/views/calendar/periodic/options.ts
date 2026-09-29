@@ -27,7 +27,7 @@ export function createPeriodicOptions(): BasesAllOptions[] {
         key: keys.path,
         displayName: 'Path pattern',
         default: '',
-        placeholder: GROUPS[kind].placeholder,
+        placeholder: `Example: ${GROUPS[kind].placeholder}`,
       },
       {
         type: 'file',
