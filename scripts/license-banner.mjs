@@ -2,7 +2,7 @@
 // Full license texts live in THIRD_PARTY_NOTICES.md; keep both in sync.
 
 export const PROJECT_LICENSE = "GPL-3.0-only";
-export const REPOSITORY_URL = "https://github.com/parkisutama/obsidian-wise-view";
+export const REPOSITORY_URL = "https://github.com/parkisutama/obsidian-unimian";
 
 export const PROJECT_COPYRIGHTS = [
 	"Copyright (C) 2025 Sawyer Rensel (Planner, https://github.com/SawyerRensel/Planner)",
@@ -60,7 +60,7 @@ export const THIRD_PARTY_COMPONENTS = [
 	},
 ];
 
-export const BANNER_START = "/*! Wise View";
+export const BANNER_START = "/*! Unimian";
 
 /** Build the preserved (`/*!`) license banner for one distributed file. */
 export function buildLicenseBanner(file, version) {

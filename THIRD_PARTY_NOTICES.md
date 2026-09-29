@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-Wise View is distributed under the GNU General Public License, version 3 only (GPL-3.0-only).
+Unimian is distributed under the GNU General Public License, version 3 only (GPL-3.0-only).
 See [LICENSE](LICENSE).
 
 The distributed plugin files (`main.js`, `styles.css`) include the third-party software listed
@@ -10,7 +10,7 @@ listed here.
 
 ## Upstream project
 
-Wise View is a derivative work of **Planner** by Sawyer Rensel
+Unimian is a derivative work of **Planner** by Sawyer Rensel
 (<https://github.com/SawyerRensel/Planner>), licensed under the GNU General Public License v3.0.
 
 ```text
@@ -242,11 +242,11 @@ SOFTWARE.
 - Used for: adapted Timeline toolbar/sidebar controls, temporal header/grid, today indicator,
   edge navigation, scroll anchoring, responsive layout, pointer/pinch zoom, quick scheduling,
   bar drag/resize into configured date properties, and related styling
-- Excluded from Wise View: task status/priority workflow, arbitrary property writes, group writes,
+- Excluded from Unimian: task status/priority workflow, arbitrary property writes, group writes,
   recurrence/dependency logic
 
 The authoritative file-level reuse decision is maintained in
-`docs/architecture/upstream-provenance.md`. The adapted work is distributed as part of Wise View
+`docs/architecture/upstream-provenance.md`. The adapted work is distributed as part of Unimian
 under GPL-3.0-only while preserving the upstream MIT notice and permission terms:
 
 ```text

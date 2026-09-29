@@ -110,8 +110,8 @@ function hasZonedDate(entry: GanttDetailEntry | null): boolean {
 }
 
 function field(label: string, control: ComponentChild, wide = false): ComponentChild {
-	return h('label', { class: wide ? 'wise-view-gantt-detail__field wise-view-gantt-detail__field--wide' : 'wise-view-gantt-detail__field' },
-		h('span', { class: 'wise-view-gantt-detail__label' }, label), control);
+	return h('label', { class: wide ? 'unimian-gantt-detail__field unimian-gantt-detail__field--wide' : 'unimian-gantt-detail__field' },
+		h('span', { class: 'unimian-gantt-detail__label' }, label), control);
 }
 
 export function renderGanttDetail(
@@ -136,18 +136,18 @@ export function renderGanttDetail(
 	const dependencies = task.dependencies ?? [];
 	const info = options.dependencyInfo?.(task.id);
 	const noteLink = (id: string, label: string) => h('button', {
-		class: 'wise-view-gantt-detail__link', type: 'button', 'data-note-path': id,
+		class: 'unimian-gantt-detail__link', type: 'button', 'data-note-path': id,
 		onClick: (event: MouseEvent) => options.onOpenNote(id, event),
 	}, label);
 	const duration = durationLabel(task.startDate, task.endDate);
-	return h('div', { class: 'wise-view-gantt-detail' },
-		h('div', { class: 'wise-view-gantt-detail__top' },
-			h('button', { class: 'clickable-icon wise-view-gantt-detail__close', type: 'button', 'aria-label': 'Close details', onClick: props.close }, '×')),
+	return h('div', { class: 'unimian-gantt-detail' },
+		h('div', { class: 'unimian-gantt-detail__top' },
+			h('button', { class: 'clickable-icon unimian-gantt-detail__close', type: 'button', 'aria-label': 'Close details', onClick: props.close }, '×')),
 		h('button', {
-			class: 'wise-view-gantt-detail__title', type: 'button', 'data-note-path': task.id,
+			class: 'unimian-gantt-detail__title', type: 'button', 'data-note-path': task.id,
 			onClick: (event: MouseEvent) => options.onOpenNote(task.id, event),
 		}, task.name),
-		h('div', { class: 'wise-view-gantt-detail__fields' },
+		h('div', { class: 'unimian-gantt-detail__fields' },
 			field('Start', h('input', {
 				type: startType === 'date' ? 'date' : 'datetime-local', value: inputDate(task.startDate, startType, 'start'),
 				disabled: !editableStart, onChange: (event: Event) => updateDate('start', (event.currentTarget as HTMLInputElement).value),
@@ -173,14 +173,14 @@ export function renderGanttDetail(
 				disabled: !options.canEditProgress || task.readOnly || task.allowProgressChange === false,
 				onChange: (event: Event) => props.update({ progress: Math.max(0, Math.min(100, Math.round(Number((event.currentTarget as HTMLInputElement).value)))) }),
 			})) : null,
-			hasZonedDate(entry) ? h('div', { class: 'wise-view-gantt-detail__timezone' }, `Local time · ${options.localTimeZone}`) : null),
-		options.dependsOnProperty && dependencies.length > 0 ? h('section', { class: 'wise-view-gantt-detail__dependencies' },
-			h('div', { class: 'wise-view-gantt-detail__section-title' }, 'Depends on'),
-			info && info.conflicts > 0 ? h('div', { class: 'wise-view-gantt-detail__warning wise-view-gantt-detail__warning--conflict' },
+			hasZonedDate(entry) ? h('div', { class: 'unimian-gantt-detail__timezone' }, `Local time · ${options.localTimeZone}`) : null),
+		options.dependsOnProperty && dependencies.length > 0 ? h('section', { class: 'unimian-gantt-detail__dependencies' },
+			h('div', { class: 'unimian-gantt-detail__section-title' }, 'Depends on'),
+			info && info.conflicts > 0 ? h('div', { class: 'unimian-gantt-detail__warning unimian-gantt-detail__warning--conflict' },
 				`Starts before ${info.conflicts} predecessor${info.conflicts === 1 ? ' finishes' : 's finish'}.`) : null,
-			info && info.incomplete > 0 ? h('div', { class: 'wise-view-gantt-detail__warning' },
+			info && info.incomplete > 0 ? h('div', { class: 'unimian-gantt-detail__warning' },
 				`Waiting on ${info.incomplete} unfinished predecessor${info.incomplete === 1 ? '' : 's'}.`) : null,
-			...dependencies.map(dependency => h('div', { class: 'wise-view-gantt-detail__dependency', key: `${dependency.type}:${dependency.targetId}` },
+			...dependencies.map(dependency => h('div', { class: 'unimian-gantt-detail__dependency', key: `${dependency.type}:${dependency.targetId}` },
 				noteLink(dependency.targetId, options.taskName?.(dependency.targetId) ?? basename(dependency.targetId)),
 				h('button', {
 					type: 'button', 'aria-label': `Remove dependency ${dependency.targetId}`,
@@ -189,12 +189,12 @@ export function renderGanttDetail(
 						if (options.onRemoveDependency(task.id, dependency)) props.update({ dependencies: dependencies.filter(item => item !== dependency) });
 					},
 				}, '×')))) : null,
-		info && info.blocks.length > 0 ? h('section', { class: 'wise-view-gantt-detail__blocks' },
-			h('div', { class: 'wise-view-gantt-detail__section-title' }, 'Blocks'),
-			...info.blocks.map(blocked => h('div', { class: 'wise-view-gantt-detail__dependency', key: blocked.id }, noteLink(blocked.id, blocked.name)))) : null,
-		entry && entry.visibleProperties.length > 0 ? h('section', { class: 'wise-view-gantt-detail__properties' },
-			h('div', { class: 'wise-view-gantt-detail__section-title' }, 'Properties'),
-			...entry.visibleProperties.map(property => h('div', { class: 'wise-view-gantt-detail__property', key: property },
-				h('span', { class: 'wise-view-gantt-detail__property-name' }, entry.propertyNames.get(property) ?? property),
-				h('span', { class: 'wise-view-gantt-detail__property-value' }, valueText(entry.values.get(property)))))) : null);
+		info && info.blocks.length > 0 ? h('section', { class: 'unimian-gantt-detail__blocks' },
+			h('div', { class: 'unimian-gantt-detail__section-title' }, 'Blocks'),
+			...info.blocks.map(blocked => h('div', { class: 'unimian-gantt-detail__dependency', key: blocked.id }, noteLink(blocked.id, blocked.name)))) : null,
+		entry && entry.visibleProperties.length > 0 ? h('section', { class: 'unimian-gantt-detail__properties' },
+			h('div', { class: 'unimian-gantt-detail__section-title' }, 'Properties'),
+			...entry.visibleProperties.map(property => h('div', { class: 'unimian-gantt-detail__property', key: property },
+				h('span', { class: 'unimian-gantt-detail__property-name' }, entry.propertyNames.get(property) ?? property),
+				h('span', { class: 'unimian-gantt-detail__property-value' }, valueText(entry.values.get(property)))))) : null);
 }

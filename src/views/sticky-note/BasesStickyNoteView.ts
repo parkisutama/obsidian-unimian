@@ -8,7 +8,7 @@
  */
 
 import { BasesView, Component, MarkdownRenderer, setIcon, type BasesEntry, type BasesPropertyId, type QueryController } from 'obsidian';
-import type WiseViewPlugin from '../../main';
+import type UnimianPlugin from '../../main';
 import { computeRenderSignature, type RenderSignatureInput } from '../../platform/bases/changeDetection';
 import { normalizeValue } from '../../platform/bases/entrySnapshotAdapter';
 import { ViewConfigReader } from '../../platform/bases/ViewConfigReader';
@@ -24,7 +24,7 @@ import { findOwningBaseFile } from './ownerBaseFile';
 import { readStickyNoteOptions, STICKY_NOTE_CSS_ONLY_KEYS, type StickyNoteOptions } from './options';
 import { isPinned, togglePin } from './pinStore';
 
-export const BASES_STICKY_NOTE_VIEW_ID = 'wise-view-sticky-note';
+export const BASES_STICKY_NOTE_VIEW_ID = 'unimian-sticky-note';
 
 /** Reads one property's value off a live entry as plain text, or `null` if unset/unreadable. */
 function propertyText(entry: BasesEntry, propertyId: BasesPropertyId | null): string | null {
@@ -137,14 +137,14 @@ export class BasesStickyNoteView extends BasesView {
 	 */
 	private readonly renderScheduler = new RenderScheduler();
 
-	constructor(controller: QueryController, private readonly containerEl: HTMLElement, private readonly plugin: WiseViewPlugin) {
+	constructor(controller: QueryController, private readonly containerEl: HTMLElement, private readonly plugin: UnimianPlugin) {
 		super(controller);
 		this.runtime = new ViewRuntime(containerEl);
-		this.containerEl.addClass('wise-view-sticky-note');
-		this.pinnedHeadingEl = this.containerEl.createEl('h3', { text: 'Pinned', cls: 'wise-view-sticky-note-section-heading' });
-		this.pinnedGridEl = this.containerEl.createDiv({ cls: 'wise-view-sticky-note-grid' });
-		this.othersHeadingEl = this.containerEl.createEl('h3', { text: 'Others', cls: 'wise-view-sticky-note-section-heading' });
-		this.othersGridEl = this.containerEl.createDiv({ cls: 'wise-view-sticky-note-grid' });
+		this.containerEl.addClass('unimian-sticky-note');
+		this.pinnedHeadingEl = this.containerEl.createEl('h3', { text: 'Pinned', cls: 'unimian-sticky-note-section-heading' });
+		this.pinnedGridEl = this.containerEl.createDiv({ cls: 'unimian-sticky-note-grid' });
+		this.othersHeadingEl = this.containerEl.createEl('h3', { text: 'Others', cls: 'unimian-sticky-note-section-heading' });
+		this.othersGridEl = this.containerEl.createDiv({ cls: 'unimian-sticky-note-grid' });
 	}
 
 	onload(): void {
@@ -243,12 +243,12 @@ export class BasesStickyNoteView extends BasesView {
 		const child = new Component();
 		child.load();
 
-		const card = parent.createDiv({ cls: `wise-view-sticky-note-card wise-view-sticky-note-fit-${options.imageFit}` });
+		const card = parent.createDiv({ cls: `unimian-sticky-note-card unimian-sticky-note-fit-${options.imageFit}` });
 		const color = this.resolveCardColor(options, entry);
-		if (color) card.style.setProperty('--wise-view-color-bg', color);
+		if (color) card.style.setProperty('--unimian-color-bg', color);
 
 		const open = (event: MouseEvent | KeyboardEvent) => {
-			if ((event.target as HTMLElement).closest('a, .internal-embed, .wise-view-sticky-note-pin-btn')) return;
+			if ((event.target as HTMLElement).closest('a, .internal-embed, .unimian-sticky-note-pin-btn')) return;
 			activateEntry({
 				app: this.plugin.app,
 				settings: this.plugin.settings,
@@ -266,7 +266,7 @@ export class BasesStickyNoteView extends BasesView {
 		card.setAttribute('tabindex', '0');
 		card.setAttribute('role', 'button');
 
-		const pinBtn = card.createDiv({ cls: `wise-view-sticky-note-pin-btn${pinned ? ' is-pinned' : ''}` });
+		const pinBtn = card.createDiv({ cls: `unimian-sticky-note-pin-btn${pinned ? ' is-pinned' : ''}` });
 		setIcon(pinBtn, 'pin');
 		pinBtn.setAttribute('aria-label', pinned ? 'Unpin note' : 'Pin note');
 		pinBtn.addEventListener('click', (event) => {
@@ -280,13 +280,13 @@ export class BasesStickyNoteView extends BasesView {
 		if (coverRaw) {
 			const coverSrc = resolveCoverImageSrc(this.plugin.app, coverRaw);
 			if (coverSrc) {
-				const cover = card.createDiv({ cls: 'wise-view-sticky-note-cover' });
+				const cover = card.createDiv({ cls: 'unimian-sticky-note-cover' });
 				cover.createEl('img', { attr: { src: coverSrc, alt: '' } });
 			}
 		}
 
-		card.createEl('h4', { text: title, cls: 'wise-view-sticky-note-title' });
-		const body = card.createDiv({ cls: 'wise-view-sticky-note-body' });
+		card.createEl('h4', { text: title, cls: 'unimian-sticky-note-title' });
+		const body = card.createDiv({ cls: 'unimian-sticky-note-body' });
 		try {
 			if (!isTextExcerptExtension(file.extension)) {
 				if (file.extension === 'canvas') {
@@ -294,7 +294,7 @@ export class BasesStickyNoteView extends BasesView {
 					// embedding it via MarkdownRenderer renders nothing useful inside a small
 					// card (native testing, 2026-09-23; the real preview only appeared once
 					// opened in Quick Preview's own live leaf).
-					body.createDiv({ text: 'Canvas — open to view.', cls: 'wise-view-sticky-note-embed-placeholder' });
+					body.createDiv({ text: 'Canvas — open to view.', cls: 'unimian-sticky-note-embed-placeholder' });
 				} else if (file.extension === 'base' && file.path === basePath) {
 					// STICKY-008: a Base's own query can list the Base file itself as an entry
 					// (seen in native testing). Embedding it here would recurse into this same
@@ -302,7 +302,7 @@ export class BasesStickyNoteView extends BasesView {
 					// risk, not a hypothetical. Placeholder instead of an embed for this one
 					// case; every other non-text entry (other `.base` files, images, PDFs, ...)
 					// still embeds normally.
-					body.createDiv({ text: 'This Base — open to view.', cls: 'wise-view-sticky-note-embed-placeholder' });
+					body.createDiv({ text: 'This Base — open to view.', cls: 'unimian-sticky-note-embed-placeholder' });
 				} else {
 					// A binary file's raw bytes are never meaningful as prose (spec §5.4.2 for
 					// `.base`/`.canvas`, generalized 2026-09-23 after native testing showed an
@@ -316,7 +316,7 @@ export class BasesStickyNoteView extends BasesView {
 				await MarkdownRenderer.render(this.plugin.app, excerpt || '*(empty note)*', body, file.path, child);
 			}
 		} catch {
-			body.createDiv({ text: 'Could not render preview.', cls: 'wise-view-sticky-note-error' });
+			body.createDiv({ text: 'Could not render preview.', cls: 'unimian-sticky-note-error' });
 		}
 
 		return { el: card, mtime: file.stat?.mtime ?? 0, pinned, component: child, kind: 'full' };
@@ -328,7 +328,7 @@ export class BasesStickyNoteView extends BasesView {
 	 * promote once this element nears the viewport — see `placeholderObserver`.
 	 */
 	private createPlaceholder(entry: BasesEntry, parent: HTMLElement, estimatedHeight: number): CardEntry {
-		const el = parent.createDiv({ cls: 'wise-view-sticky-note-card wise-view-sticky-note-card-placeholder' });
+		const el = parent.createDiv({ cls: 'unimian-sticky-note-card unimian-sticky-note-card-placeholder' });
 		el.style.height = `${estimatedHeight}px`;
 		el.dataset.stickyPath = entry.file.path;
 		this.placeholderObserver?.observe(el);
@@ -435,7 +435,7 @@ export class BasesStickyNoteView extends BasesView {
 
 		if (this.safetyNetTimer !== null) this.runtime.win.clearTimeout(this.safetyNetTimer);
 		for (const gridEl of [this.pinnedGridEl, this.othersGridEl]) {
-			gridEl.style.setProperty('--wise-view-sticky-note-max-height', `${options.cardMaxHeight}px`);
+			gridEl.style.setProperty('--unimian-sticky-note-max-height', `${options.cardMaxHeight}px`);
 		}
 
 		// Only content-affecting options invalidate cached cards — cardWidth/cardMaxHeight/
@@ -470,7 +470,7 @@ export class BasesStickyNoteView extends BasesView {
 			this.otherEntryByPath.clear();
 			this.cardResizeObserver?.disconnect();
 			this.othersGridEl.addClass('is-ready'); // No relayout will run to add this — the empty state has no cards to hide behind a fade-in.
-			this.othersGridEl.createDiv({ text: 'No entries match this Base.', cls: 'wise-view-sticky-note-empty' });
+			this.othersGridEl.createDiv({ text: 'No entries match this Base.', cls: 'unimian-sticky-note-empty' });
 			return;
 		}
 
@@ -515,7 +515,7 @@ export class BasesStickyNoteView extends BasesView {
 					&& ((wantFull && existing.kind === 'full') || (!wantFull && existing.kind === 'placeholder'))) {
 					if (existing.kind === 'full') {
 						if (existing.pinned !== pinned) {
-							const pinBtn = existing.el.querySelector('.wise-view-sticky-note-pin-btn');
+							const pinBtn = existing.el.querySelector('.unimian-sticky-note-pin-btn');
 							pinBtn?.classList.toggle('is-pinned', pinned);
 							pinBtn?.setAttribute('aria-label', pinned ? 'Unpin note' : 'Pin note');
 							existing.pinned = pinned;
@@ -523,7 +523,7 @@ export class BasesStickyNoteView extends BasesView {
 						// `imageFit` is excluded from the content-invalidation key above
 						// (CSS-only), but still needs syncing on a reused card — cheap class
 						// toggle, not a rebuild.
-						existing.el.className = `wise-view-sticky-note-card wise-view-sticky-note-fit-${options.imageFit}`;
+						existing.el.className = `unimian-sticky-note-card unimian-sticky-note-fit-${options.imageFit}`;
 					}
 					gridEl.appendChild(existing.el); // Cheap even if already the right parent — keeps DOM order matching the query's order for masonry.
 					continue;

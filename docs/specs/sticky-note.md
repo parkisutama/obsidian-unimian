@@ -22,7 +22,7 @@ repeating Grid's failure mode — see §6 (Layout approach) and §7 (Risks) for 
 
 ## 1. Objective
 
-A new Bases view, "Sticky Note" (id `wise-view-sticky-note`), that renders entries as a
+A new Bases view, "Sticky Note" (current id `unimian-sticky-note`), that renders entries as a
 Google-Keep-style card grid: a **bounded Markdown excerpt** per card (not the whole note —
 see §5.4), tables and inline formatting rendered through Obsidian's own `MarkdownRenderer`,
 per-card accent color, and a plugin-level pin-to-top feature — without writing anything to note
@@ -31,12 +31,12 @@ frontmatter for view-only state (color stays a property; pin does not).
 References for the card-grid *interaction and content-model* shape (not code, see §5.4 and
 `docs/architecture/upstream-provenance.md` for what each contributes and why nothing is copied):
 <https://github.com/k4fn/keep-bases-view> and <https://github.com/rknastenka/obsidian-mini-notes>.
-Wise View's approach to color, layout, and persistence deliberately differs from both; see §5
+Unimian's approach to color, layout, and persistence deliberately differs from both; see §5
 and §6.
 
 ## 2. Scope
 
-1. **View registration.** `wise-view-sticky-note` in `src/viewRegistry.ts`, displayed as "Sticky
+1. **View registration.** `unimian-sticky-note` in `src/viewRegistry.ts`, displayed as "Sticky
    Note", read-only (no `capabilities.mutations`, no `legacyMutation` — see §5.3).
 2. **Card rendering.** Each card renders a **bounded excerpt** of the note's own content/body
    (not a synthetic template, not the whole note) via Obsidian's `MarkdownRenderer.render()`, so
@@ -52,7 +52,7 @@ and §6.
 5. **Card layout options.** Base view options (`src/platform/bases/viewOptionTypes.ts` +
    `ViewConfigReader`) for: card title property, cover image property, color property, image
    fit, card width (desktop/tablet/mobile), excerpt character budget — mirroring the "Configure
-   view" panel already shown for the reference plugin, adapted to Wise View's own options schema
+   view" panel already shown for the reference plugin, adapted to Unimian's own options schema
    conventions (see Gantt/Calendar `options` callbacks for the pattern). "Show tags" is *not*
    part of v1 (§5.4.4 — inline `#tags` already render as pills, so a separate tag row would be
    genuine duplication, not a distinct feature); revisit only alongside a real design for that
@@ -93,7 +93,7 @@ Concrete, already-in-tree pieces this view builds on instead of re-implementing:
 
 - **Not a note property.** Pin state is exclusive to this view and must never touch frontmatter.
 - Stored in the plugin's own `data.json` (via `loadData()`/`saveData()`, the same mechanism
-  `WiseViewSettings` already uses — `src/main.ts:132`), under a new namespace:
+  `UnimianSettings` already uses — `src/main.ts:132`), under a new namespace:
 
   ```ts
   interface StickyNoteData {
@@ -289,7 +289,7 @@ not conceptual masonry-layout mistakes:
 
 ## 9. Definition of done
 
-1. `wise-view-sticky-note` registered, renders cards per §2, with pin (§5.1) and color (§5.2)
+1. `unimian-sticky-note` registered, renders cards per §2, with pin (§5.1) and color (§5.2)
    working exactly as decided here.
 2. No delete/trash capability shipped (§5.3) — deferred to its own future decision record.
 3. Layout spike (§8.1) passed before full build began; native acceptance (§8.3) passed before

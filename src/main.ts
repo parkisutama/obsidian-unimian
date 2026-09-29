@@ -6,8 +6,8 @@
 // Modifications Copyright (C) 2026 Parkis Utama
 
 import { Plugin } from 'obsidian';
-import { WiseViewSettings, DEFAULT_SETTINGS } from './types/settings';
-import { WiseViewSettingTab } from './settings/SettingsTab';
+import { UnimianSettings, DEFAULT_SETTINGS } from './types/settings';
+import { UnimianSettingTab } from './settings/SettingsTab';
 import { ViewRegistry, type ViewDescriptor } from './viewRegistry';
 
 import {
@@ -40,8 +40,8 @@ import { migratePath, pruneMissing } from './views/sticky-note/pinStore';
 // ship or keep patching it blind. See docs/architecture/upstream-provenance.md's Dynamic Views
 // entry for the history if this is revisited.
 
-export default class WiseViewPlugin extends Plugin {
-  settings!: WiseViewSettings;
+export default class UnimianPlugin extends Plugin {
+  settings!: UnimianSettings;
   private readonly viewRegistry = new ViewRegistry();
 
   async onload() {
@@ -51,7 +51,7 @@ export default class WiseViewPlugin extends Plugin {
     this.registerViewDescriptors(this.buildViewDescriptors());
 
     // Add settings tab
-    this.addSettingTab(new WiseViewSettingTab(this.app, this));
+    this.addSettingTab(new UnimianSettingTab(this.app, this));
 
     // Sticky Note pin persistence (spec docs/specs/sticky-note.md §5.1): plugin-level, never a
     // note property. Prune stale entries once at load, then keep both sides of the mapping
@@ -160,7 +160,7 @@ export default class WiseViewPlugin extends Plugin {
   }
 
   async loadSettings() {
-    const loadedData = await this.loadData() as (Partial<WiseViewSettings> & { kanbanDefaults?: unknown; ganttDefaults?: unknown }) | null;
+    const loadedData = await this.loadData() as (Partial<UnimianSettings> & { kanbanDefaults?: unknown; ganttDefaults?: unknown }) | null;
     // Versions before the Swimlane rename saved every Kanban default, including a forced
     // "note.status" column property. Drop that key instead of migrating it. The Frappe Gantt view's
     // "ganttDefaults" are dropped the same way: nothing reads them any more.

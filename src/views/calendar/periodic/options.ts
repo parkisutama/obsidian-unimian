@@ -15,7 +15,7 @@ const GROUPS: Record<PeriodicKind, { name: string; placeholder: string }> = {
 
 /**
  * One option group per period. A period with an empty path pattern is not configured and gets no
- * links. The template is created through Templater or core Templates; Wise View never substitutes
+ * links. The template is created through Templater or core Templates; Unimian never substitutes
  * tokens in it.
  */
 export function createPeriodicOptions(): BasesAllOptions[] {

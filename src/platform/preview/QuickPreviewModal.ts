@@ -29,7 +29,7 @@ const FRONTMATTER_BLOCK = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
  * Scoped to this class, active only while a Quick Preview modal is open, rather than a global
  * z-index change.
  */
-const ACTIVE_CLASS = 'wise-view-quick-preview-active';
+const ACTIVE_CLASS = 'unimian-quick-preview-active';
 
 export type OpenFull = (path: string, event?: UserEvent | null) => void;
 
@@ -45,12 +45,12 @@ export class QuickPreviewModal extends Modal {
 	async onOpen(): Promise<void> {
 		const file = this.app.vault.getAbstractFileByPath(this.path);
 		if (!(file instanceof TFile)) {
-			new Notice('Wise View: note not found.');
+			new Notice('Unimian: note not found.');
 			this.close();
 			return;
 		}
 
-		this.modalEl.addClass('wise-view-quick-preview');
+		this.modalEl.addClass('unimian-quick-preview');
 		document.body.classList.add(ACTIVE_CLASS);
 		const { contentEl } = this;
 		contentEl.empty();
@@ -59,19 +59,19 @@ export class QuickPreviewModal extends Modal {
 		// menu (which includes opening a real tab) and clicking a linked-mention item below
 		// chains straight into that note's own quick preview instead — nothing here needs a
 		// second, redundant way to leave the popup.
-		const layout = contentEl.createDiv({ cls: 'wise-view-quick-preview-layout' });
-		const bodyEl = layout.createDiv({ cls: 'wise-view-quick-preview-body' });
+		const layout = contentEl.createDiv({ cls: 'unimian-quick-preview-layout' });
+		const bodyEl = layout.createDiv({ cls: 'unimian-quick-preview-body' });
 
 		const backlinks = getBacklinkPaths(this.app, this.path);
 		if (backlinks.length > 0) {
-			const panel = layout.createDiv({ cls: 'wise-view-quick-preview-backlinks' });
+			const panel = layout.createDiv({ cls: 'unimian-quick-preview-backlinks' });
 			panel.createEl('h3', { text: 'Linked mentions' });
 			const list = panel.createEl('ul');
 			for (const backlink of backlinks) {
 				const item = list.createEl('li');
 				const link = item.createEl('a', {
 					text: backlink.basename,
-					cls: 'wise-view-quick-preview-backlink',
+					cls: 'unimian-quick-preview-backlink',
 					attr: { title: backlink.path },
 				});
 				link.addEventListener('click', (event) => {
@@ -93,12 +93,12 @@ export class QuickPreviewModal extends Modal {
 
 		if (detached) {
 			this.detachedLeaf = detached;
-			bodyEl.addClass('wise-view-quick-preview-body--leaf');
+			bodyEl.addClass('unimian-quick-preview-body--leaf');
 			bodyEl.appendChild(detached.el);
 			return;
 		}
 
-		bodyEl.createEl('h2', { text: file.basename, cls: 'wise-view-quick-preview-title' });
+		bodyEl.createEl('h2', { text: file.basename, cls: 'unimian-quick-preview-title' });
 
 		this.renderChild = new Component();
 		this.renderChild.load();

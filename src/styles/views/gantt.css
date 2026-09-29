@@ -8,7 +8,7 @@
    real scrolling ancestor's pixel height onto this element's inline style instead. Either way,
    overflow: hidden is what then keeps the toolbar and the chart's sticky timeline header fixed
    while only the library's own .gantt-scroll-container scrolls. */
-.bases-view.wise-view-gantt {
+.bases-view.unimian-gantt {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -18,7 +18,7 @@
 	color: var(--text-normal);
 }
 
-.wise-view-gantt-toolbar {
+.unimian-gantt-toolbar {
 	display: flex;
 	flex: 0 0 auto;
 	align-items: center;
@@ -27,11 +27,11 @@
 	border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.wise-view-gantt-toolbar__scale {
+.unimian-gantt-toolbar__scale {
 	min-width: 7rem;
 }
 
-.wise-view-gantt-toolbar__button {
+.unimian-gantt-toolbar__button {
 	display: inline-flex;
 	align-items: center;
 	gap: var(--size-2-1);
@@ -39,13 +39,13 @@
 	padding-inline: var(--size-2-2);
 }
 
-.wise-view-gantt-chart {
+.unimian-gantt-chart {
 	min-height: 0;
 	flex: 1 1 auto;
 	overflow: hidden;
 }
 
-.wise-view-gantt-chart > .gantt-container {
+.unimian-gantt-chart > .gantt-container {
 	--gantt-font-sans: var(--font-interface);
 	--gantt-background: var(--background-primary);
 	--gantt-foreground: var(--text-normal);
@@ -75,38 +75,38 @@
 }
 
 /* The chart uses a UTC wall clock; our task dates are local-floating, so align "now" likewise. */
-.wise-view-gantt .gantt-today-marker {
+.unimian-gantt .gantt-today-marker {
 	transform: translateX(var(--gantt-local-today-offset, 0px));
 }
 
-.wise-view-gantt .gantt-today-dot {
+.unimian-gantt .gantt-today-dot {
 	transform: translate(calc(-50% + var(--gantt-local-today-offset, 0px)), 50%);
 }
 
 @media (max-width: 600px) {
-	.wise-view-gantt-toolbar__label {
+	.unimian-gantt-toolbar__label {
 		display: none;
 	}
 
-	.wise-view-gantt-toolbar__button {
+	.unimian-gantt-toolbar__button {
 		padding-inline: var(--size-2-1);
 	}
 }
 
-.wise-view-gantt-empty {
+.unimian-gantt-empty {
 	display: grid;
 	min-height: 240px;
 	place-items: center;
 	color: var(--text-muted);
 }
 
-/* Summary bars carry the same visual weight as their task rows in Wise View. */
-.wise-view-gantt .gantt-task-bar.summary {
+/* Summary bars carry the same visual weight as their task rows in Unimian. */
+.unimian-gantt .gantt-task-bar.summary {
 	height: 28px !important;
 	border-radius: 6px;
 }
 
-.wise-view-gantt-detail {
+.unimian-gantt-detail {
 	display: flex;
 	flex-direction: column;
 	gap: var(--size-4-2);
@@ -114,19 +114,19 @@
 }
 
 /* The close button sits alone on a row above the title, so it reads as the panel's, not the note's. */
-.wise-view-gantt-detail__top {
+.unimian-gantt-detail__top {
 	display: flex;
 	justify-content: flex-end;
 	margin-block: calc(var(--size-4-1) * -1) calc(var(--size-2-2) * -1);
 }
 
-.wise-view-gantt-detail__dependency {
+.unimian-gantt-detail__dependency {
 	display: flex;
 	align-items: center;
 	gap: var(--size-2-2);
 }
 
-.wise-view-gantt-detail__title {
+.unimian-gantt-detail__title {
 	display: block;
 	width: 100%;
 	height: auto;
@@ -144,98 +144,98 @@
 	cursor: pointer;
 }
 
-.wise-view-gantt-detail__title:hover {
+.unimian-gantt-detail__title:hover {
 	background: transparent;
 	text-decoration: underline;
 }
 
-.wise-view-gantt-detail__close {
+.unimian-gantt-detail__close {
 	flex: 0 0 auto;
 }
 
-.wise-view-gantt-detail__fields {
+.unimian-gantt-detail__fields {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: var(--size-2-3) var(--size-4-2);
 }
 
 /* Labels sit above their values instead of taking a column of their own. */
-.wise-view-gantt-detail__field {
+.unimian-gantt-detail__field {
 	display: flex;
 	flex-direction: column;
 	gap: var(--size-2-1);
 	min-width: 0;
 }
 
-.wise-view-gantt-detail__field--wide,
-.wise-view-gantt-detail__timezone {
+.unimian-gantt-detail__field--wide,
+.unimian-gantt-detail__timezone {
 	grid-column: 1 / -1;
 }
 
-.wise-view-gantt-detail__field input {
+.unimian-gantt-detail__field input {
 	min-width: 0;
 	width: 100%;
 }
 
-.wise-view-gantt-detail__label,
-.wise-view-gantt-detail__property-name,
-.wise-view-gantt-detail__timezone {
+.unimian-gantt-detail__label,
+.unimian-gantt-detail__property-name,
+.unimian-gantt-detail__timezone {
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 }
 
-.wise-view-gantt-detail__section-title {
+.unimian-gantt-detail__section-title {
 	margin-bottom: var(--size-2-2);
 	font-weight: var(--font-semibold);
 }
 
-.wise-view-gantt-detail__dependencies,
-.wise-view-gantt-detail__properties {
+.unimian-gantt-detail__dependencies,
+.unimian-gantt-detail__properties {
 	padding-top: var(--size-4-2);
 	border-top: 1px solid var(--background-modifier-border);
 }
 
-.wise-view-gantt-detail__dependency span,
-.wise-view-gantt-detail__property-value {
+.unimian-gantt-detail__dependency span,
+.unimian-gantt-detail__property-value {
 	min-width: 0;
 	flex: 1;
 	overflow-wrap: anywhere;
 }
 
-.wise-view-gantt-detail__property {
+.unimian-gantt-detail__property {
 	display: flex;
 	flex-direction: column;
 	gap: 0;
 	padding-block: var(--size-2-1);
 }
 
-.wise-view-gantt-detail__property-name {
+.unimian-gantt-detail__property-name {
 	width: auto;
 	flex: none;
 }
 
 /* Derived from Depends on: a bar that starts before a predecessor finishes, or waits on an
    unfinished one. The class lands on both the bar and its task-list row. */
-.wise-view-gantt-chart .wise-view-gantt-conflict .gantt-task-bar,
-.wise-view-gantt-chart .gantt-task-bar.wise-view-gantt-conflict {
+.unimian-gantt-chart .unimian-gantt-conflict .gantt-task-bar,
+.unimian-gantt-chart .gantt-task-bar.unimian-gantt-conflict {
 	outline: 2px solid var(--text-error);
 	outline-offset: 1px;
 }
 
-.wise-view-gantt-chart .wise-view-gantt-blocked .gantt-task-bar,
-.wise-view-gantt-chart .gantt-task-bar.wise-view-gantt-blocked {
+.unimian-gantt-chart .unimian-gantt-blocked .gantt-task-bar,
+.unimian-gantt-chart .gantt-task-bar.unimian-gantt-blocked {
 	opacity: 0.6;
 }
 
-.wise-view-gantt-chart .gantt-grid-row.wise-view-gantt-conflict {
+.unimian-gantt-chart .gantt-grid-row.unimian-gantt-conflict {
 	box-shadow: inset 3px 0 0 var(--text-error);
 }
 
-.wise-view-gantt-chart .gantt-grid-row.wise-view-gantt-blocked {
+.unimian-gantt-chart .gantt-grid-row.unimian-gantt-blocked {
 	box-shadow: inset 3px 0 0 var(--text-faint);
 }
 
-.wise-view-gantt-detail__link {
+.unimian-gantt-detail__link {
 	min-width: 0;
 	height: auto;
 	flex: 1;
@@ -250,28 +250,28 @@
 	cursor: pointer;
 }
 
-.wise-view-gantt-detail__link:hover {
+.unimian-gantt-detail__link:hover {
 	background: none;
 	text-decoration: underline;
 }
 
-.wise-view-gantt-detail__warning {
+.unimian-gantt-detail__warning {
 	margin-bottom: var(--size-2-2);
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 }
 
-.wise-view-gantt-detail__warning--conflict {
+.unimian-gantt-detail__warning--conflict {
 	color: var(--text-error);
 }
 
-.wise-view-gantt-detail__blocks {
+.unimian-gantt-detail__blocks {
 	padding-top: var(--size-4-2);
 	border-top: 1px solid var(--background-modifier-border);
 }
 
 /* Ctrl/Cmd is Obsidian's Page Preview modifier; the library's own hover card would sit under it. */
-.wise-view-gantt-previewing .gantt-bar-tooltip-detail {
+.unimian-gantt-previewing .gantt-bar-tooltip-detail {
 	display: none;
 }
 
@@ -281,6 +281,6 @@
  * text color instead (white on dark bars, black on light ones) keeps the fill distinguishable at either
  * end. The library sets --gantt-progress-color inline on colored bars, hence !important.
  */
-.wise-view-gantt-chart .gantt-task-bar[style*="--gantt-progress-color"]:not(.summary) {
+.unimian-gantt-chart .gantt-task-bar[style*="--gantt-progress-color"]:not(.summary) {
 	--gantt-progress-color: color-mix(in srgb, var(--gantt-bar-color) 50%, var(--gantt-bar-text-color)) !important;
 }

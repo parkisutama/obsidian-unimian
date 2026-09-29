@@ -44,7 +44,7 @@ jobs:
               run: pnpm run check:ci
 
             - name: Package plugin zip
-              run: zip wise-view.zip main.js manifest.json styles.css LICENSE THIRD_PARTY_NOTICES.md
+              run: zip unimian.zip main.js manifest.json styles.css LICENSE THIRD_PARTY_NOTICES.md
 
             - name: Create release
               env:
@@ -55,4 +55,4 @@ jobs:
                   gh release create "$tag" \
                     --title="$tag" \
                     --generate-notes \
-                    main.js manifest.json styles.css LICENSE THIRD_PARTY_NOTICES.md wise-view.zip
+                    main.js manifest.json styles.css LICENSE THIRD_PARTY_NOTICES.md unimian.zip

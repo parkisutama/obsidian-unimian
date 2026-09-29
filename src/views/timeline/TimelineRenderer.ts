@@ -168,13 +168,13 @@ export class TimelineRenderer {
 	};
 	private readonly handleTouchEnd = (): void => { this.pinchDistance = null; };
 	private readonly handleQuickScheduleClick = (event: MouseEvent): void => {
-		if (this.suppressBarClick && event.target instanceof Element && event.target.closest('.wise-view-timeline__bar')) {
+		if (this.suppressBarClick && event.target instanceof Element && event.target.closest('.unimian-timeline__bar')) {
 			event.preventDefault();
 			event.stopPropagation();
 			this.suppressBarClick = false;
 			return;
 		}
-		const ghost = event.target instanceof Element ? event.target.closest<HTMLElement>('.wise-view-timeline__ghost') : null;
+		const ghost = event.target instanceof Element ? event.target.closest<HTMLElement>('.unimian-timeline__ghost') : null;
 		const path = ghost?.dataset.notePath;
 		if (!path || !this.quickScheduleGhost) return;
 		event.preventDefault();
@@ -183,22 +183,22 @@ export class TimelineRenderer {
 	};
 
 	constructor(private readonly containerEl: HTMLElement, private readonly actions: TimelineRendererActions = {}) {
-		containerEl.classList.add('wise-view-timeline');
-		this.toolbarEl = containerEl.createDiv({ cls: 'wise-view-timeline__toolbar' });
+		containerEl.classList.add('unimian-timeline');
+		this.toolbarEl = containerEl.createDiv({ cls: 'unimian-timeline__toolbar' });
 		this.toolbarEl.setAttribute('role', 'toolbar');
 		this.toolbarEl.setAttribute('aria-label', 'Timeline controls');
-		const main = containerEl.createDiv({ cls: 'wise-view-timeline__main' });
-		this.sidebarPanel = main.createDiv({ cls: 'wise-view-timeline__sidebar-panel' });
+		const main = containerEl.createDiv({ cls: 'unimian-timeline__main' });
+		this.sidebarPanel = main.createDiv({ cls: 'unimian-timeline__sidebar-panel' });
 		// Mirrors the chart header's height so sidebar rows line up with their timeline bars —
 		// without it, the sidebar column starts a header's-height too high once the toolbar
 		// (which used to fill that gap) moved out to sit above both columns.
-		this.sidebarPanel.createDiv({ cls: 'wise-view-timeline__sidebar-corner' });
-		this.sidebarViewport = this.sidebarPanel.createDiv({ cls: 'wise-view-timeline__sidebar' });
-		const chart = main.createDiv({ cls: 'wise-view-timeline__chart' });
-		this.headerEl = chart.createDiv({ cls: 'wise-view-timeline__header' });
-		this.headerCanvas = this.headerEl.createDiv({ cls: 'wise-view-timeline__header-canvas' });
-		this.timelineViewport = chart.createDiv({ cls: 'wise-view-timeline__scroller' });
-		this.gridEl = this.timelineViewport.createDiv({ cls: 'wise-view-timeline__grid' });
+		this.sidebarPanel.createDiv({ cls: 'unimian-timeline__sidebar-corner' });
+		this.sidebarViewport = this.sidebarPanel.createDiv({ cls: 'unimian-timeline__sidebar' });
+		const chart = main.createDiv({ cls: 'unimian-timeline__chart' });
+		this.headerEl = chart.createDiv({ cls: 'unimian-timeline__header' });
+		this.headerCanvas = this.headerEl.createDiv({ cls: 'unimian-timeline__header-canvas' });
+		this.timelineViewport = chart.createDiv({ cls: 'unimian-timeline__scroller' });
+		this.gridEl = this.timelineViewport.createDiv({ cls: 'unimian-timeline__grid' });
 		this.sidebarRows = new VirtualLinearCollection(this.sidebarViewport, {
 			rowHeight: ROW_HEIGHT,
 			overscan: 5,
@@ -223,7 +223,7 @@ export class TimelineRenderer {
 		this.timelineViewport.addEventListener('touchstart', this.handleTouchStart, { passive: true });
 		this.timelineViewport.addEventListener('touchmove', this.handleTouchMove, { passive: false });
 		this.timelineViewport.addEventListener('touchend', this.handleTouchEnd, { passive: true });
-		this.emptyEl = containerEl.createDiv({ cls: 'wise-view-timeline__empty' });
+		this.emptyEl = containerEl.createDiv({ cls: 'unimian-timeline__empty' });
 	}
 
 	render(
@@ -239,13 +239,13 @@ export class TimelineRenderer {
 		this.currentModel = model;
 		this.currentToday = today;
 		this.wrapTitles = wrapTitles;
-		this.containerEl.classList.toggle('wise-view-timeline--wrap-titles', wrapTitles);
+		this.containerEl.classList.toggle('unimian-timeline--wrap-titles', wrapTitles);
 		// No start property configured: the toolbar/header/grid/today below would otherwise
 		// still render a fully-formed-looking calendar around "today" that tracks no real
 		// property, misleadingly implying a working timeline. CSS hides that chrome under this
 		// class so only the configuration hint is visible; the pipeline still runs normally
 		// (with an empty model) so bars/rows from a previous configured state are cleared.
-		this.containerEl.classList.toggle('wise-view-timeline--unconfigured', !model.startConfigured);
+		this.containerEl.classList.toggle('unimian-timeline--unconfigured', !model.startConfigured);
 		this.activeZoom ??= zoom;
 		this.layoutViewportWidth = this.timelineViewport.clientWidth || 500;
 		const layout = createTimelineLayout(model, today, this.activeZoom, this.layoutViewportWidth, this.extraPaddingDays);
@@ -279,7 +279,7 @@ export class TimelineRenderer {
 
 	toggleSidebar(): void {
 		this.sidebarCollapsed = !this.sidebarCollapsed;
-		this.containerEl.classList.toggle('wise-view-timeline--sidebar-collapsed', this.sidebarCollapsed);
+		this.containerEl.classList.toggle('unimian-timeline--sidebar-collapsed', this.sidebarCollapsed);
 		this.renderToolbar();
 		this.refreshViewport(true);
 	}
@@ -323,7 +323,7 @@ export class TimelineRenderer {
 	}
 
 	setNarrow(narrow: boolean): void {
-		this.containerEl.classList.toggle('wise-view-timeline--narrow', narrow);
+		this.containerEl.classList.toggle('unimian-timeline--narrow', narrow);
 	}
 
 	refreshViewport(reflow = false): void {
@@ -353,11 +353,11 @@ export class TimelineRenderer {
 		// (Timeline -> Table, Timeline -> Gantt, ...). Leaving our classes on it after unload would
 		// leave the next view type wearing our !important flex/overflow layout.
 		this.containerEl.classList.remove(
-			'wise-view-timeline',
-			'wise-view-timeline--wrap-titles',
-			'wise-view-timeline--unconfigured',
-			'wise-view-timeline--sidebar-collapsed',
-			'wise-view-timeline--narrow',
+			'unimian-timeline',
+			'unimian-timeline--wrap-titles',
+			'unimian-timeline--unconfigured',
+			'unimian-timeline--sidebar-collapsed',
+			'unimian-timeline--narrow',
 		);
 	}
 
@@ -394,7 +394,7 @@ export class TimelineRenderer {
 	private startDrag(event: PointerEvent): void {
 		if (event.button !== 0 || !this.currentLayout) return;
 		const target = event.target instanceof Element ? event.target : null;
-		const barEl = target?.closest<HTMLElement>('.wise-view-timeline__bar');
+		const barEl = target?.closest<HTMLElement>('.unimian-timeline__bar');
 		const path = barEl?.dataset.notePath;
 		const layout = path ? this.bars.get(path) : null;
 		if (!barEl || !path || !layout?.item.range) return;
@@ -403,8 +403,8 @@ export class TimelineRenderer {
 		const startDay = pending?.startDay ?? bounds.startDay;
 		const endDay = pending?.endDay ?? bounds.endDay - 1;
 		let mode: TimelineDragState['mode'] = 'move';
-		if (target?.closest('.wise-view-timeline__handle--left')) mode = 'resize-left';
-		else if (target?.closest('.wise-view-timeline__handle--right')) mode = 'resize-right';
+		if (target?.closest('.unimian-timeline__handle--left')) mode = 'resize-left';
+		else if (target?.closest('.unimian-timeline__handle--right')) mode = 'resize-right';
 		this.drag = {
 			path,
 			barEl,
@@ -438,20 +438,20 @@ export class TimelineRenderer {
 		}
 		const left = dateToPixel(drag.start, this.currentLayout.domain, this.activeZoom);
 		const width = Math.max(8, (drag.end - drag.start + 1) * TIMELINE_ZOOM_SPECS[this.activeZoom].pixelsPerDay - 2);
-		drag.barEl.style.setProperty('--wise-view-timeline-left', `${left}px`);
-		drag.barEl.style.setProperty('--wise-view-timeline-bar-width', `${width}px`);
-		drag.barEl.classList.toggle('wise-view-timeline__bar--dragging', drag.moved);
-		const startLabel = drag.barEl.parentElement?.querySelector<HTMLElement>('.wise-view-timeline__date-label--start');
-		const endLabel = drag.barEl.parentElement?.querySelector<HTMLElement>('.wise-view-timeline__date-label--end');
+		drag.barEl.style.setProperty('--unimian-timeline-left', `${left}px`);
+		drag.barEl.style.setProperty('--unimian-timeline-bar-width', `${width}px`);
+		drag.barEl.classList.toggle('unimian-timeline__bar--dragging', drag.moved);
+		const startLabel = drag.barEl.parentElement?.querySelector<HTMLElement>('.unimian-timeline__date-label--start');
+		const endLabel = drag.barEl.parentElement?.querySelector<HTMLElement>('.unimian-timeline__date-label--end');
 		if (startLabel) {
 			startLabel.setText(this.formatDay(drag.start));
-			startLabel.style.setProperty('--wise-view-timeline-left', `${left}px`);
-			startLabel.classList.toggle('wise-view-timeline__date-label--active', drag.moved);
+			startLabel.style.setProperty('--unimian-timeline-left', `${left}px`);
+			startLabel.classList.toggle('unimian-timeline__date-label--active', drag.moved);
 		}
 		if (endLabel) {
 			endLabel.setText(this.formatDay(drag.end));
-			endLabel.style.setProperty('--wise-view-timeline-left', `${left + width}px`);
-			endLabel.classList.toggle('wise-view-timeline__date-label--active', drag.moved);
+			endLabel.style.setProperty('--unimian-timeline-left', `${left + width}px`);
+			endLabel.classList.toggle('unimian-timeline__date-label--active', drag.moved);
 		}
 	}
 
@@ -495,7 +495,7 @@ export class TimelineRenderer {
 	private previewQuickSchedule(event: PointerEvent): void {
 		if (!this.currentLayout || !this.activeZoom) return;
 		const row = event.target instanceof Element
-			? event.target.closest<HTMLElement>('.wise-view-timeline__row--unscheduled[data-note-path]')
+			? event.target.closest<HTMLElement>('.unimian-timeline__row--unscheduled[data-note-path]')
 			: null;
 		const path = row?.dataset.notePath;
 		if (!row || !path) {
@@ -509,14 +509,14 @@ export class TimelineRenderer {
 		this.quickScheduleEnd = this.quickScheduleStart + DEFAULT_SPAN[this.activeZoom] - 1;
 		if (!this.quickScheduleGhost || this.quickScheduleGhost.parentElement !== row) {
 			this.clearQuickSchedule();
-			this.quickScheduleGhost = row.createEl('button', { cls: 'wise-view-timeline__ghost', attr: { type: 'button' } });
+			this.quickScheduleGhost = row.createEl('button', { cls: 'unimian-timeline__ghost', attr: { type: 'button' } });
 			this.quickScheduleGhost.dataset.notePath = path;
 		}
 		const item = this.currentModel?.itemsByPath.get(path);
 		this.quickScheduleGhost.setText(item?.title ?? path);
 		this.quickScheduleGhost.title = `${dateOnlyFromDayIndex(this.quickScheduleStart).iso} – ${dateOnlyFromDayIndex(this.quickScheduleEnd).iso}`;
-		this.quickScheduleGhost.style.setProperty('--wise-view-timeline-left', `${dateToPixel(this.quickScheduleStart, this.currentLayout.domain, this.activeZoom)}px`);
-		this.quickScheduleGhost.style.setProperty('--wise-view-timeline-bar-width', `${Math.max(8, DEFAULT_SPAN[this.activeZoom]
+		this.quickScheduleGhost.style.setProperty('--unimian-timeline-left', `${dateToPixel(this.quickScheduleStart, this.currentLayout.domain, this.activeZoom)}px`);
+		this.quickScheduleGhost.style.setProperty('--unimian-timeline-bar-width', `${Math.max(8, DEFAULT_SPAN[this.activeZoom]
 			* TIMELINE_ZOOM_SPECS[this.activeZoom].pixelsPerDay - 2)}px`);
 	}
 
@@ -560,7 +560,7 @@ export class TimelineRenderer {
 			this.sidebarCollapsed ? 'Show timeline sidebar' : 'Hide timeline sidebar', 'toggle-sidebar');
 		this.iconButton(this.toolbarEl, 'calendar-days', 'Today', 'today');
 		this.iconButton(this.toolbarEl, 'scan', 'Zoom to fit', 'zoom-to-fit');
-		const select = this.toolbarEl.createEl('select', { cls: 'dropdown wise-view-timeline__zoom' });
+		const select = this.toolbarEl.createEl('select', { cls: 'dropdown unimian-timeline__zoom' });
 		select.dataset.action = 'zoom';
 		select.setAttribute('aria-label', 'Timeline zoom');
 		for (const zoom of Object.keys(TIMELINE_ZOOM_SPECS) as TimelineZoom[]) {
@@ -571,21 +571,21 @@ export class TimelineRenderer {
 	}
 
 	private iconButton(host: HTMLElement, icon: string, label: string, action: string): HTMLButtonElement {
-		const button = host.createEl('button', { cls: 'clickable-icon wise-view-timeline__toolbar-button' });
+		const button = host.createEl('button', { cls: 'clickable-icon unimian-timeline__toolbar-button' });
 		button.type = 'button';
 		button.dataset.action = action;
 		button.setAttribute('aria-label', label);
 		button.title = label;
 		setIcon(button, icon);
-		button.createSpan({ cls: 'wise-view-timeline__toolbar-label', text: label });
+		button.createSpan({ cls: 'unimian-timeline__toolbar-label', text: label });
 		return button;
 	}
 
 	private renderHeader(layout: TimelineLayout, zoom: TimelineZoom): void {
 		this.headerCanvas.replaceChildren();
-		this.headerCanvas.style.setProperty('--wise-view-timeline-width', `${layout.width}px`);
-		const periods = this.headerCanvas.createDiv({ cls: 'wise-view-timeline__periods' });
-		const ticks = this.headerCanvas.createDiv({ cls: 'wise-view-timeline__ticks' });
+		this.headerCanvas.style.setProperty('--unimian-timeline-width', `${layout.width}px`);
+		const periods = this.headerCanvas.createDiv({ cls: 'unimian-timeline__periods' });
+		const ticks = this.headerCanvas.createDiv({ cls: 'unimian-timeline__ticks' });
 		const useYears = zoom === 'quarter' || zoom === 'year' || zoom === 'fiveyear';
 		for (let day = layout.domain.startDay; day < layout.domain.endDay;) {
 			const current = dateOnlyFromDayIndex(day);
@@ -598,11 +598,11 @@ export class TimelineRenderer {
 			const from = Math.max(start, layout.domain.startDay);
 			const to = Math.min(next, layout.domain.endDay);
 			const block = periods.createDiv({
-				cls: 'wise-view-timeline__period',
+				cls: 'unimian-timeline__period',
 				text: useYears ? String(current.year) : new Date(day * 86_400_000).toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' }),
 			});
-			block.style.setProperty('--wise-view-timeline-left', `${dateToPixel(from, layout.domain, zoom)}px`);
-			block.style.setProperty('--wise-view-timeline-period-width', `${dateToPixel(to, layout.domain, zoom) - dateToPixel(from, layout.domain, zoom)}px`);
+			block.style.setProperty('--unimian-timeline-left', `${dateToPixel(from, layout.domain, zoom)}px`);
+			block.style.setProperty('--unimian-timeline-period-width', `${dateToPixel(to, layout.domain, zoom) - dateToPixel(from, layout.domain, zoom)}px`);
 			day = next;
 		}
 		for (let day = layout.domain.startDay; day < layout.domain.endDay; day++) {
@@ -616,11 +616,11 @@ export class TimelineRenderer {
 			const label = zoom === 'day' || zoom === 'week' || zoom === 'biweek' || zoom === 'month'
 				? String(date.getUTCDate())
 				: date.toLocaleDateString(undefined, { month: 'short', timeZone: 'UTC' });
-			const tickEl = ticks.createDiv({ cls: 'wise-view-timeline__tick', text: label });
-			tickEl.style.setProperty('--wise-view-timeline-left', `${dateToPixel(day, layout.domain, zoom)}px`);
+			const tickEl = ticks.createDiv({ cls: 'unimian-timeline__tick', text: label });
+			tickEl.style.setProperty('--unimian-timeline-left', `${dateToPixel(day, layout.domain, zoom)}px`);
 			if (zoom === 'day' || zoom === 'week' || zoom === 'biweek') {
-				tickEl.style.setProperty('--wise-view-timeline-tick-width', `${TIMELINE_ZOOM_SPECS[zoom].pixelsPerDay}px`);
-				if (weekday === 0 || weekday === 6) tickEl.classList.add('wise-view-timeline__tick--weekend');
+				tickEl.style.setProperty('--unimian-timeline-tick-width', `${TIMELINE_ZOOM_SPECS[zoom].pixelsPerDay}px`);
+				if (weekday === 0 || weekday === 6) tickEl.classList.add('unimian-timeline__tick--weekend');
 			}
 		}
 		this.syncHorizontalHeader();
@@ -628,16 +628,16 @@ export class TimelineRenderer {
 
 	private renderGrid(layout: TimelineLayout, zoom: TimelineZoom): void {
 		this.gridEl.replaceChildren();
-		this.gridEl.style.setProperty('--wise-view-timeline-width', `${layout.width}px`);
+		this.gridEl.style.setProperty('--unimian-timeline-width', `${layout.width}px`);
 		this.gridEl.style.height = `${Math.max(this.timelineRows.currentRange.totalHeight, this.timelineViewport.clientHeight)}px`;
 		const pixelsPerDay = TIMELINE_ZOOM_SPECS[zoom].pixelsPerDay;
 		for (let day = layout.domain.startDay; day < layout.domain.endDay; day++) {
 			const date = new Date(day * 86_400_000);
 			const weekday = date.getUTCDay();
 			if (pixelsPerDay >= 10 && weekday === 6) {
-				const weekend = this.gridEl.createDiv({ cls: 'wise-view-timeline__weekend' });
-				weekend.style.setProperty('--wise-view-timeline-left', `${dateToPixel(day, layout.domain, zoom)}px`);
-				weekend.style.setProperty('--wise-view-timeline-weekend-width', `${pixelsPerDay * 2}px`);
+				const weekend = this.gridEl.createDiv({ cls: 'unimian-timeline__weekend' });
+				weekend.style.setProperty('--unimian-timeline-left', `${dateToPixel(day, layout.domain, zoom)}px`);
+				weekend.style.setProperty('--unimian-timeline-weekend-width', `${pixelsPerDay * 2}px`);
 			}
 			const lineHere = zoom === 'day' || zoom === 'week' || zoom === 'biweek' || zoom === 'month'
 				? weekday === 1
@@ -645,24 +645,24 @@ export class TimelineRenderer {
 					? date.getUTCDate() === 1
 					: date.getUTCDate() === 1 && date.getUTCMonth() % 3 === 0;
 			if (lineHere) {
-				const line = this.gridEl.createDiv({ cls: 'wise-view-timeline__gridline' });
-				line.style.setProperty('--wise-view-timeline-left', `${dateToPixel(day, layout.domain, zoom)}px`);
+				const line = this.gridEl.createDiv({ cls: 'unimian-timeline__gridline' });
+				line.style.setProperty('--unimian-timeline-left', `${dateToPixel(day, layout.domain, zoom)}px`);
 			}
 		}
 	}
 
 	private renderToday(layout: TimelineLayout): void {
-		this.containerEl.querySelectorAll('.wise-view-timeline__today, .wise-view-timeline__today-line, .wise-view-timeline__edge').forEach(el => el.remove());
+		this.containerEl.querySelectorAll('.unimian-timeline__today, .unimian-timeline__today-line, .unimian-timeline__edge').forEach(el => el.remove());
 		if (layout.todayEdge === 'inside') {
-			const ticks = this.headerCanvas.querySelector<HTMLElement>('.wise-view-timeline__ticks') ?? this.headerCanvas;
-			const marker = ticks.createDiv({ cls: 'wise-view-timeline__today', text: String(this.currentToday?.day ?? '') });
+			const ticks = this.headerCanvas.querySelector<HTMLElement>('.unimian-timeline__ticks') ?? this.headerCanvas;
+			const marker = ticks.createDiv({ cls: 'unimian-timeline__today', text: String(this.currentToday?.day ?? '') });
 			marker.setAttribute('aria-label', 'Today');
-			marker.style.setProperty('--wise-view-timeline-left', `${layout.todayLeft}px`);
-			const line = this.timelineViewport.createDiv({ cls: 'wise-view-timeline__today-line' });
-			line.style.setProperty('--wise-view-timeline-left', `${layout.todayLeft}px`);
+			marker.style.setProperty('--unimian-timeline-left', `${layout.todayLeft}px`);
+			const line = this.timelineViewport.createDiv({ cls: 'unimian-timeline__today-line' });
+			line.style.setProperty('--unimian-timeline-left', `${layout.todayLeft}px`);
 			line.style.height = this.gridEl.style.height;
 		} else {
-			const edge = this.containerEl.createDiv({ cls: `wise-view-timeline__edge wise-view-timeline__edge--${layout.todayEdge}` });
+			const edge = this.containerEl.createDiv({ cls: `unimian-timeline__edge unimian-timeline__edge--${layout.todayEdge}` });
 			edge.dataset.edge = layout.todayEdge;
 			edge.setText(layout.todayEdge === 'before' ? 'Today is earlier' : 'Today is later');
 		}
@@ -692,7 +692,7 @@ export class TimelineRenderer {
 
 	private updateSidebarRow(handle: VirtualRowHandle, row: TimelineVirtualRow): void {
 		handle.element.replaceChildren();
-		handle.element.className = `wise-view-timeline__sidebar-row wise-view-timeline__sidebar-row--${row.kind}`;
+		handle.element.className = `unimian-timeline__sidebar-row unimian-timeline__sidebar-row--${row.kind}`;
 		if (row.kind === 'group') {
 			const button = handle.element.createEl('button', { text: `${row.label} (${row.count})` });
 			button.type = 'button';
@@ -718,44 +718,44 @@ export class TimelineRenderer {
 
 	private updateTimelineRow(handle: VirtualRowHandle, row: TimelineVirtualRow): void {
 		handle.element.replaceChildren();
-		handle.element.className = `wise-view-timeline__row wise-view-timeline__row--${row.kind}`;
-		handle.element.style.setProperty('--wise-view-timeline-width', `${this.currentLayout?.width ?? 0}px`);
+		handle.element.className = `unimian-timeline__row unimian-timeline__row--${row.kind}`;
+		handle.element.style.setProperty('--unimian-timeline-width', `${this.currentLayout?.width ?? 0}px`);
 		if (row.kind === 'group') {
-			handle.element.createSpan({ cls: 'wise-view-timeline__group-label', text: row.label });
+			handle.element.createSpan({ cls: 'unimian-timeline__group-label', text: row.label });
 			return;
 		}
 		const bar = this.bars.get(row.item.path);
 		if (!bar) {
-			handle.element.classList.add('wise-view-timeline__row--unscheduled');
+			handle.element.classList.add('unimian-timeline__row--unscheduled');
 			handle.element.dataset.notePath = row.item.path;
 			return;
 		}
 		const startDay = rangeToDayBounds(row.item.range!).startDay;
 		const endDay = rangeToDayBounds(row.item.range!).endDay - 1;
 		const startLabel = handle.element.createSpan({
-			cls: 'wise-view-timeline__date-label wise-view-timeline__date-label--start',
+			cls: 'unimian-timeline__date-label unimian-timeline__date-label--start',
 			text: this.formatDay(startDay),
 		});
-		startLabel.style.setProperty('--wise-view-timeline-left', `${bar.left}px`);
+		startLabel.style.setProperty('--unimian-timeline-left', `${bar.left}px`);
 		const endLabel = handle.element.createSpan({
-			cls: 'wise-view-timeline__date-label wise-view-timeline__date-label--end',
+			cls: 'unimian-timeline__date-label unimian-timeline__date-label--end',
 			text: this.formatDay(endDay),
 		});
-		endLabel.style.setProperty('--wise-view-timeline-left', `${bar.left + bar.width}px`);
-		const barEl = handle.element.createEl('button', { cls: 'wise-view-timeline__bar' });
+		endLabel.style.setProperty('--unimian-timeline-left', `${bar.left + bar.width}px`);
+		const barEl = handle.element.createEl('button', { cls: 'unimian-timeline__bar' });
 		barEl.type = 'button';
 		barEl.dataset.notePath = row.item.path;
 		barEl.title = `${row.item.title} — ${dateOnlyFromDayIndex(startDay).iso} – ${dateOnlyFromDayIndex(endDay).iso}`;
-		barEl.createSpan({ cls: 'wise-view-timeline__bar-label', text: row.item.title });
-		barEl.createSpan({ cls: 'wise-view-timeline__handle wise-view-timeline__handle--left' });
-		barEl.createSpan({ cls: 'wise-view-timeline__handle wise-view-timeline__handle--right' });
+		barEl.createSpan({ cls: 'unimian-timeline__bar-label', text: row.item.title });
+		barEl.createSpan({ cls: 'unimian-timeline__handle unimian-timeline__handle--left' });
+		barEl.createSpan({ cls: 'unimian-timeline__handle unimian-timeline__handle--right' });
 		barEl.dataset.colorValue = row.item.colorValue ?? '';
 		if (row.item.colorValue) {
 			for (const [name, value] of Object.entries(toCssVariables(resolveColor({ categoryValue: row.item.colorValue })))) {
 				barEl.style.setProperty(name, value);
 			}
 		}
-		barEl.style.setProperty('--wise-view-timeline-left', `${bar.left}px`);
-		barEl.style.setProperty('--wise-view-timeline-bar-width', `${bar.width}px`);
+		barEl.style.setProperty('--unimian-timeline-left', `${bar.left}px`);
+		barEl.style.setProperty('--unimian-timeline-bar-width', `${bar.width}px`);
 	}
 }

@@ -4,12 +4,12 @@
 // Modifications Copyright (C) 2026 Parkis Utama
 
 import type { BasesAllOptions, BasesPropertyId, TFile } from 'obsidian';
-import type WiseViewPlugin from '../../main';
+import type UnimianPlugin from '../../main';
 import { createPeriodicOptions } from './periodic/options';
 import { PropertyTypeService } from '../../services/PropertyTypeService';
 
 /** The Bases options schema for the Calendar view. Keys are persisted in `.base` files. */
-export function createCalendarOptions(plugin: WiseViewPlugin): BasesAllOptions[] {
+export function createCalendarOptions(plugin: UnimianPlugin): BasesAllOptions[] {
   return [
     {
       type: 'dropdown',

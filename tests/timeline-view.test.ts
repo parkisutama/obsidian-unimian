@@ -51,10 +51,10 @@ describe('Timeline renderer', () => {
 		], options, today);
 		const renderer = new TimelineRenderer(host);
 		const layout = renderer.render(model, today, 'day');
-		const bar = host.querySelector<HTMLButtonElement>('.wise-view-timeline__bar[data-note-path="Framework.md"]')!;
+		const bar = host.querySelector<HTMLButtonElement>('.unimian-timeline__bar[data-note-path="Framework.md"]')!;
 		expect(layout.bars[0]?.width).toBe(126);
-		expect(host.querySelector('.wise-view-timeline__date-label--start')?.textContent).toContain('20');
-		expect(host.querySelector('.wise-view-timeline__date-label--end')?.textContent).toContain('21');
+		expect(host.querySelector('.unimian-timeline__date-label--start')?.textContent).toContain('20');
+		expect(host.querySelector('.unimian-timeline__date-label--end')?.textContent).toContain('21');
 		expect(bar.title).toBe('Framework — 2026-09-20 – 2026-09-21');
 		renderer.dispose();
 	});
@@ -66,13 +66,13 @@ describe('Timeline renderer', () => {
 			timelineSnapshot('A.md', { 'note.start': date('2026-01-01') }),
 		], options, today);
 		new TimelineRenderer(host).render(model, today, 'day');
-		expect(host.querySelector('.wise-view-timeline__period')).not.toBeNull();
-		expect(host.querySelector('.wise-view-timeline__tick')).not.toBeNull();
-		expect(host.querySelector('.wise-view-timeline__weekend')).not.toBeNull();
-		expect(host.querySelector('.wise-view-timeline__gridline')).not.toBeNull();
-		expect(host.querySelector('.wise-view-timeline__row')).not.toBeNull();
-		expect(host.querySelector('.wise-view-timeline__today')).not.toBeNull();
-		expect(host.querySelector('.wise-view-timeline__today-line')).not.toBeNull();
+		expect(host.querySelector('.unimian-timeline__period')).not.toBeNull();
+		expect(host.querySelector('.unimian-timeline__tick')).not.toBeNull();
+		expect(host.querySelector('.unimian-timeline__weekend')).not.toBeNull();
+		expect(host.querySelector('.unimian-timeline__gridline')).not.toBeNull();
+		expect(host.querySelector('.unimian-timeline__row')).not.toBeNull();
+		expect(host.querySelector('.unimian-timeline__today')).not.toBeNull();
+		expect(host.querySelector('.unimian-timeline__today-line')).not.toBeNull();
 		expect(host.querySelector('button[data-note-path="A.md"]')).not.toBeNull();
 	});
 
@@ -83,10 +83,10 @@ describe('Timeline renderer', () => {
 		renderer.render(buildTimelineModel([
 			timelineSnapshot('A.md', { 'note.start': date('2026-01-01') }),
 		], options, today), today, 'day');
-		const scroller = host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const scroller = host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		scroller.scrollLeft = 125;
 		scroller.dispatchEvent(new Event('scroll'));
-		expect(host.querySelector<HTMLElement>('.wise-view-timeline__header-canvas')?.style.transform).toBe('translateX(-125px)');
+		expect(host.querySelector<HTMLElement>('.unimian-timeline__header-canvas')?.style.transform).toBe('translateX(-125px)');
 		renderer.dispose();
 	});
 
@@ -98,8 +98,8 @@ describe('Timeline renderer', () => {
 			timelineSnapshot('A.md', { 'note.start': date('2026-01-01'), 'note.color': { kind: 'text', value: 'Research' } }),
 		], coloredOptions, today);
 		new TimelineRenderer(host).render(model, today, 'day');
-		const bar = host.querySelector<HTMLElement>('.wise-view-timeline__bar[data-note-path="A.md"]')!;
-		expect(bar.style.getPropertyValue('--wise-view-color-bg')).toMatch(/^#[0-9a-f]{6}$/i);
+		const bar = host.querySelector<HTMLElement>('.unimian-timeline__bar[data-note-path="A.md"]')!;
+		expect(bar.style.getPropertyValue('--unimian-color-bg')).toMatch(/^#[0-9a-f]{6}$/i);
 	});
 
 	it('shows configuration guidance instead of converting every note to Unscheduled', () => {
@@ -110,7 +110,7 @@ describe('Timeline renderer', () => {
 			today,
 			'month',
 		);
-		expect(host.querySelector('.wise-view-timeline__empty')?.textContent).toContain('Configure a start date property');
+		expect(host.querySelector('.unimian-timeline__empty')?.textContent).toContain('Configure a start date property');
 		expect(host.querySelector('[data-note-path="A.md"]')).toBeNull();
 	});
 
@@ -124,8 +124,8 @@ describe('Timeline renderer', () => {
 			today,
 			'month',
 		);
-		expect(host.classList.contains('wise-view-timeline--unconfigured')).toBe(true);
-		expect(host.querySelector('.wise-view-timeline__empty')).not.toBeNull();
+		expect(host.classList.contains('unimian-timeline--unconfigured')).toBe(true);
+		expect(host.querySelector('.unimian-timeline__empty')).not.toBeNull();
 	});
 
 	it('shows the toolbar/sidebar/grid chrome again once a start property is configured', () => {
@@ -133,10 +133,10 @@ describe('Timeline renderer', () => {
 		const today = dateOnlyFromParts(2026, 1, 2)!;
 		const renderer = new TimelineRenderer(host);
 		renderer.render(buildTimelineModel([timelineSnapshot('A.md', {})], { ...options, startProperty: null }, today), today, 'month');
-		expect(host.classList.contains('wise-view-timeline--unconfigured')).toBe(true);
+		expect(host.classList.contains('unimian-timeline--unconfigured')).toBe(true);
 
 		renderer.render(buildTimelineModel([timelineSnapshot('A.md', { 'note.start': date('2026-01-01') })], options, today), today, 'month');
-		expect(host.classList.contains('wise-view-timeline--unconfigured')).toBe(false);
+		expect(host.classList.contains('unimian-timeline--unconfigured')).toBe(false);
 	});
 
 	it('keeps unscheduled note titles in the sidebar without generic chart pills', () => {
@@ -146,7 +146,7 @@ describe('Timeline renderer', () => {
 			timelineSnapshot('Missing.md', {}),
 		], options, today), today, 'month');
 		expect(host.querySelector('[data-note-path="Missing.md"]')?.textContent).toBe('Missing');
-		expect(host.querySelector('.wise-view-timeline__unscheduled')).toBeNull();
+		expect(host.querySelector('.unimian-timeline__unscheduled')).toBeNull();
 	});
 
 	it('offers full-title tooltips and optional two-line sidebar wrapping', () => {
@@ -156,8 +156,8 @@ describe('Timeline renderer', () => {
 		renderer.render(buildTimelineModel([
 			timelineSnapshot('Long.md', { 'note.start': date('2026-01-01') }),
 		], options, today), today, 'month', true);
-		const title = host.querySelector<HTMLButtonElement>('.wise-view-timeline__sidebar-row--item button')!;
-		expect(host.classList.contains('wise-view-timeline--wrap-titles')).toBe(true);
+		const title = host.querySelector<HTMLButtonElement>('.unimian-timeline__sidebar-row--item button')!;
+		expect(host.classList.contains('unimian-timeline--wrap-titles')).toBe(true);
 		expect(title.title).toBe('Long');
 		renderer.dispose();
 	});
@@ -169,13 +169,13 @@ describe('Timeline renderer', () => {
 		const renderer = new TimelineRenderer(host, {
 			onQuickSchedule: (path, start, end) => scheduled.push([path, start, end]),
 		});
-		const scroller = host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const scroller = host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		Object.defineProperty(scroller, 'clientHeight', { configurable: true, value: 200 });
 		Object.defineProperty(scroller, 'clientWidth', { configurable: true, value: 500 });
 		renderer.render(buildTimelineModel([timelineSnapshot('Missing.md', {})], options, today), today, 'month');
-		const row = host.querySelector<HTMLElement>('.wise-view-timeline__row--unscheduled')!;
+		const row = host.querySelector<HTMLElement>('.unimian-timeline__row--unscheduled')!;
 		row.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: 150 }));
-		const ghost = host.querySelector<HTMLButtonElement>('.wise-view-timeline__ghost')!;
+		const ghost = host.querySelector<HTMLButtonElement>('.unimian-timeline__ghost')!;
 		expect(ghost.title).toMatch(/^\d{4}-\d{2}-\d{2} – \d{4}-\d{2}-\d{2}$/);
 		ghost.click();
 		expect(scheduled[0]?.[0]).toBe('Missing.md');
@@ -189,7 +189,7 @@ describe('Timeline renderer', () => {
 		const zooms: string[] = [];
 		const today = dateOnlyFromParts(2026, 1, 2)!;
 		const renderer = new TimelineRenderer(host, { onZoomChange: zoom => zooms.push(zoom) });
-		const scroller = host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const scroller = host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		Object.defineProperty(scroller, 'clientWidth', { configurable: true, value: 500 });
 		renderer.render(buildTimelineModel([timelineSnapshot('A.md', { 'note.start': date('2026-01-01') })], options, today), today, 'month');
 		const wheel = new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: -30, clientX: 180 });
@@ -209,19 +209,19 @@ describe('Timeline renderer', () => {
 			timelineSnapshot('Missing.md', {}),
 		], options, today);
 		const renderer = new TimelineRenderer(host);
-		const sidebar = host.querySelector<HTMLElement>('.wise-view-timeline__sidebar')!;
-		const timeline = host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const sidebar = host.querySelector<HTMLElement>('.unimian-timeline__sidebar')!;
+		const timeline = host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		Object.defineProperty(sidebar, 'clientHeight', { configurable: true, value: 200 });
 		Object.defineProperty(timeline, 'clientHeight', { configurable: true, value: 200 });
 		renderer.render(model, today, 'month');
-		const paths = (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('.wise-view-virtual-linear-content > [data-path]')]
+		const paths = (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('.unimian-virtual-linear-content > [data-path]')]
 			.map(element => element.dataset.path);
 		expect(paths(sidebar)).toEqual(paths(timeline));
 		expect(paths(sidebar)).toEqual(['A.md', 'Missing.md']);
 		sidebar.scrollTop = 36;
 		timeline.scrollTop = 36;
 		renderer.setNarrow(true);
-		expect(host.classList.contains('wise-view-timeline--narrow')).toBe(true);
+		expect(host.classList.contains('unimian-timeline--narrow')).toBe(true);
 		expect([sidebar.scrollTop, timeline.scrollTop]).toEqual([36, 36]);
 		renderer.dispose();
 	});
@@ -233,13 +233,13 @@ describe('Timeline renderer', () => {
 			timelineSnapshot(`Notes/${index}.md`, { 'note.start': date('2026-01-01') })
 		), options, today);
 		const renderer = new TimelineRenderer(host);
-		const viewports = host.querySelectorAll<HTMLElement>('.wise-view-timeline__sidebar, .wise-view-timeline__scroller');
+		const viewports = host.querySelectorAll<HTMLElement>('.unimian-timeline__sidebar, .unimian-timeline__scroller');
 		for (const viewport of viewports) {
 			Object.defineProperty(viewport, 'clientHeight', { configurable: true, value: 360 });
 		}
 		renderer.render(model, today, 'month');
 		for (const viewport of viewports) {
-			expect(viewport.querySelectorAll('.wise-view-virtual-linear-content > [data-path]').length).toBeLessThanOrEqual(16);
+			expect(viewport.querySelectorAll('.unimian-virtual-linear-content > [data-path]').length).toBeLessThanOrEqual(16);
 		}
 		expect(host.querySelectorAll('[data-note-path]').length).toBeLessThanOrEqual(30);
 		renderer.dispose();
@@ -256,7 +256,7 @@ describe('Timeline view interactions', () => {
 		const context = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
 		bar.dispatchEvent(context);
 		expect(harness.opened).toEqual(['Notes/Alpha.md', 'Notes/Alpha.md']);
-		expect(harness.hovers[0]).toMatchObject({ source: 'wise-view-timeline', linktext: 'Notes/Alpha.md' });
+		expect(harness.hovers[0]).toMatchObject({ source: 'unimian-timeline', linktext: 'Notes/Alpha.md' });
 		expect(context.defaultPrevented).toBe(true);
 	});
 
@@ -271,13 +271,13 @@ describe('Timeline view interactions', () => {
 
 	it('routes quick scheduling through the configured start/end mutation capability', async () => {
 		harness = createTimelineHarness();
-		const scroller = harness.host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const scroller = harness.host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		Object.defineProperty(scroller, 'clientHeight', { configurable: true, value: 200 });
 		Object.defineProperty(scroller, 'clientWidth', { configurable: true, value: 500 });
 		harness.view.onDataUpdated();
-		const row = harness.host.querySelector<HTMLElement>('.wise-view-timeline__row--unscheduled[data-note-path="Notes/Beta.md"]')!;
+		const row = harness.host.querySelector<HTMLElement>('.unimian-timeline__row--unscheduled[data-note-path="Notes/Beta.md"]')!;
 		row.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: 160 }));
-		harness.host.querySelector<HTMLButtonElement>('.wise-view-timeline__ghost')!.click();
+		harness.host.querySelector<HTMLButtonElement>('.unimian-timeline__ghost')!.click();
 		await Promise.resolve();
 		expect(harness.frontmatterWrites).toBe(1);
 		expect(harness.frontmatterUpdates[0]).toMatchObject({ start: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/), end: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) });
@@ -285,8 +285,8 @@ describe('Timeline view interactions', () => {
 
 	it('preserves zoom and synchronized scroll across data rerenders and narrow mode', () => {
 		harness = createTimelineHarness();
-		const sidebar = harness.host.querySelector<HTMLElement>('.wise-view-timeline__sidebar')!;
-		const timeline = harness.host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const sidebar = harness.host.querySelector<HTMLElement>('.unimian-timeline__sidebar')!;
+		const timeline = harness.host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		Object.defineProperty(sidebar, 'clientHeight', { configurable: true, value: 200 });
 		Object.defineProperty(timeline, 'clientHeight', { configurable: true, value: 200 });
 		harness.view.onDataUpdated();
@@ -306,9 +306,9 @@ describe('Timeline view interactions', () => {
 
 	it('writes moved date ranges through the mutation capability and suppresses accidental open', async () => {
 		harness = createTimelineHarness();
-		const bar = harness.host.querySelector<HTMLElement>('.wise-view-timeline__bar[data-note-path="Notes/Alpha.md"]')!;
-		const initialLeft = bar.style.getPropertyValue('--wise-view-timeline-left');
-		const initialWidth = bar.style.getPropertyValue('--wise-view-timeline-bar-width');
+		const bar = harness.host.querySelector<HTMLElement>('.unimian-timeline__bar[data-note-path="Notes/Alpha.md"]')!;
+		const initialLeft = bar.style.getPropertyValue('--unimian-timeline-left');
+		const initialWidth = bar.style.getPropertyValue('--unimian-timeline-bar-width');
 		bar.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 7, button: 0, clientX: 100 }));
 		bar.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerId: 7, clientX: 130 }));
 		bar.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 7, clientX: 130 }));
@@ -317,41 +317,41 @@ describe('Timeline view interactions', () => {
 		bar.click();
 		expect(harness.opened).toEqual([]);
 		harness.view.onDataUpdated();
-		const optimisticBar = harness.host.querySelector<HTMLElement>('.wise-view-timeline__bar[data-note-path="Notes/Alpha.md"]')!;
-		expect(optimisticBar.style.getPropertyValue('--wise-view-timeline-left')).not.toBe(initialLeft);
-		expect(optimisticBar.style.getPropertyValue('--wise-view-timeline-bar-width')).toBe(initialWidth);
+		const optimisticBar = harness.host.querySelector<HTMLElement>('.unimian-timeline__bar[data-note-path="Notes/Alpha.md"]')!;
+		expect(optimisticBar.style.getPropertyValue('--unimian-timeline-left')).not.toBe(initialLeft);
+		expect(optimisticBar.style.getPropertyValue('--unimian-timeline-bar-width')).toBe(initialWidth);
 	});
 
 	it('resizes the end date from the right handle', async () => {
 		harness = createTimelineHarness();
-		const bar = harness.host.querySelector<HTMLElement>('.wise-view-timeline__bar[data-note-path="Notes/Alpha.md"]')!;
-		const initialWidth = Number.parseFloat(bar.style.getPropertyValue('--wise-view-timeline-bar-width'));
-		const handle = harness.host.querySelector<HTMLElement>('.wise-view-timeline__bar[data-note-path="Notes/Alpha.md"] .wise-view-timeline__handle--right')!;
+		const bar = harness.host.querySelector<HTMLElement>('.unimian-timeline__bar[data-note-path="Notes/Alpha.md"]')!;
+		const initialWidth = Number.parseFloat(bar.style.getPropertyValue('--unimian-timeline-bar-width'));
+		const handle = harness.host.querySelector<HTMLElement>('.unimian-timeline__bar[data-note-path="Notes/Alpha.md"] .unimian-timeline__handle--right')!;
 		handle.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 9, button: 0, clientX: 100 }));
 		handle.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerId: 9, clientX: 130 }));
 		handle.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 9, clientX: 130 }));
 		await Promise.resolve();
 		expect(harness.frontmatterUpdates[0]).toMatchObject({ start: '2026-01-01', end: '2026-01-05' });
 		harness.view.onDataUpdated();
-		const resizedWidth = Number.parseFloat(harness.host.querySelector<HTMLElement>('.wise-view-timeline__bar[data-note-path="Notes/Alpha.md"]')!
-			.style.getPropertyValue('--wise-view-timeline-bar-width'));
+		const resizedWidth = Number.parseFloat(harness.host.querySelector<HTMLElement>('.unimian-timeline__bar[data-note-path="Notes/Alpha.md"]')!
+			.style.getPropertyValue('--unimian-timeline-bar-width'));
 		expect(resizedWidth).toBeGreaterThan(initialWidth);
 	});
 
 	it('keeps the today marker synchronized and extends the time domain near an edge', () => {
 		harness = createTimelineHarness();
-		const scroller = harness.host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const scroller = harness.host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		Object.defineProperty(scroller, 'clientWidth', { configurable: true, value: 500 });
 		harness.view.onDataUpdated();
-		const header = harness.host.querySelector<HTMLElement>('.wise-view-timeline__header-canvas')!;
-		const initialWidth = Number.parseFloat(header.style.getPropertyValue('--wise-view-timeline-width'));
+		const header = harness.host.querySelector<HTMLElement>('.unimian-timeline__header-canvas')!;
+		const initialWidth = Number.parseFloat(header.style.getPropertyValue('--unimian-timeline-width'));
 		scroller.scrollLeft = 0;
 		scroller.dispatchEvent(new Event('scroll'));
-		const extendedWidth = Number.parseFloat(header.style.getPropertyValue('--wise-view-timeline-width'));
+		const extendedWidth = Number.parseFloat(header.style.getPropertyValue('--unimian-timeline-width'));
 		expect(extendedWidth).toBeGreaterThan(initialWidth);
 		harness.host.querySelector<HTMLElement>('[data-action="today"]')!.click();
 		expect(header.style.transform).toBe(`translateX(${-scroller.scrollLeft}px)`);
-		const todayLine = harness.host.querySelector<HTMLElement>('.wise-view-timeline__today-line')!;
+		const todayLine = harness.host.querySelector<HTMLElement>('.unimian-timeline__today-line')!;
 		expect(todayLine.parentElement).toBe(scroller);
 	});
 
@@ -361,7 +361,7 @@ describe('Timeline view interactions', () => {
 		expect(harness.host.querySelectorAll('[data-action="zoom"][data-zoom]')).toHaveLength(0);
 		harness.host.querySelector<HTMLElement>('[aria-label="Hide timeline sidebar"]')
 			?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-		expect(harness.host.classList.contains('wise-view-timeline--sidebar-collapsed')).toBe(true);
+		expect(harness.host.classList.contains('unimian-timeline--sidebar-collapsed')).toBe(true);
 		harness.view.onDataUpdated();
 		expect(harness.host.querySelector('[aria-label="Show timeline sidebar"]')).not.toBeNull();
 	});
@@ -382,20 +382,20 @@ describe('Timeline view interactions', () => {
 	// row froze mid-scroll after switching away from Timeline).
 	it('removes its own state classes from the shared container on unload', () => {
 		harness = createTimelineHarness();
-		expect(harness.host.classList.contains('wise-view-timeline')).toBe(true);
+		expect(harness.host.classList.contains('unimian-timeline')).toBe(true);
 		harness.view.onunload();
 		expect(harness.host.className).toBe('');
 	});
 
 	it('centers on today once the container has a real, laid-out width', () => {
 		harness = createTimelineHarness({ containerWidth: 800 });
-		const scroller = harness.host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const scroller = harness.host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		expect(scroller.scrollLeft).toBeGreaterThan(0);
 	});
 
 	it('does not re-center on a later data refresh once the user has scrolled elsewhere', () => {
 		harness = createTimelineHarness({ containerWidth: 800 });
-		const scroller = harness.host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const scroller = harness.host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		scroller.scrollLeft = 3;
 		harness.view.onDataUpdated();
 		expect(scroller.scrollLeft).toBe(3);
@@ -403,14 +403,14 @@ describe('Timeline view interactions', () => {
 
 	it('never scrolls when the container has no real width (never attached/laid out)', () => {
 		harness = createTimelineHarness();
-		const scroller = harness.host.querySelector<HTMLElement>('.wise-view-timeline__scroller')!;
+		const scroller = harness.host.querySelector<HTMLElement>('.unimian-timeline__scroller')!;
 		expect(scroller.scrollLeft).toBe(0);
 	});
 });
 
 describe('Timeline root layout CSS (regression)', () => {
 	// Obsidian's own .bases-view rules for display/overflow-y won the cascade against ours at
-	// equal specificity (confirmed via devtools on a real vault: .wise-view-timeline__main
+	// equal specificity (confirmed via devtools on a real vault: .unimian-timeline__main
 	// rendered at full content height — ~22700px for 500+ rows — instead of the ~645px flex:1
 	// should have given it, because `display: flex` on the root wasn't actually taking effect).
 	// That left virtualization nothing to bound against, and let the toolbar/date header scroll
@@ -419,7 +419,7 @@ describe('Timeline root layout CSS (regression)', () => {
 	it('pins the root flex/overflow layout with !important so Obsidian cannot override it', () => {
 		const cssPath = join(process.cwd(), 'src/styles/views/timeline.css');
 		const css = readFileSync(cssPath, 'utf8');
-		const rootRule = css.match(/^\.wise-view-timeline\s*\{([^}]*)\}/m)?.[1];
+		const rootRule = css.match(/^\.unimian-timeline\s*\{([^}]*)\}/m)?.[1];
 		expect(rootRule).toBeDefined();
 		for (const prop of ['display', 'flex-direction', 'height', 'min-height', 'overflow']) {
 			expect(rootRule).toMatch(new RegExp(`\\b${prop}\\s*:[^;]*!important`));

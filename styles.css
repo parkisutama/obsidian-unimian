@@ -1,13 +1,13 @@
-/*! Wise View | SPDX-License-Identifier: GPL-3.0-only
+/*! Unimian | SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2025 Sawyer Rensel (Planner, https://github.com/SawyerRensel/Planner)
  * Copyright (C) 2026 Parkis Utama
- * Source: https://github.com/parkisutama/obsidian-wise-view
+ * Source: https://github.com/parkisutama/obsidian-unimian
  *
  * This file includes third-party software:
  *   obsidian-bases-gantt (MIT) Copyright (c) 2026 Lars Tray
  *   FullCalendar (MIT) Copyright (c) 2026 Adam Shaw
  *   Gantt Chart (MIT) Copyright (c) 2025 jaeungkim
- * Full license texts: https://github.com/parkisutama/obsidian-wise-view/blob/main/THIRD_PARTY_NOTICES.md
+ * Full license texts: https://github.com/parkisutama/obsidian-unimian/blob/main/THIRD_PARTY_NOTICES.md
  */
 
 /* ==========================================================================
@@ -263,10 +263,10 @@
    6. QUICK PREVIEW MODAL
    ========================================================================== */
 
-/* `.wise-view-quick-preview` is on `modalEl` (the `.modal` box itself), not `.modal-content` —
+/* `.unimian-quick-preview` is on `modalEl` (the `.modal` box itself), not `.modal-content` —
    Obsidian sizes the box via its own width/height, so the override has to target the box, not
    just its inner padding area, or the box stays at Obsidian's default (much narrower) size. */
-.wise-view-quick-preview.modal {
+.unimian-quick-preview.modal {
 	width: min(900px, 80vw);
 	height: min(85vh, 950px);
 	max-width: 80vw;
@@ -278,11 +278,11 @@
 /* Page Preview's hover popover (--layer-popover) sits below a modal (--layer-modal) by default,
    so it renders correctly but invisibly behind this popup when triggered from the embedded leaf.
    Only bumped while the popup is open (see ACTIVE_CLASS in QuickPreviewModal.ts). */
-body.wise-view-quick-preview-active .hover-popover {
+body.unimian-quick-preview-active .hover-popover {
 	z-index: calc(var(--layer-modal, 70) + 5);
 }
 
-.wise-view-quick-preview .modal-content {
+.unimian-quick-preview .modal-content {
 	flex: 1 1 auto;
 	min-height: 0;
 	display: flex;
@@ -300,22 +300,22 @@ body.wise-view-quick-preview-active .hover-popover {
    2026-09-22 (an earlier attempt using `--background-primary` matched on some themes only by
    coincidence). Match the header to that same token so the toolbar blends into the body.
    `!important`: Obsidian's own `.is-focused .workspace-leaf.mod-active .view-header` rule
-   outranks a plain `.wise-view-quick-preview .view-header` on specificity, and the reparented
+   outranks a plain `.unimian-quick-preview .view-header` on specificity, and the reparented
    leaf (detachedLeaf.ts) is always "active". */
-.wise-view-quick-preview .view-header {
+.unimian-quick-preview .view-header {
 	background-color: var(--modal-background) !important;
 	border-bottom: none !important;
 	box-shadow: none !important;
 }
 
-.wise-view-quick-preview-title {
+.unimian-quick-preview-title {
 	margin: 0 0 12px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
-.wise-view-quick-preview-layout {
+.unimian-quick-preview-layout {
 	display: flex;
 	gap: 24px;
 	align-items: stretch;
@@ -323,7 +323,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	min-height: 0;
 }
 
-.wise-view-quick-preview-body {
+.unimian-quick-preview-body {
 	flex: 1 1 auto;
 	min-width: 0;
 	min-height: 0;
@@ -331,17 +331,17 @@ body.wise-view-quick-preview-active .hover-popover {
 }
 
 /* A reparented WorkspaceLeaf expects its split's flex layout to size it; give it one directly. */
-.wise-view-quick-preview-body--leaf {
+.unimian-quick-preview-body--leaf {
 	overflow: hidden;
 	display: flex;
 }
 
-.wise-view-quick-preview-body--leaf .workspace-leaf {
+.unimian-quick-preview-body--leaf .workspace-leaf {
 	height: 100%;
 	width: 100%;
 }
 
-.wise-view-quick-preview-backlinks {
+.unimian-quick-preview-backlinks {
 	flex: 0 0 220px;
 	min-height: 0;
 	overflow-y: auto;
@@ -349,49 +349,49 @@ body.wise-view-quick-preview-active .hover-popover {
 	border-left: 1px solid var(--background-modifier-border);
 }
 
-.wise-view-quick-preview-backlinks h3 {
+.unimian-quick-preview-backlinks h3 {
 	margin-top: 0;
 	font-size: var(--font-ui-small);
 	color: var(--text-muted);
 	text-transform: uppercase;
 }
 
-.wise-view-quick-preview-backlinks ul {
+.unimian-quick-preview-backlinks ul {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-.wise-view-quick-preview-backlinks li {
+.unimian-quick-preview-backlinks li {
 	margin-bottom: 6px;
 }
 
-.wise-view-quick-preview-backlink {
+.unimian-quick-preview-backlink {
 	color: var(--text-normal);
 	cursor: pointer;
 	text-decoration: none;
 }
 
-.wise-view-quick-preview-backlink:hover {
+.unimian-quick-preview-backlink:hover {
 	color: var(--interactive-accent);
 	text-decoration: underline;
 }
 
 @media (max-width: 600px) {
-	.wise-view-quick-preview.modal {
+	.unimian-quick-preview.modal {
 		width: 96vw;
 		height: 92vh;
 	}
 
-	.wise-view-quick-preview-layout {
+	.unimian-quick-preview-layout {
 		flex-direction: column;
 	}
 
-	.wise-view-quick-preview-body {
+	.unimian-quick-preview-body {
 		flex: 2 1 0;
 	}
 
-	.wise-view-quick-preview-backlinks {
+	.unimian-quick-preview-backlinks {
 		flex: 1 1 0;
 		border-left: none;
 		border-top: 1px solid var(--background-modifier-border);
@@ -1568,11 +1568,11 @@ body.wise-view-quick-preview-active .hover-popover {
 
 /* Obsidian's .bases-view wrapper is this same element, and its own rules for display/overflow-y
    win the cascade against ours at equal specificity (confirmed via devtools: computed overflow-y
-   stayed "auto" and .wise-view-timeline__main rendered at full content height — ~22700px instead
+   stayed "auto" and .unimian-timeline__main rendered at full content height — ~22700px instead
    of the ~645px flex:1 should have given it — meaning `display: flex` here wasn't actually taking
    effect, so `.main`'s `flex: 1` had no flex container to size against). The properties below are
    load-bearing for the whole column layout, so they're !important rather than losing quietly. */
-.wise-view-timeline {
+.unimian-timeline {
 	position: relative;
 	display: flex !important;
 	flex-direction: column !important;
@@ -1584,11 +1584,11 @@ body.wise-view-quick-preview-active .hover-popover {
 	font-family: var(--font-interface);
 }
 
-.bases-view.wise-view-timeline {
+.bases-view.unimian-timeline {
 	padding: 0;
 }
 
-.wise-view-timeline__toolbar {
+.unimian-timeline__toolbar {
 	display: flex;
 	flex: 0 0 auto;
 	align-items: center;
@@ -1598,7 +1598,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	overflow-x: auto;
 }
 
-.wise-view-timeline__sidebar-row button {
+.unimian-timeline__sidebar-row button {
 	border: 0;
 	border-radius: var(--radius-s);
 	color: var(--text-normal);
@@ -1607,11 +1607,11 @@ body.wise-view-quick-preview-active .hover-popover {
 	cursor: pointer;
 }
 
-.wise-view-timeline__zoom {
+.unimian-timeline__zoom {
 	min-width: 7rem;
 }
 
-.wise-view-timeline__toolbar-button {
+.unimian-timeline__toolbar-button {
 	display: inline-flex;
 	align-items: center;
 	gap: var(--size-2-1);
@@ -1619,16 +1619,16 @@ body.wise-view-quick-preview-active .hover-popover {
 	padding-inline: var(--size-2-2);
 }
 
-.wise-view-timeline__row--unscheduled {
+.unimian-timeline__row--unscheduled {
 	background: transparent;
 	cursor: crosshair;
 }
 
-.wise-view-timeline__row--item:hover {
+.unimian-timeline__row--item:hover {
 	background: var(--background-modifier-hover);
 }
 
-.wise-view-timeline__empty {
+.unimian-timeline__empty {
 	position: absolute;
 	z-index: var(--layer-popover);
 	top: 50%;
@@ -1646,23 +1646,23 @@ body.wise-view-quick-preview-active .hover-popover {
 
 /* No start property configured: hide the toolbar/sidebar/chart chrome entirely instead of
    showing a fully-formed-looking calendar around "today" that tracks no real property. Only
-   the centered configuration hint (.wise-view-timeline__empty) remains visible. */
-.wise-view-timeline--unconfigured .wise-view-timeline__toolbar,
-.wise-view-timeline--unconfigured .wise-view-timeline__main {
+   the centered configuration hint (.unimian-timeline__empty) remains visible. */
+.unimian-timeline--unconfigured .unimian-timeline__toolbar,
+.unimian-timeline--unconfigured .unimian-timeline__main {
 	display: none;
 }
 
-.wise-view-timeline__sidebar-row button:hover {
+.unimian-timeline__sidebar-row button:hover {
 	background: var(--background-modifier-hover);
 }
 
-.wise-view-timeline__sidebar-row button:focus-visible,
-.wise-view-timeline__bar:focus-visible {
+.unimian-timeline__sidebar-row button:focus-visible,
+.unimian-timeline__bar:focus-visible {
 	outline: 2px solid var(--interactive-accent);
 	outline-offset: -2px;
 }
 
-.wise-view-timeline__main {
+.unimian-timeline__main {
 	display: grid;
 	grid-template-rows: minmax(0, 1fr);
 	grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
@@ -1671,7 +1671,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	overflow: hidden;
 }
 
-.wise-view-timeline__sidebar-panel {
+.unimian-timeline__sidebar-panel {
 	display: grid;
 	grid-template-rows: 3rem minmax(0, 1fr);
 	min-width: 0;
@@ -1681,65 +1681,65 @@ body.wise-view-quick-preview-active .hover-popover {
 	transition: width 0.25s ease;
 }
 
-.wise-view-timeline__sidebar-corner {
+.unimian-timeline__sidebar-corner {
 	border-bottom: 1px solid var(--background-modifier-border);
 	background: var(--background-secondary);
 }
 
-.wise-view-timeline__sidebar,
-.wise-view-timeline__scroller {
+.unimian-timeline__sidebar,
+.unimian-timeline__scroller {
 	min-height: 0;
 	overflow: auto;
 	scrollbar-gutter: stable;
 }
 
-.wise-view-timeline__scroller {
+.unimian-timeline__scroller {
 	position: relative;
 }
 
-.wise-view-timeline__sidebar {
+.unimian-timeline__sidebar {
 	background: var(--background-secondary);
 }
 
-.wise-view-timeline--sidebar-collapsed .wise-view-timeline__main {
+.unimian-timeline--sidebar-collapsed .unimian-timeline__main {
 	grid-template-columns: 0 minmax(0, 1fr);
 }
 
-.wise-view-timeline--sidebar-collapsed .wise-view-timeline__sidebar-panel {
+.unimian-timeline--sidebar-collapsed .unimian-timeline__sidebar-panel {
 	width: 0;
 	border-right-color: transparent;
 }
 
-.wise-view-timeline__chart {
+.unimian-timeline__chart {
 	display: grid;
 	grid-template-rows: 3rem minmax(0, 1fr);
 	min-width: 0;
 	min-height: 0;
 }
 
-.wise-view-timeline__header {
+.unimian-timeline__header {
 	position: relative;
 	border-bottom: 1px solid var(--background-modifier-border);
 	background: var(--background-secondary);
 	overflow: hidden;
 }
 
-.wise-view-timeline__header-canvas {
+.unimian-timeline__header-canvas {
 	position: relative;
-	width: var(--wise-view-timeline-width);
+	width: var(--unimian-timeline-width);
 	min-width: 100%;
 	will-change: transform;
 }
 
-.wise-view-timeline__periods {
+.unimian-timeline__periods {
 	position: relative;
 	height: 1.625rem;
 }
 
-.wise-view-timeline__period {
+.unimian-timeline__period {
 	position: absolute;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-period-width);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-period-width);
 	height: 100%;
 	box-sizing: border-box;
 	padding-inline: var(--size-4-2);
@@ -1751,15 +1751,15 @@ body.wise-view-quick-preview-active .hover-popover {
 	overflow: hidden;
 }
 
-.wise-view-timeline__ticks {
+.unimian-timeline__ticks {
 	position: relative;
 	height: 1.375rem;
 }
 
-.wise-view-timeline__tick {
+.unimian-timeline__tick {
 	position: absolute;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-tick-width, auto);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-tick-width, auto);
 	height: 100%;
 	box-sizing: border-box;
 	padding-inline: var(--size-4-1);
@@ -1770,57 +1770,57 @@ body.wise-view-quick-preview-active .hover-popover {
 	white-space: nowrap;
 }
 
-.wise-view-timeline__tick--weekend {
+.unimian-timeline__tick--weekend {
 	opacity: 0.55;
 }
 
-.wise-view-timeline__scroller .wise-view-virtual-linear-content,
-.wise-view-timeline__row {
-	min-width: var(--wise-view-timeline-width);
+.unimian-timeline__scroller .unimian-virtual-linear-content,
+.unimian-timeline__row {
+	min-width: var(--unimian-timeline-width);
 }
 
-.wise-view-timeline__scroller .wise-view-virtual-linear-content {
+.unimian-timeline__scroller .unimian-virtual-linear-content {
 	z-index: 1;
 }
 
-.wise-view-timeline__grid {
+.unimian-timeline__grid {
 	position: absolute;
 	z-index: 0;
 	top: 0;
 	left: 0;
-	width: var(--wise-view-timeline-width);
+	width: var(--unimian-timeline-width);
 	pointer-events: none;
 }
 
-.wise-view-timeline__weekend {
+.unimian-timeline__weekend {
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-weekend-width);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-weekend-width);
 	background: var(--background-secondary);
 	opacity: 0.45;
 }
 
-.wise-view-timeline__gridline {
+.unimian-timeline__gridline {
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	left: var(--wise-view-timeline-left);
+	left: var(--unimian-timeline-left);
 	width: 1px;
 	background: var(--background-modifier-border);
 	opacity: 0.6;
 }
 
-.wise-view-timeline__sidebar-row,
-.wise-view-timeline__row {
+.unimian-timeline__sidebar-row,
+.unimian-timeline__row {
 	display: flex;
 	align-items: center;
 	box-sizing: border-box;
 	border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.wise-view-timeline__sidebar-row button {
+.unimian-timeline__sidebar-row button {
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
@@ -1833,7 +1833,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	white-space: nowrap;
 }
 
-.wise-view-timeline--wrap-titles .wise-view-timeline__sidebar-row--item button {
+.unimian-timeline--wrap-titles .unimian-timeline__sidebar-row--item button {
 	display: -webkit-box;
 	padding-block: var(--size-2-2);
 	padding-inline: var(--size-4-3);
@@ -1844,8 +1844,8 @@ body.wise-view-quick-preview-active .hover-popover {
 	word-break: break-word;
 }
 
-.wise-view-timeline__sidebar-row--group,
-.wise-view-timeline__row--group {
+.unimian-timeline__sidebar-row--group,
+.unimian-timeline__row--group {
 	/* A translucent wash plus a border reads as a section break without the heavier solid
 	   fill dominating the row of card-like bars underneath it. */
 	background: var(--background-modifier-hover);
@@ -1854,17 +1854,17 @@ body.wise-view-quick-preview-active .hover-popover {
 	font-weight: var(--font-semibold);
 }
 
-.wise-view-timeline__group-label {
+.unimian-timeline__group-label {
 	position: sticky;
 	left: var(--size-4-2);
 	color: var(--text-muted);
 }
 
-.wise-view-timeline__bar {
+.unimian-timeline__bar {
 	position: absolute;
 	top: 7px;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-bar-width);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-bar-width);
 	height: 30px;
 	max-width: none;
 	box-sizing: border-box;
@@ -1872,7 +1872,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	/* Bordered pill on a plain background by default; the border picks up the configured
 	   color-by value when one resolves, but the fill and text stay neutral either way so a
 	   bar never looks like a solid accent-colored block. */
-	border: 1px solid var(--wise-view-color-bg, var(--background-modifier-border));
+	border: 1px solid var(--unimian-color-bg, var(--background-modifier-border));
 	border-radius: var(--radius-s);
 	color: var(--text-normal);
 	background: var(--background-primary);
@@ -1883,22 +1883,22 @@ body.wise-view-quick-preview-active .hover-popover {
 	transition: filter 120ms ease;
 }
 
-.wise-view-timeline__bar:hover {
+.unimian-timeline__bar:hover {
 	filter: brightness(1.08);
 }
 
-.wise-view-timeline__bar--dragging {
+.unimian-timeline__bar--dragging {
 	cursor: grabbing;
 }
 
-.wise-view-timeline__bar-label {
+.unimian-timeline__bar-label {
 	display: block;
 	min-width: max-content;
 	overflow: visible;
 	pointer-events: none;
 }
 
-.wise-view-timeline__handle {
+.unimian-timeline__handle {
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -1908,25 +1908,25 @@ body.wise-view-quick-preview-active .hover-popover {
 	cursor: col-resize;
 }
 
-.wise-view-timeline__bar:hover .wise-view-timeline__handle {
+.unimian-timeline__bar:hover .unimian-timeline__handle {
 	border-color: color-mix(in srgb, currentColor 35%, transparent);
 }
 
-.wise-view-timeline__handle--left {
+.unimian-timeline__handle--left {
 	left: 0;
 	border-left: 2px solid;
 }
 
-.wise-view-timeline__handle--right {
+.unimian-timeline__handle--right {
 	right: 0;
 	border-right: 2px solid;
 }
 
-.wise-view-timeline__date-label {
+.unimian-timeline__date-label {
 	position: absolute;
 	z-index: 3;
 	top: 50%;
-	left: var(--wise-view-timeline-left);
+	left: var(--unimian-timeline-left);
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 	white-space: nowrap;
@@ -1934,18 +1934,18 @@ body.wise-view-quick-preview-active .hover-popover {
 	opacity: 0;
 }
 
-.wise-view-timeline__row:hover > .wise-view-timeline__date-label,
-.wise-view-timeline__date-label--active {
+.unimian-timeline__row:hover > .unimian-timeline__date-label,
+.unimian-timeline__date-label--active {
 	opacity: 1;
 }
 
-.wise-view-timeline__date-label--start { transform: translate(-100%, -50%); }
-.wise-view-timeline__date-label--end { transform: translateY(-50%); }
+.unimian-timeline__date-label--start { transform: translate(-100%, -50%); }
+.unimian-timeline__date-label--end { transform: translateY(-50%); }
 
-.wise-view-timeline__ghost {
+.unimian-timeline__ghost {
 	position: absolute;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-bar-width);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-bar-width);
 	max-width: none;
 	padding: var(--size-4-1) var(--size-4-2);
 	border: 1px dashed var(--interactive-accent);
@@ -1959,15 +1959,15 @@ body.wise-view-quick-preview-active .hover-popover {
 	cursor: pointer;
 }
 
-.wise-view-timeline__ghost:hover {
+.unimian-timeline__ghost:hover {
 	background: var(--background-modifier-hover);
 }
 
-.wise-view-timeline__today {
+.unimian-timeline__today {
 	position: absolute;
 	z-index: var(--layer-popover);
 	top: 50%;
-	left: var(--wise-view-timeline-left);
+	left: var(--unimian-timeline-left);
 	min-width: 18px;
 	height: 18px;
 	padding-inline: 3px;
@@ -1982,12 +1982,12 @@ body.wise-view-quick-preview-active .hover-popover {
 	pointer-events: none;
 }
 
-.wise-view-timeline__today-line {
+.unimian-timeline__today-line {
 	position: absolute;
 	z-index: 2;
 	top: 0;
 	bottom: 0;
-	left: var(--wise-view-timeline-left);
+	left: var(--unimian-timeline-left);
 	width: 2px;
 	margin-left: -1px;
 	background: var(--color-red);
@@ -1995,7 +1995,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	pointer-events: none;
 }
 
-.wise-view-timeline__edge {
+.unimian-timeline__edge {
 	position: absolute;
 	z-index: var(--layer-popover);
 	top: var(--size-4-2);
@@ -2005,34 +2005,34 @@ body.wise-view-quick-preview-active .hover-popover {
 	background: var(--interactive-accent);
 }
 
-.wise-view-timeline__edge--before { left: var(--size-4-2); }
-.wise-view-timeline__edge--after { right: var(--size-4-2); }
+.unimian-timeline__edge--before { left: var(--size-4-2); }
+.unimian-timeline__edge--after { right: var(--size-4-2); }
 
-.wise-view-timeline--narrow .wise-view-timeline__main {
+.unimian-timeline--narrow .unimian-timeline__main {
 	grid-template-columns: minmax(7rem, 38%) minmax(0, 1fr);
 }
 
-.wise-view-timeline--narrow .wise-view-timeline__toolbar {
+.unimian-timeline--narrow .unimian-timeline__toolbar {
 	padding: var(--size-4-1);
 }
 
 @media (max-width: 600px) {
-	.wise-view-timeline__toolbar-label {
+	.unimian-timeline__toolbar-label {
 		display: none;
 	}
 
-	.wise-view-timeline__toolbar-button {
+	.unimian-timeline__toolbar-button {
 		padding-inline: var(--size-2-1);
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.wise-view-timeline__bar,
-	.wise-view-timeline__sidebar-panel { transition: none; }
+	.unimian-timeline__bar,
+	.unimian-timeline__sidebar-panel { transition: none; }
 }
 
 @media (pointer: coarse) {
-	.wise-view-timeline__handle { width: 16px; }
+	.unimian-timeline__handle { width: 16px; }
 }
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* Copyright (C) 2026 Parkis Utama */
@@ -2044,7 +2044,7 @@ body.wise-view-quick-preview-active .hover-popover {
    real scrolling ancestor's pixel height onto this element's inline style instead. Either way,
    overflow: hidden is what then keeps the toolbar and the chart's sticky timeline header fixed
    while only the library's own .gantt-scroll-container scrolls. */
-.bases-view.wise-view-gantt {
+.bases-view.unimian-gantt {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -2054,7 +2054,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	color: var(--text-normal);
 }
 
-.wise-view-gantt-toolbar {
+.unimian-gantt-toolbar {
 	display: flex;
 	flex: 0 0 auto;
 	align-items: center;
@@ -2063,11 +2063,11 @@ body.wise-view-quick-preview-active .hover-popover {
 	border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.wise-view-gantt-toolbar__scale {
+.unimian-gantt-toolbar__scale {
 	min-width: 7rem;
 }
 
-.wise-view-gantt-toolbar__button {
+.unimian-gantt-toolbar__button {
 	display: inline-flex;
 	align-items: center;
 	gap: var(--size-2-1);
@@ -2075,13 +2075,13 @@ body.wise-view-quick-preview-active .hover-popover {
 	padding-inline: var(--size-2-2);
 }
 
-.wise-view-gantt-chart {
+.unimian-gantt-chart {
 	min-height: 0;
 	flex: 1 1 auto;
 	overflow: hidden;
 }
 
-.wise-view-gantt-chart > .gantt-container {
+.unimian-gantt-chart > .gantt-container {
 	--gantt-font-sans: var(--font-interface);
 	--gantt-background: var(--background-primary);
 	--gantt-foreground: var(--text-normal);
@@ -2111,38 +2111,38 @@ body.wise-view-quick-preview-active .hover-popover {
 }
 
 /* The chart uses a UTC wall clock; our task dates are local-floating, so align "now" likewise. */
-.wise-view-gantt .gantt-today-marker {
+.unimian-gantt .gantt-today-marker {
 	transform: translateX(var(--gantt-local-today-offset, 0px));
 }
 
-.wise-view-gantt .gantt-today-dot {
+.unimian-gantt .gantt-today-dot {
 	transform: translate(calc(-50% + var(--gantt-local-today-offset, 0px)), 50%);
 }
 
 @media (max-width: 600px) {
-	.wise-view-gantt-toolbar__label {
+	.unimian-gantt-toolbar__label {
 		display: none;
 	}
 
-	.wise-view-gantt-toolbar__button {
+	.unimian-gantt-toolbar__button {
 		padding-inline: var(--size-2-1);
 	}
 }
 
-.wise-view-gantt-empty {
+.unimian-gantt-empty {
 	display: grid;
 	min-height: 240px;
 	place-items: center;
 	color: var(--text-muted);
 }
 
-/* Summary bars carry the same visual weight as their task rows in Wise View. */
-.wise-view-gantt .gantt-task-bar.summary {
+/* Summary bars carry the same visual weight as their task rows in Unimian. */
+.unimian-gantt .gantt-task-bar.summary {
 	height: 28px !important;
 	border-radius: 6px;
 }
 
-.wise-view-gantt-detail {
+.unimian-gantt-detail {
 	display: flex;
 	flex-direction: column;
 	gap: var(--size-4-2);
@@ -2150,19 +2150,19 @@ body.wise-view-quick-preview-active .hover-popover {
 }
 
 /* The close button sits alone on a row above the title, so it reads as the panel's, not the note's. */
-.wise-view-gantt-detail__top {
+.unimian-gantt-detail__top {
 	display: flex;
 	justify-content: flex-end;
 	margin-block: calc(var(--size-4-1) * -1) calc(var(--size-2-2) * -1);
 }
 
-.wise-view-gantt-detail__dependency {
+.unimian-gantt-detail__dependency {
 	display: flex;
 	align-items: center;
 	gap: var(--size-2-2);
 }
 
-.wise-view-gantt-detail__title {
+.unimian-gantt-detail__title {
 	display: block;
 	width: 100%;
 	height: auto;
@@ -2180,98 +2180,98 @@ body.wise-view-quick-preview-active .hover-popover {
 	cursor: pointer;
 }
 
-.wise-view-gantt-detail__title:hover {
+.unimian-gantt-detail__title:hover {
 	background: transparent;
 	text-decoration: underline;
 }
 
-.wise-view-gantt-detail__close {
+.unimian-gantt-detail__close {
 	flex: 0 0 auto;
 }
 
-.wise-view-gantt-detail__fields {
+.unimian-gantt-detail__fields {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: var(--size-2-3) var(--size-4-2);
 }
 
 /* Labels sit above their values instead of taking a column of their own. */
-.wise-view-gantt-detail__field {
+.unimian-gantt-detail__field {
 	display: flex;
 	flex-direction: column;
 	gap: var(--size-2-1);
 	min-width: 0;
 }
 
-.wise-view-gantt-detail__field--wide,
-.wise-view-gantt-detail__timezone {
+.unimian-gantt-detail__field--wide,
+.unimian-gantt-detail__timezone {
 	grid-column: 1 / -1;
 }
 
-.wise-view-gantt-detail__field input {
+.unimian-gantt-detail__field input {
 	min-width: 0;
 	width: 100%;
 }
 
-.wise-view-gantt-detail__label,
-.wise-view-gantt-detail__property-name,
-.wise-view-gantt-detail__timezone {
+.unimian-gantt-detail__label,
+.unimian-gantt-detail__property-name,
+.unimian-gantt-detail__timezone {
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 }
 
-.wise-view-gantt-detail__section-title {
+.unimian-gantt-detail__section-title {
 	margin-bottom: var(--size-2-2);
 	font-weight: var(--font-semibold);
 }
 
-.wise-view-gantt-detail__dependencies,
-.wise-view-gantt-detail__properties {
+.unimian-gantt-detail__dependencies,
+.unimian-gantt-detail__properties {
 	padding-top: var(--size-4-2);
 	border-top: 1px solid var(--background-modifier-border);
 }
 
-.wise-view-gantt-detail__dependency span,
-.wise-view-gantt-detail__property-value {
+.unimian-gantt-detail__dependency span,
+.unimian-gantt-detail__property-value {
 	min-width: 0;
 	flex: 1;
 	overflow-wrap: anywhere;
 }
 
-.wise-view-gantt-detail__property {
+.unimian-gantt-detail__property {
 	display: flex;
 	flex-direction: column;
 	gap: 0;
 	padding-block: var(--size-2-1);
 }
 
-.wise-view-gantt-detail__property-name {
+.unimian-gantt-detail__property-name {
 	width: auto;
 	flex: none;
 }
 
 /* Derived from Depends on: a bar that starts before a predecessor finishes, or waits on an
    unfinished one. The class lands on both the bar and its task-list row. */
-.wise-view-gantt-chart .wise-view-gantt-conflict .gantt-task-bar,
-.wise-view-gantt-chart .gantt-task-bar.wise-view-gantt-conflict {
+.unimian-gantt-chart .unimian-gantt-conflict .gantt-task-bar,
+.unimian-gantt-chart .gantt-task-bar.unimian-gantt-conflict {
 	outline: 2px solid var(--text-error);
 	outline-offset: 1px;
 }
 
-.wise-view-gantt-chart .wise-view-gantt-blocked .gantt-task-bar,
-.wise-view-gantt-chart .gantt-task-bar.wise-view-gantt-blocked {
+.unimian-gantt-chart .unimian-gantt-blocked .gantt-task-bar,
+.unimian-gantt-chart .gantt-task-bar.unimian-gantt-blocked {
 	opacity: 0.6;
 }
 
-.wise-view-gantt-chart .gantt-grid-row.wise-view-gantt-conflict {
+.unimian-gantt-chart .gantt-grid-row.unimian-gantt-conflict {
 	box-shadow: inset 3px 0 0 var(--text-error);
 }
 
-.wise-view-gantt-chart .gantt-grid-row.wise-view-gantt-blocked {
+.unimian-gantt-chart .gantt-grid-row.unimian-gantt-blocked {
 	box-shadow: inset 3px 0 0 var(--text-faint);
 }
 
-.wise-view-gantt-detail__link {
+.unimian-gantt-detail__link {
 	min-width: 0;
 	height: auto;
 	flex: 1;
@@ -2286,28 +2286,28 @@ body.wise-view-quick-preview-active .hover-popover {
 	cursor: pointer;
 }
 
-.wise-view-gantt-detail__link:hover {
+.unimian-gantt-detail__link:hover {
 	background: none;
 	text-decoration: underline;
 }
 
-.wise-view-gantt-detail__warning {
+.unimian-gantt-detail__warning {
 	margin-bottom: var(--size-2-2);
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 }
 
-.wise-view-gantt-detail__warning--conflict {
+.unimian-gantt-detail__warning--conflict {
 	color: var(--text-error);
 }
 
-.wise-view-gantt-detail__blocks {
+.unimian-gantt-detail__blocks {
 	padding-top: var(--size-4-2);
 	border-top: 1px solid var(--background-modifier-border);
 }
 
 /* Ctrl/Cmd is Obsidian's Page Preview modifier; the library's own hover card would sit under it. */
-.wise-view-gantt-previewing .gantt-bar-tooltip-detail {
+.unimian-gantt-previewing .gantt-bar-tooltip-detail {
 	display: none;
 }
 
@@ -2317,7 +2317,7 @@ body.wise-view-quick-preview-active .hover-popover {
  * text color instead (white on dark bars, black on light ones) keeps the fill distinguishable at either
  * end. The library sets --gantt-progress-color inline on colored bars, hence !important.
  */
-.wise-view-gantt-chart .gantt-task-bar[style*="--gantt-progress-color"]:not(.summary) {
+.unimian-gantt-chart .gantt-task-bar[style*="--gantt-progress-color"]:not(.summary) {
 	--gantt-progress-color: color-mix(in srgb, var(--gantt-bar-color) 50%, var(--gantt-bar-text-color)) !important;
 }
 /* SPDX-License-Identifier: GPL-3.0-only */
@@ -2331,7 +2331,7 @@ body.wise-view-quick-preview-active .hover-popover {
  * taller than the rest — tasks/sticky-note/spike-report.md, STICKY-001).
  */
 
-.wise-view-sticky-note {
+.unimian-sticky-note {
 	display: block;
 	width: 100%;
 	height: 100%;
@@ -2341,7 +2341,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	box-sizing: border-box;
 }
 
-.wise-view-sticky-note-section-heading {
+.unimian-sticky-note-section-heading {
 	margin: 0 0 var(--size-4-2) 0;
 	font-size: var(--font-ui-small);
 	font-weight: var(--font-medium);
@@ -2350,7 +2350,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	letter-spacing: 0.04em;
 }
 
-.wise-view-sticky-note-grid {
+.unimian-sticky-note-grid {
 	/* position: relative and an explicit pixel height are set by masonry.ts at runtime, sized to
 	 * the tallest column so the scroll container's scrollHeight is correct. */
 	width: 100%;
@@ -2363,11 +2363,11 @@ body.wise-view-quick-preview-active .hover-popover {
 	transition: opacity 0.15s ease;
 }
 
-.wise-view-sticky-note-grid.is-ready {
+.unimian-sticky-note-grid.is-ready {
 	opacity: 1;
 }
 
-.wise-view-sticky-note-card {
+.unimian-sticky-note-card {
 	/* Defensive baseline from Grid's post-mortem, kept even though this is not a CSS-column
 	 * layout: */
 	min-width: 0;
@@ -2377,17 +2377,17 @@ body.wise-view-quick-preview-active .hover-popover {
 	margin: 0;
 	padding: var(--size-4-3);
 	border-radius: var(--radius-m);
-	background: var(--wise-view-color-bg, var(--background-secondary));
+	background: var(--unimian-color-bg, var(--background-secondary));
 	border: 1px solid var(--background-modifier-border);
 	transition: top 0.12s ease, left 0.12s ease, box-shadow 0.12s ease;
 	cursor: pointer;
 	position: relative;
 	overflow: hidden;
-	max-height: var(--wise-view-sticky-note-max-height, 480px);
+	max-height: var(--unimian-sticky-note-max-height, 480px);
 }
 
-.wise-view-sticky-note-card:hover,
-.wise-view-sticky-note-card:focus-visible {
+.unimian-sticky-note-card:hover,
+.unimian-sticky-note-card:focus-visible {
 	box-shadow: 0 2px 8px var(--background-modifier-box-shadow);
 	outline: none;
 }
@@ -2399,7 +2399,7 @@ body.wise-view-quick-preview-active .hover-popover {
  * still-blank placeholder can be genuinely on-screen for a moment — a subtle shimmer marks that
  * as "loading", not "stuck" (maintainer report, 2026-09-23: a fast scroll up-and-down left a
  * visible block of blank cards with no indication they were still on their way). */
-.wise-view-sticky-note-card-placeholder {
+.unimian-sticky-note-card-placeholder {
 	cursor: default;
 	background: linear-gradient(
 		100deg,
@@ -2408,42 +2408,42 @@ body.wise-view-quick-preview-active .hover-popover {
 		var(--background-secondary) 60%
 	);
 	background-size: 200% 100%;
-	animation: wise-view-sticky-note-shimmer 1.4s ease-in-out infinite;
+	animation: unimian-sticky-note-shimmer 1.4s ease-in-out infinite;
 }
 
-.wise-view-sticky-note-card-placeholder:hover {
+.unimian-sticky-note-card-placeholder:hover {
 	box-shadow: none;
 }
 
-@keyframes wise-view-sticky-note-shimmer {
+@keyframes unimian-sticky-note-shimmer {
 	from { background-position: 150% 0; }
 	to { background-position: -50% 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.wise-view-sticky-note-card-placeholder {
+	.unimian-sticky-note-card-placeholder {
 		animation: none;
 		background: var(--background-secondary);
 	}
 }
 
-.wise-view-sticky-note-card-placeholder::after {
+.unimian-sticky-note-card-placeholder::after {
 	display: none;
 }
 
-.wise-view-sticky-note-card::after {
+.unimian-sticky-note-card::after {
 	content: '';
 	position: absolute;
 	inset: auto 0 0 0;
 	height: 48px;
-	background: linear-gradient(to bottom, transparent, var(--wise-view-color-bg, var(--background-secondary)));
+	background: linear-gradient(to bottom, transparent, var(--unimian-color-bg, var(--background-secondary)));
 	pointer-events: none;
 }
 
 /* Cover banner: the `height:0`/`padding-top` percentage technique already proven in this
  * project's Swimlane cover treatment, not `aspect-ratio` (one of Grid's three original failure
  * modes). */
-.wise-view-sticky-note-cover {
+.unimian-sticky-note-cover {
 	position: relative;
 	width: calc(100% + 2 * var(--size-4-3));
 	margin: calc(-1 * var(--size-4-3)) calc(-1 * var(--size-4-3)) var(--size-4-3);
@@ -2454,22 +2454,22 @@ body.wise-view-quick-preview-active .hover-popover {
 	background: var(--background-modifier-border);
 }
 
-.wise-view-sticky-note-cover img {
+.unimian-sticky-note-cover img {
 	position: absolute;
 	inset: 0;
 	width: 100%;
 	height: 100%;
 }
 
-.wise-view-sticky-note-fit-cover .wise-view-sticky-note-cover img {
+.unimian-sticky-note-fit-cover .unimian-sticky-note-cover img {
 	object-fit: cover;
 }
 
-.wise-view-sticky-note-fit-contain .wise-view-sticky-note-cover img {
+.unimian-sticky-note-fit-contain .unimian-sticky-note-cover img {
 	object-fit: contain;
 }
 
-.wise-view-sticky-note-pin-btn {
+.unimian-sticky-note-pin-btn {
 	position: absolute;
 	top: var(--size-4-2);
 	right: var(--size-4-2);
@@ -2486,33 +2486,33 @@ body.wise-view-quick-preview-active .hover-popover {
 	transition: opacity 0.15s ease;
 }
 
-.wise-view-sticky-note-card:hover .wise-view-sticky-note-pin-btn,
-.wise-view-sticky-note-card:focus-within .wise-view-sticky-note-pin-btn,
-.wise-view-sticky-note-pin-btn.is-pinned {
+.unimian-sticky-note-card:hover .unimian-sticky-note-pin-btn,
+.unimian-sticky-note-card:focus-within .unimian-sticky-note-pin-btn,
+.unimian-sticky-note-pin-btn.is-pinned {
 	opacity: 1;
 }
 
-.wise-view-sticky-note-pin-btn.is-pinned {
+.unimian-sticky-note-pin-btn.is-pinned {
 	color: var(--interactive-accent);
 }
 
-.wise-view-sticky-note-pin-btn svg {
+.unimian-sticky-note-pin-btn svg {
 	width: 14px;
 	height: 14px;
 }
 
-.wise-view-sticky-note-title {
+.unimian-sticky-note-title {
 	margin: 0 0 var(--size-4-1) 0;
 	font-size: var(--font-ui-medium);
 	overflow-wrap: break-word;
 }
 
-.wise-view-sticky-note-body {
+.unimian-sticky-note-body {
 	font-size: var(--font-ui-small);
 	overflow-wrap: break-word;
 }
 
-.wise-view-sticky-note-body img {
+.unimian-sticky-note-body img {
 	max-width: 100%;
 	height: auto;
 }
@@ -2520,18 +2520,18 @@ body.wise-view-quick-preview-active .hover-popover {
 /* Normalize excerpt content to the card's own compact scale instead of full reading-view sizes
  * (maintainer feedback 2026-09-22, referencing the reference plugin's own card typography):
  * a heading or table rendered at document scale reads as visual noise at card width. */
-.wise-view-sticky-note-body :is(h1, h2, h3, h4, h5, h6) {
+.unimian-sticky-note-body :is(h1, h2, h3, h4, h5, h6) {
 	margin: var(--size-4-2) 0 var(--size-4-1) 0;
 	font-size: var(--font-ui-medium);
 	font-weight: var(--font-semibold);
 	line-height: var(--line-height-tight);
 }
 
-.wise-view-sticky-note-body :is(h1, h2, h3, h4, h5, h6):first-child {
+.unimian-sticky-note-body :is(h1, h2, h3, h4, h5, h6):first-child {
 	margin-top: 0;
 }
 
-.wise-view-sticky-note-body p {
+.unimian-sticky-note-body p {
 	margin: 0 0 var(--size-4-2) 0;
 }
 
@@ -2539,23 +2539,23 @@ body.wise-view-quick-preview-active .hover-popover {
  * expected/native, not a Sticky Note bug. Just keep it from bursting out of the card's width,
  * and shrink it to the card's own compact scale (a full-size table header wraps awkwardly at
  * card width otherwise). */
-.wise-view-sticky-note-body table,
-.wise-view-sticky-note-body .table-wrapper {
+.unimian-sticky-note-body table,
+.unimian-sticky-note-body .table-wrapper {
 	max-width: 100%;
 }
 
-.wise-view-sticky-note-body table {
+.unimian-sticky-note-body table {
 	font-size: var(--font-ui-smaller);
 }
 
-.wise-view-sticky-note-body table th,
-.wise-view-sticky-note-body table td {
+.unimian-sticky-note-body table th,
+.unimian-sticky-note-body table td {
 	padding: var(--size-2-1) var(--size-2-2);
 }
 
-.wise-view-sticky-note-empty,
-.wise-view-sticky-note-error,
-.wise-view-sticky-note-embed-placeholder {
+.unimian-sticky-note-empty,
+.unimian-sticky-note-error,
+.unimian-sticky-note-embed-placeholder {
 	color: var(--text-muted);
 	font-style: italic;
 }

@@ -2,7 +2,7 @@ import type { EntrySnapshot } from '../../src/core/entries/EntrySnapshot';
 import type { NormalizedValue } from '../../src/core/entries/NormalizedValue';
 import { DateValue, StringValue, TFile } from './obsidian';
 import { BasesTimelineView } from '../../src/views/timeline/BasesTimelineView';
-import type WiseViewPlugin from '../../src/main';
+import type UnimianPlugin from '../../src/main';
 
 export function timelineSnapshot(path: string, values: Record<string, NormalizedValue>): EntrySnapshot {
 	const basename = path.replace(/\.md$/i, '').split('/').pop() ?? path;
@@ -106,7 +106,7 @@ export function createTimelineHarness(options: TimelineHarnessOptions = {}): Tim
 		},
 		data: { data: [entry, unscheduledEntry], groupedData: [{ entries: [entry, unscheduledEntry], hasKey: () => false }] },
 	};
-	const plugin = { app, settings: { openNotesInPreview: false } } as unknown as WiseViewPlugin;
+	const plugin = { app, settings: { openNotesInPreview: false } } as unknown as UnimianPlugin;
 	const host = document.createElement('div');
 	document.body.appendChild(host);
 	if (options.containerWidth !== undefined) {
@@ -114,7 +114,7 @@ export function createTimelineHarness(options: TimelineHarnessOptions = {}): Tim
 	}
 	const view = new BasesTimelineView(controller as never, host, plugin);
 	if (options.containerWidth !== undefined) {
-		const scroller = host.querySelector<HTMLElement>('.wise-view-timeline__scroller');
+		const scroller = host.querySelector<HTMLElement>('.unimian-timeline__scroller');
 		if (scroller) Object.defineProperty(scroller, 'clientWidth', { configurable: true, value: options.containerWidth });
 	}
 	view.onload();

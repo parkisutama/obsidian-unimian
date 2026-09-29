@@ -1,9 +1,9 @@
 {
-	"id": "wise-view",
-	"name": "Wise View",
+	"id": "unimian",
+	"name": "Unimian",
 	"version": "1.0.3",
 	"minAppVersion": "1.10.2",
-	"description": "Enriched Obsidian Bases views: Calendar, Swimlane, Gantt, and Timeline — task-management agnostic.",
+	"description": "Add Calendar, Swimlane, Gantt, and Timeline views to Bases without prescribing a task management workflow.",
 	"author": "Parkis Utama",
 	"authorUrl": "https://github.com/parkisutama",
 	"isDesktopOnly": false

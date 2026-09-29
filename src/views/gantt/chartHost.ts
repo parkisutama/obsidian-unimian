@@ -57,7 +57,7 @@ export class GanttChartHost {
 	private paint(): void {
 		if (!this.model) return;
 		if (this.model.tasks.length === 0) {
-			this.renderChart(h('div', { class: 'wise-view-gantt-empty' },
+			this.renderChart(h('div', { class: 'unimian-gantt-empty' },
 				this.model.unscheduledCount > 0 ? `${this.model.unscheduledCount} note(s) need a configured start date.` : 'No scheduled notes.'), this.containerEl);
 			return;
 		}

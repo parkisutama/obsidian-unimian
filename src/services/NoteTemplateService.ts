@@ -37,7 +37,7 @@ interface TemplateParts {
  * Creates notes for Calendar events and Gantt tasks (docs/specs/note-template.md).
  *
  * The template file is processed by Templater or the core Templates plugin (see
- * `templateEngine.ts`); Wise View's `{{title|date|time|start|end}}` tokens apply only to the
+ * `templateEngine.ts`); Unimian's `{{title|date|time|start|end}}` tokens apply only to the
  * title format, whose values the view itself computed, never to the template's own text.
  */
 export class NoteTemplateService {

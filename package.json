@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-wise-view",
+	"name": "obsidian-unimian",
 	"version": "1.0.3",
-	"description": "Enriched Obsidian Bases views: Calendar, Swimlane, Gantt, and Timeline — task-management agnostic",
+	"description": "Add Calendar, Swimlane, Gantt, and Timeline views to Bases without prescribing a task management workflow.",
 	"main": "main.js",
 	"packageManager": "pnpm@12.4.2",
 	"engines": {

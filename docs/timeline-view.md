@@ -50,7 +50,7 @@ Rentang terbalik dinormalisasi untuk tampilan tanpa menulis perubahan ke note.
 - Klik atau tekan Enter/Space pada judul atau bar untuk membuka note.
 - Modifier Obsidian pada klik tetap menentukan tab, split, atau window tujuan.
 - Hover mengikuti Page Preview Obsidian.
-- Klik kanan membuka menu lokasi file bersama Wise View.
+- Klik kanan membuka menu lokasi file bersama Unimian.
 - Klik heading group untuk collapse atau expand.
 - Tombol **Today** membawa posisi horizontal ke hari ini.
 - `Ctrl/Cmd+wheel` atau pinch dua jari mengganti zoom dengan tanggal di bawah pointer tetap terjangkar.
@@ -60,7 +60,7 @@ Rentang terbalik dinormalisasi untuk tampilan tanpa menulis perubahan ke note.
 
 Timeline tidak menyediakan status/priority workflow, recurrence, dependency editing, atau perubahan
 group. Write Timeline dibatasi pada quick scheduling serta drag/resize start/end yang dipilih
-pengguna, melalui mutation gateway Wise View.
+pengguna, melalui mutation gateway Unimian.
 
 ## Unscheduled dan data tidak valid
 
@@ -85,13 +85,13 @@ diadaptasi secara selektif dari
 `2c6ee7ca2ab881f5557df5a042a377b0139b8608` (MIT), dengan notice dipertahankan pada file yang
 diadaptasi dan di `THIRD_PARTY_NOTICES.md`.
 
-Wise View mengadopsi perilaku Timeline upstream secara penuh untuk navigasi temporal dan penempatan
+Unimian mengadopsi perilaku Timeline upstream secara penuh untuk navigasi temporal dan penempatan
 item yang belum terjadwal, tetapi tetap memisahkan workflow task yang tidak agnostik:
 
 - tidak memiliki status atau urutan priority bawaan;
 - melakukan quick scheduling dan bar drag/resize hanya ke properti start/end yang dikonfigurasi;
 - tidak menulis group, status, priority, recurrence, atau dependency;
-- memakai Temporal Core, navigation service, dan virtualization platform Wise View;
+- memakai Temporal Core, navigation service, dan virtualization platform Unimian;
 - memisahkan model murni, renderer DOM, dan adapter Obsidian Bases.
 
 ## Batas verifikasi

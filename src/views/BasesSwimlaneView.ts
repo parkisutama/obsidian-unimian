@@ -15,7 +15,7 @@ import {
   Notice,
   normalizePath,
 } from 'obsidian';
-import type WiseViewPlugin from '../main';
+import type UnimianPlugin from '../main';
 import { formatDate, getEntryValue, looksLikeDateString, valueToString } from './swimlane/values';
 import type { BadgePlacement, BorderStyle, CoverDisplay, FreezeHeaders, SwimHeaderDisplay } from './swimlane/types';
 import { DragController } from './swimlane/dragAndDrop';
@@ -39,7 +39,7 @@ import { getContrastColor } from '../utils/colorUtils';
 import { resolveCoverImageSrc } from '../platform/dom/CoverImageResolver';
 
 
-export const BASES_SWIMLANE_VIEW_ID = 'wise-view-swimlane';
+export const BASES_SWIMLANE_VIEW_ID = 'unimian-swimlane';
 
 
 /**
@@ -48,7 +48,7 @@ export const BASES_SWIMLANE_VIEW_ID = 'wise-view-swimlane';
  */
 export class BasesSwimlaneView extends BasesView {
   type = BASES_SWIMLANE_VIEW_ID;
-  private plugin: WiseViewPlugin;
+  private plugin: UnimianPlugin;
   private containerEl: HTMLElement;
   private readonly runtime: ViewRuntime;
   private readonly mutations: LegacyMutationGateway;
@@ -192,7 +192,7 @@ export class BasesSwimlaneView extends BasesView {
   constructor(
     controller: QueryController,
     containerEl: HTMLElement,
-    plugin: WiseViewPlugin
+    plugin: UnimianPlugin
   ) {
     super(controller);
     this.plugin = plugin;
@@ -775,7 +775,7 @@ export class BasesSwimlaneView extends BasesView {
 /**
  * Create the Bases view registration for the Swimlane
  */
-export function createSwimlaneViewRegistration(plugin: WiseViewPlugin): BasesViewRegistration {
+export function createSwimlaneViewRegistration(plugin: UnimianPlugin): BasesViewRegistration {
   return {
     name: 'Swimlane',
     icon: 'rows-3',

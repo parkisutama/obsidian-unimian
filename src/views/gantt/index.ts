@@ -2,7 +2,7 @@
 // Copyright (C) 2026 Parkis Utama
 
 import type { BasesViewRegistration, QueryController } from 'obsidian';
-import type WiseViewPlugin from '../../main';
+import type UnimianPlugin from '../../main';
 import type { GrantedMutations } from '../../platform/mutations/grants';
 import { BASES_GANTT_VIEW_ID, BasesGanttView } from './BasesGanttView';
 import { getGanttViewOptions } from './options';
@@ -10,7 +10,7 @@ import { getGanttViewOptions } from './options';
 export { BASES_GANTT_VIEW_ID, BasesGanttView } from './BasesGanttView';
 
 export function createGanttViewRegistration(
-	plugin: WiseViewPlugin,
+	plugin: UnimianPlugin,
 	mutationsFor: () => GrantedMutations = () => ({}),
 ): BasesViewRegistration {
 	return {

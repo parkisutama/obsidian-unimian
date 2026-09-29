@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS } from "../src/types/settings";
-import type WiseViewPlugin from "../src/main";
+import type UnimianPlugin from "../src/main";
 import { createCalendarOptions } from "../src/views/calendar/options";
 import {
 	configuredKinds,
@@ -52,7 +52,7 @@ describe("periodic config", () => {
 });
 
 describe("calendar options schema", () => {
-	const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as WiseViewPlugin;
+	const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as UnimianPlugin;
 	const keys = collectKeys(createCalendarOptions(plugin));
 
 	it("keeps every existing key", () => {

@@ -12,7 +12,7 @@ function setup() {
 	root.innerHTML = `
 		<div class="gantt-task-bar" data-task-id="Tasks/A.md"><span class="inner">A</span></div>
 		<div class="gantt-grid-row" data-row-id="Tasks/B.md"></div>
-		<div class="gantt-task-bar" data-task-id="wise-view-synthetic://group/X"></div>
+		<div class="gantt-task-bar" data-task-id="unimian-synthetic://group/X"></div>
 		<button data-note-path="Tasks/C.md" class="link"></button>`;
 	document.body.appendChild(root);
 	const trigger = vi.fn();
@@ -22,7 +22,7 @@ function setup() {
 	const runtime = new ViewRuntime(root);
 	installGanttNavigation({
 		app: app as never, root, runtime, hoverParent: hoverParent as never,
-		sourceId: 'wise-view-gantt', isNote: path => !path.startsWith('wise-view-synthetic://'),
+		sourceId: 'unimian-gantt', isNote: path => !path.startsWith('unimian-synthetic://'),
 	});
 	return { root, trigger, openLinkText, hoverParent, runtime };
 }
@@ -37,7 +37,7 @@ describe('Gantt navigation (GBETA-015)', () => {
 		bar.dispatchEvent(event);
 
 		expect(h.trigger).toHaveBeenCalledWith('hover-link', expect.objectContaining({
-			source: 'wise-view-gantt', hoverParent: h.hoverParent, linktext: 'Tasks/A.md', targetEl: bar,
+			source: 'unimian-gantt', hoverParent: h.hoverParent, linktext: 'Tasks/A.md', targetEl: bar,
 		}));
 	});
 

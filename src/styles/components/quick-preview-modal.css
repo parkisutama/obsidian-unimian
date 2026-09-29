@@ -2,10 +2,10 @@
    6. QUICK PREVIEW MODAL
    ========================================================================== */
 
-/* `.wise-view-quick-preview` is on `modalEl` (the `.modal` box itself), not `.modal-content` —
+/* `.unimian-quick-preview` is on `modalEl` (the `.modal` box itself), not `.modal-content` —
    Obsidian sizes the box via its own width/height, so the override has to target the box, not
    just its inner padding area, or the box stays at Obsidian's default (much narrower) size. */
-.wise-view-quick-preview.modal {
+.unimian-quick-preview.modal {
 	width: min(900px, 80vw);
 	height: min(85vh, 950px);
 	max-width: 80vw;
@@ -17,11 +17,11 @@
 /* Page Preview's hover popover (--layer-popover) sits below a modal (--layer-modal) by default,
    so it renders correctly but invisibly behind this popup when triggered from the embedded leaf.
    Only bumped while the popup is open (see ACTIVE_CLASS in QuickPreviewModal.ts). */
-body.wise-view-quick-preview-active .hover-popover {
+body.unimian-quick-preview-active .hover-popover {
 	z-index: calc(var(--layer-modal, 70) + 5);
 }
 
-.wise-view-quick-preview .modal-content {
+.unimian-quick-preview .modal-content {
 	flex: 1 1 auto;
 	min-height: 0;
 	display: flex;
@@ -39,22 +39,22 @@ body.wise-view-quick-preview-active .hover-popover {
    2026-09-22 (an earlier attempt using `--background-primary` matched on some themes only by
    coincidence). Match the header to that same token so the toolbar blends into the body.
    `!important`: Obsidian's own `.is-focused .workspace-leaf.mod-active .view-header` rule
-   outranks a plain `.wise-view-quick-preview .view-header` on specificity, and the reparented
+   outranks a plain `.unimian-quick-preview .view-header` on specificity, and the reparented
    leaf (detachedLeaf.ts) is always "active". */
-.wise-view-quick-preview .view-header {
+.unimian-quick-preview .view-header {
 	background-color: var(--modal-background) !important;
 	border-bottom: none !important;
 	box-shadow: none !important;
 }
 
-.wise-view-quick-preview-title {
+.unimian-quick-preview-title {
 	margin: 0 0 12px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
-.wise-view-quick-preview-layout {
+.unimian-quick-preview-layout {
 	display: flex;
 	gap: 24px;
 	align-items: stretch;
@@ -62,7 +62,7 @@ body.wise-view-quick-preview-active .hover-popover {
 	min-height: 0;
 }
 
-.wise-view-quick-preview-body {
+.unimian-quick-preview-body {
 	flex: 1 1 auto;
 	min-width: 0;
 	min-height: 0;
@@ -70,17 +70,17 @@ body.wise-view-quick-preview-active .hover-popover {
 }
 
 /* A reparented WorkspaceLeaf expects its split's flex layout to size it; give it one directly. */
-.wise-view-quick-preview-body--leaf {
+.unimian-quick-preview-body--leaf {
 	overflow: hidden;
 	display: flex;
 }
 
-.wise-view-quick-preview-body--leaf .workspace-leaf {
+.unimian-quick-preview-body--leaf .workspace-leaf {
 	height: 100%;
 	width: 100%;
 }
 
-.wise-view-quick-preview-backlinks {
+.unimian-quick-preview-backlinks {
 	flex: 0 0 220px;
 	min-height: 0;
 	overflow-y: auto;
@@ -88,49 +88,49 @@ body.wise-view-quick-preview-active .hover-popover {
 	border-left: 1px solid var(--background-modifier-border);
 }
 
-.wise-view-quick-preview-backlinks h3 {
+.unimian-quick-preview-backlinks h3 {
 	margin-top: 0;
 	font-size: var(--font-ui-small);
 	color: var(--text-muted);
 	text-transform: uppercase;
 }
 
-.wise-view-quick-preview-backlinks ul {
+.unimian-quick-preview-backlinks ul {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-.wise-view-quick-preview-backlinks li {
+.unimian-quick-preview-backlinks li {
 	margin-bottom: 6px;
 }
 
-.wise-view-quick-preview-backlink {
+.unimian-quick-preview-backlink {
 	color: var(--text-normal);
 	cursor: pointer;
 	text-decoration: none;
 }
 
-.wise-view-quick-preview-backlink:hover {
+.unimian-quick-preview-backlink:hover {
 	color: var(--interactive-accent);
 	text-decoration: underline;
 }
 
 @media (max-width: 600px) {
-	.wise-view-quick-preview.modal {
+	.unimian-quick-preview.modal {
 		width: 96vw;
 		height: 92vh;
 	}
 
-	.wise-view-quick-preview-layout {
+	.unimian-quick-preview-layout {
 		flex-direction: column;
 	}
 
-	.wise-view-quick-preview-body {
+	.unimian-quick-preview-body {
 		flex: 2 1 0;
 	}
 
-	.wise-view-quick-preview-backlinks {
+	.unimian-quick-preview-backlinks {
 		flex: 1 1 0;
 		border-left: none;
 		border-top: 1px solid var(--background-modifier-border);

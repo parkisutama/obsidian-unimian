@@ -39,7 +39,7 @@ weigh the following before granting the same capability to another view:
 
 - **Shared property ownership.** Gantt writes to properties that other plugins may also
   own (task managers, Dataview/Tasks-style workflows, Templater-created fields, Obsidian
-  Calendar/Full Calendar plugins). The same note can be edited by several plugins; Wise View
+  Calendar/Full Calendar plugins). The same note can be edited by several plugins; Unimian
   writes must stay minimal (changed fields only) and format-preserving (keep list vs. comma
   shape, keep `Date` vs. `Date & time` shape) to avoid churn and conflicts.
 - **Format contracts.** Gantt writes local floating dates (`YYYY-MM-DD`,

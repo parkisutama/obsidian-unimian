@@ -3,9 +3,9 @@
 Status: Active  
 Specification: [Code quality, organization, and performance](../specs/code-quality-and-performance.md)
 
-This ledger records every upstream repository assessed for Wise View's adopted-view work (the
+This ledger records every upstream repository assessed for Unimian's adopted-view work (the
 now-retired extensible-view-platform program, and any future adoption work), the exact snapshot
-inspected, its license, the reuse mode Wise View applies to it, and what is explicitly excluded.
+inspected, its license, the reuse mode Unimian applies to it, and what is explicitly excluded.
 It is the source of truth `pnpm run verify:artifacts` and `THIRD_PARTY_NOTICES.md` are reconciled
 against. No task may copy source from a repository listed here beyond what its **Reuse mode** and
 **Excluded** rows permit.
@@ -13,13 +13,13 @@ against. No task may copy source from a repository listed here beyond what its *
 ## Reuse mode definitions
 
 - **Design evidence only** — no source is copied; only observed behavior/structure informs
-  Wise View's own implementation. No attribution notice is required, but the row stays here
+  Unimian's own implementation. No attribution notice is required, but the row stays here
   for review traceability.
-- **Behaviorally reimplemented** — Wise View writes its own code to match documented/observed
+- **Behaviorally reimplemented** — Unimian writes its own code to match documented/observed
   public behavior. No attribution notice is required unless a specific fragment is adapted
   (tracked per file below).
 - **Modified** — a specific upstream source file is adapted with changes; requires SPDX/
-  copyright header on the resulting Wise View file and a `THIRD_PARTY_NOTICES.md` entry.
+  copyright header on the resulting Unimian file and a `THIRD_PARTY_NOTICES.md` entry.
 - **Copied** — used verbatim (rare, e.g. vendored CSS); requires SPDX/copyright header and a
   `THIRD_PARTY_NOTICES.md` entry.
 
@@ -54,12 +54,12 @@ copied.
 - **Excluded:** hardcoded status/priority workflows, direct unguarded writes, the
   monolithic 1,316-line view structure.
 - **File-level provenance:** T034A may adapt the following pinned files:
-  - upstream `src/timeline-view.ts` -> Wise View `src/views/timeline/TimelineRenderer.ts` and,
+  - upstream `src/timeline-view.ts` -> Unimian `src/views/timeline/TimelineRenderer.ts` and,
     only where lifecycle wiring is necessary, `src/views/timeline/BasesTimelineView.ts`;
     permitted scope is toolbar/sidebar controls, temporal header/grid, today indicator, edge
     navigation, scroll-anchor behavior, pointer/pinch zoom, quick scheduling, and bar drag/resize
     through the configured start/end mutation capability;
-  - upstream `styles.css` -> Wise View `src/styles/views/timeline.css`; permitted scope is the
+  - upstream `styles.css` -> Unimian `src/styles/views/timeline.css`; permitted scope is the
     corresponding layout, ghost-bar, and presentation rules.
 - **Must remain excluded:** `PRIORITY_LEVELS`, `PRIORITY_RANK`, `STATUS_ORDER`, workflow group
   sorting, group/status drops, priority editing, arbitrary property writes, and hardcoded task
@@ -124,12 +124,12 @@ copied.
 - **Reuse mode:** Full behavioral adaptation approved by the maintainer on 2026-09-19 (same
   terms as Bases Timeline); implementation remains modular rather than copying the file
   wholesale. A React-based file cannot be adapted as-is regardless — see Excluded — so adapting
-  it still means porting its logic into Wise View's imperative-DOM approach, not copy-pasting.
+  it still means porting its logic into Unimian's imperative-DOM approach, not copy-pasting.
 - **Useful design evidence:** linear virtualization, dynamic measurement, feed presentation.
 - **Excluded:** the React stack, private TanStack cache access, internal
   `new WorkspaceLeaf(app)` construction, embedded editable Markdown views.
 - **File-level provenance:** none yet. A Feed task (T041-T045) records a row here, naming the
-  specific upstream file(s) and resulting Wise View file(s), before adapting anything beyond
+  specific upstream file(s) and resulting Unimian file(s), before adapting anything beyond
   design evidence.
 - **Attribution required:** yes, once a file-level entry above is added — adapted TypeScript
   carries an SPDX/copyright adaptation header and the upstream MIT text is included in
@@ -153,7 +153,7 @@ copied.
   `.base` cleanup, network thumbnails, the image viewer/slideshow, checkbox writes, and the
   broad settings framework.
 - **File-level provenance:** none. Card Core and Grid (T035-T040) were implemented from the
-  design evidence above plus Wise View's own established patterns (`EntrySnapshot`,
+  design evidence above plus Unimian's own established patterns (`EntrySnapshot`,
   `ViewRuntime`, `RenderScheduler`), not by porting a specific pinned upstream file. While
   debugging Grid's native layout failures (2026-09-19), `src/bases/grid-view.ts`,
   `styles/_grid-view.scss`, and `styles/card/_cover.scss` at the pinned commit were read
@@ -178,7 +178,7 @@ copied.
   needs a more conservative, incrementally-verified adoption than the two large jumps attempted
   here, independent of the license terms below (which remain favorable and unaffected by this).
 - **Attribution required:** yes, once a file-level entry above is added. Because this upstream
-  project is GPL-3.0-or-later, Wise View (GPL-3.0-only) selects GPL version 3 for the
+  project is GPL-3.0-or-later, Unimian (GPL-3.0-only) selects GPL version 3 for the
   combined distribution per specification §5.2; the upstream license and attribution must
   remain visible in any adapted file's header and in `THIRD_PARTY_NOTICES.md`. Reading the
   source for design evidence only, without adapting a specific file, still requires no
@@ -213,7 +213,7 @@ this ledger; they remain reconciled by `pnpm run verify:artifacts`.
 
 ## Known upstream library limitations
 
-Bugs in a bundled dependency that Wise View cannot fix without patching the vendored source.
+Bugs in a bundled dependency that Unimian cannot fix without patching the vendored source.
 Recorded here so a later task does not rediscover the same tradeoff from scratch, and so a
 general fix (if one is ever found) gets applied everywhere it applies instead of once.
 
@@ -227,8 +227,8 @@ When a task copies or modifies an upstream file (rather than only reading it for
 evidence):
 
 1. Add a row under the relevant candidate's **File-level provenance** above naming the
-   upstream file path, the resulting Wise View file path, and the commit it was taken from.
-2. Add an SPDX license identifier and copyright header to the top of the resulting Wise View
+   upstream file path, the resulting Unimian file path, and the commit it was taken from.
+2. Add an SPDX license identifier and copyright header to the top of the resulting Unimian
    file.
 3. Add or extend the corresponding entry in `THIRD_PARTY_NOTICES.md` with the full required
    notice text.

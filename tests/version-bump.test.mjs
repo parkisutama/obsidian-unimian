@@ -11,13 +11,13 @@ const readRepoJson = (name) => JSON.parse(readFileSync(path.join(repoRoot, name)
 const tempDirs = [];
 
 function makeFixture({ manifestVersion = "1.0.0", minAppVersion = "0.15.0" } = {}) {
-	const cwd = mkdtempSync(path.join(tmpdir(), "wise-view-version-"));
+	const cwd = mkdtempSync(path.join(tmpdir(), "unimian-version-"));
 	tempDirs.push(cwd);
 	writeFileSync(
 		path.join(cwd, "manifest.json"),
 		`${JSON.stringify(
 			{
-				id: "wise-view",
+				id: "unimian",
 				version: manifestVersion,
 				minAppVersion,
 			},

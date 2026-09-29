@@ -26,7 +26,7 @@ Recommended branch naming:
 
 ## Local Development
 
-Wise View builds with esbuild and outputs the Obsidian plugin artifacts at the repo root:
+Unimian builds with esbuild and outputs the Obsidian plugin artifacts at the repo root:
 
 - `main.js`
 - `manifest.json`
@@ -35,7 +35,7 @@ Wise View builds with esbuild and outputs the Obsidian plugin artifacts at the r
 For local vault copying, create `.env` from `.env.example` and set:
 
 ```bash
-OBSIDIAN_VAULT_PLUGIN_PATH=/absolute/path/to/TestVault/.obsidian/plugins/wise-view
+OBSIDIAN_VAULT_PLUGIN_PATH=/absolute/path/to/TestVault/.obsidian/plugins/unimian
 ```
 
 Then run:
@@ -110,7 +110,7 @@ git push origin main
 git push origin 1.2.3
 ```
 
-The GitHub release workflow installs with `pnpm install --frozen-lockfile`, runs `pnpm run check:ci`, uploads `main.js`, `manifest.json`, `styles.css`, `LICENSE`, and `THIRD_PARTY_NOTICES.md`, and attaches `wise-view.zip` containing all five.
+The GitHub release workflow installs with `pnpm install --frozen-lockfile`, runs `pnpm run check:ci`, uploads `main.js`, `manifest.json`, `styles.css`, `LICENSE`, and `THIRD_PARTY_NOTICES.md`, and attaches `unimian.zip` containing all five.
 
 ## Manual QA Checklist
 

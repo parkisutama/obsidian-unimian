@@ -77,7 +77,7 @@ describe("Timeline option compatibility", () => {
 		expect(options.endProperty).toBe("note.upstreamEnd");
 	});
 
-	it("keeps early Wise View startDate/endDate configurations readable", () => {
+	it("keeps early Unimian startDate/endDate configurations readable", () => {
 		const options = readTimelineOptions(new ViewConfigReader(makeConfig({
 			startDate: "note.start",
 			endDate: "note.end",

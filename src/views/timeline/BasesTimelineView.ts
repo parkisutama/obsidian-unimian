@@ -2,7 +2,7 @@
 // Copyright (C) 2026 Parkis Utama
 
 import { BasesView, Notice, type QueryController } from 'obsidian';
-import type WiseViewPlugin from '../../main';
+import type UnimianPlugin from '../../main';
 import { createEntrySnapshotGroups } from '../../platform/bases/entrySnapshotAdapter';
 import { ViewConfigReader } from '../../platform/bases/ViewConfigReader';
 import { ViewRuntime } from '../../platform/dom/ViewRuntime';
@@ -14,7 +14,7 @@ import { buildTimelineModel } from './TimelineModel';
 import { TimelineRenderer } from './TimelineRenderer';
 import { readTimelineOptions, timelineRequestedProperties } from './timelineOptions';
 
-export const BASES_TIMELINE_VIEW_ID = 'wise-view-timeline';
+export const BASES_TIMELINE_VIEW_ID = 'unimian-timeline';
 
 function localToday() {
 	const now = new Date();
@@ -29,7 +29,7 @@ export class BasesTimelineView extends BasesView {
 	/** Centers the timeline on today exactly once, the first time it has a real, laid-out size. */
 	private hasCenteredOnToday = false;
 
-	constructor(controller: QueryController, private readonly containerEl: HTMLElement, private readonly plugin: WiseViewPlugin) {
+	constructor(controller: QueryController, private readonly containerEl: HTMLElement, private readonly plugin: UnimianPlugin) {
 		super(controller);
 		this.runtime = new ViewRuntime(containerEl);
 		this.mutations = new LegacyMutationGateway(this.app);

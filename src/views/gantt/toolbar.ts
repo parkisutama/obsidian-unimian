@@ -24,11 +24,11 @@ export class GanttToolbar {
 	private readonly addButton: HTMLButtonElement;
 
 	constructor(container: HTMLElement, runtime: ViewRuntime, actions: GanttToolbarActions) {
-		container.addClass('wise-view-gantt-toolbar');
+		container.addClass('unimian-gantt-toolbar');
 		container.setAttribute('role', 'toolbar');
 		container.setAttribute('aria-label', 'Gantt controls');
 
-		this.scaleSelect = container.createEl('select', { cls: 'dropdown wise-view-gantt-toolbar__scale' });
+		this.scaleSelect = container.createEl('select', { cls: 'dropdown unimian-gantt-toolbar__scale' });
 		this.scaleSelect.setAttribute('aria-label', 'Time resolution');
 		for (const scale of GANTT_SCALES) {
 			const option = this.scaleSelect.createEl('option', { text: SCALE_LABELS[scale] });
@@ -55,12 +55,12 @@ export class GanttToolbar {
 		label: string,
 		action: () => void,
 	): HTMLButtonElement {
-		const button = container.createEl('button', { cls: 'clickable-icon wise-view-gantt-toolbar__button' });
+		const button = container.createEl('button', { cls: 'clickable-icon unimian-gantt-toolbar__button' });
 		button.type = 'button';
 		button.setAttribute('aria-label', label);
 		button.title = label;
 		setIcon(button, icon);
-		button.createSpan({ cls: 'wise-view-gantt-toolbar__label', text: label });
+		button.createSpan({ cls: 'unimian-gantt-toolbar__label', text: label });
 		runtime.addEventListener(button, 'click', action);
 		return button;
 	}

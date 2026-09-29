@@ -4,8 +4,9 @@
 /**
  * One-time import of option values saved by earlier versions of this view.
  *
- * The view id `wise-view-gantt` was first released for the Frappe-based Gantt, so a base saved by that
- * release opens in this view with the old option keys (`startDate`, `viewMode`, ...). During
+ * The former view id `unimian-gantt` was first released for the Frappe-based Gantt. The current
+ * Unimian id is `unimian-gantt`, so a base saved by that release opens in this view with the old
+ * option keys (`startDate`, `viewMode`, ...). During
  * development this view also stored its options under a `ganttBeta*` prefix. Both are copied to the
  * permanent `gantt*` keys once, so the option panel shows what the chart is using and nothing is
  * silently guessed at read time. The old keys are left in the file untouched.

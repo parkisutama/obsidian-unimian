@@ -199,10 +199,10 @@ describe("architecture guard: stable view IDs", () => {
 		return ids;
 	}
 
-	it("registers every current view under the wise-view- prefix", () => {
+	it("registers every current view under the unimian- prefix", () => {
 		const ids = collectViewIds();
 		expect(ids.length).toBeGreaterThan(0);
-		for (const id of ids) expect(id.startsWith("wise-view-")).toBe(true);
+		for (const id of ids) expect(id.startsWith("unimian-")).toBe(true);
 	});
 
 	it("declares no duplicate view id", () => {
@@ -210,7 +210,7 @@ describe("architecture guard: stable view IDs", () => {
 		expect(new Set(ids).size).toBe(ids.length);
 	});
 
-	it("does not reintroduce the retired wise-view-kanban id", () => {
-		expect(collectViewIds()).not.toContain("wise-view-kanban");
+	it("does not reintroduce the retired unimian-kanban id", () => {
+		expect(collectViewIds()).not.toContain("unimian-kanban");
 	});
 });

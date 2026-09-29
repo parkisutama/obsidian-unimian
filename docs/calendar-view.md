@@ -185,7 +185,7 @@ Teks event otomatis memakai hitam atau putih berdasarkan kontras warna backgroun
 
 ## Pengaturan default plugin
 
-Default global Calendar tersedia di pengaturan Wise View:
+Default global Calendar tersedia di pengaturan Unimian:
 
 - **Week starts on**
 - **Font size**

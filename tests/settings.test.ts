@@ -1,16 +1,16 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from "vitest";
-import WiseViewPlugin from "../src/main";
+import UnimianPlugin from "../src/main";
 import { DEFAULT_SETTINGS } from "../src/types/settings";
 
 async function loadWith(storedData: unknown) {
-	const plugin = new WiseViewPlugin({} as never, {} as never);
+	const plugin = new UnimianPlugin({} as never, {} as never);
 	(plugin as unknown as { storedData: unknown }).storedData = storedData;
 	await plugin.loadSettings();
 	return plugin.settings;
 }
 
-describe("WiseViewPlugin.loadSettings", () => {
+describe("UnimianPlugin.loadSettings", () => {
 	it("uses defaults when there is no data.json", async () => {
 		expect(await loadWith(null)).toEqual(DEFAULT_SETTINGS);
 	});

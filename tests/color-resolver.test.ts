@@ -110,11 +110,11 @@ describe("expresses existing Calendar/Swimlane color scenarios", () => {
 });
 
 describe("toCssVariables", () => {
-	it("exposes background/foreground as semantic wise-view CSS variables", () => {
+	it("exposes background/foreground as semantic Unimian CSS variables", () => {
 		const resolved = resolveColor({ explicitColor: "#ff0000" });
 		expect(toCssVariables(resolved)).toEqual({
-			"--wise-view-color-bg": "#ff0000",
-			"--wise-view-color-fg": getContrastColor("#ff0000"),
+			"--unimian-color-bg": "#ff0000",
+			"--unimian-color-fg": getContrastColor("#ff0000"),
 		});
 	});
 });

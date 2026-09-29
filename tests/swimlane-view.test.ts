@@ -5,10 +5,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { BASES_SWIMLANE_VIEW_ID, createSwimlaneViewRegistration } from "../src/views/BasesSwimlaneView";
 import { DEFAULT_SETTINGS } from "../src/types/settings";
-import type WiseViewPlugin from "../src/main";
+import type UnimianPlugin from "../src/main";
 import { createSwimlaneHarness, waitForRender, type SwimlaneHarness } from "./fixtures/swimlane";
 
-const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as WiseViewPlugin;
+const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as UnimianPlugin;
 const repoRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
 let harness: SwimlaneHarness | null = null;
@@ -28,7 +28,7 @@ const texts = (h: SwimlaneHarness, selector: string) =>
 describe("Swimlane view registration", () => {
 	it("is registered as Swimlane with its own view id", () => {
 		const registration = createSwimlaneViewRegistration(plugin);
-		expect(BASES_SWIMLANE_VIEW_ID).toBe("wise-view-swimlane");
+		expect(BASES_SWIMLANE_VIEW_ID).toBe("unimian-swimlane");
 		expect(registration.name).toBe("Swimlane");
 		// A lanes icon, distinct from Obsidian's core Kanban layout.
 		expect(registration.icon).toBe("rows-3");

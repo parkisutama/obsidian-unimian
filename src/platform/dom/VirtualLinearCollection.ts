@@ -43,7 +43,7 @@ export class VirtualLinearCollection<T extends VirtualLinearItem> {
 	) {
 		if (!Number.isFinite(options.rowHeight) || options.rowHeight <= 0) throw new Error('rowHeight must be positive.');
 		this.contentEl = viewportEl.ownerDocument.createElement('div');
-		this.contentEl.className = 'wise-view-virtual-linear-content';
+		this.contentEl.className = 'unimian-virtual-linear-content';
 		this.contentEl.style.position = 'relative';
 		viewportEl.appendChild(this.contentEl);
 		viewportEl.addEventListener('scroll', this.onScroll, { passive: true });

@@ -3,7 +3,7 @@
 
 import { BasesView, Notice, TFile, type QueryController } from 'obsidian';
 import type { GanttDetailRenderProps, GanttProps, GanttTaskDraft, Task, TaskDependency } from '@jaeungkim/gantt-chart';
-import type WiseViewPlugin from '../../main';
+import type UnimianPlugin from '../../main';
 import type { NormalizedValue } from '../../core/entries/NormalizedValue';
 import { writeGanttDate, type GanttPropertyDateType } from '../../core/gantt/dates';
 import { toGanttWikiLink, wikiLinkText } from '../../core/gantt/dependencies';
@@ -31,7 +31,7 @@ import { migrateLegacyOptions } from './legacyOptions';
 import { GanttToolbar } from './toolbar';
 import { GanttWriteBack } from './writeBack';
 
-export const BASES_GANTT_VIEW_ID = 'wise-view-gantt';
+export const BASES_GANTT_VIEW_ID = 'unimian-gantt';
 
 const PIXELS_PER_MINUTE: Record<GanttOptions['scale'], number> = {
 	day: 12 / 60,
@@ -98,15 +98,15 @@ export class BasesGanttView extends BasesView {
 	constructor(
 		controller: QueryController,
 		private readonly containerEl: HTMLElement,
-		private readonly plugin: WiseViewPlugin,
+		private readonly plugin: UnimianPlugin,
 		renderChart?: ChartRender,
 		private readonly mutations: GrantedMutations = {},
 	) {
 		super(controller);
 		this.runtime = new ViewRuntime(containerEl);
-		this.containerEl.addClass('wise-view-gantt');
+		this.containerEl.addClass('unimian-gantt');
 		const toolbarEl = containerEl.createDiv();
-		const chartEl = containerEl.createDiv({ cls: 'wise-view-gantt-chart' });
+		const chartEl = containerEl.createDiv({ cls: 'unimian-gantt-chart' });
 		this.chart = this.runtime.own(new GanttChartHost(chartEl, this.runtime, renderChart));
 		installGanttNavigation({
 			app: this.app, root: chartEl, runtime: this.runtime, hoverParent: this.plugin,
@@ -490,7 +490,7 @@ export class BasesGanttView extends BasesView {
 
 	onunload(): void {
 		this.runtime.dispose();
-		this.containerEl.removeClass('wise-view-gantt');
+		this.containerEl.removeClass('unimian-gantt');
 		this.containerEl.replaceChildren();
 	}
 }

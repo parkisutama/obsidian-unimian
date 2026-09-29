@@ -9,7 +9,7 @@
  * taller than the rest — tasks/sticky-note/spike-report.md, STICKY-001).
  */
 
-.wise-view-sticky-note {
+.unimian-sticky-note {
 	display: block;
 	width: 100%;
 	height: 100%;
@@ -19,7 +19,7 @@
 	box-sizing: border-box;
 }
 
-.wise-view-sticky-note-section-heading {
+.unimian-sticky-note-section-heading {
 	margin: 0 0 var(--size-4-2) 0;
 	font-size: var(--font-ui-small);
 	font-weight: var(--font-medium);
@@ -28,7 +28,7 @@
 	letter-spacing: 0.04em;
 }
 
-.wise-view-sticky-note-grid {
+.unimian-sticky-note-grid {
 	/* position: relative and an explicit pixel height are set by masonry.ts at runtime, sized to
 	 * the tallest column so the scroll container's scrollHeight is correct. */
 	width: 100%;
@@ -41,11 +41,11 @@
 	transition: opacity 0.15s ease;
 }
 
-.wise-view-sticky-note-grid.is-ready {
+.unimian-sticky-note-grid.is-ready {
 	opacity: 1;
 }
 
-.wise-view-sticky-note-card {
+.unimian-sticky-note-card {
 	/* Defensive baseline from Grid's post-mortem, kept even though this is not a CSS-column
 	 * layout: */
 	min-width: 0;
@@ -55,17 +55,17 @@
 	margin: 0;
 	padding: var(--size-4-3);
 	border-radius: var(--radius-m);
-	background: var(--wise-view-color-bg, var(--background-secondary));
+	background: var(--unimian-color-bg, var(--background-secondary));
 	border: 1px solid var(--background-modifier-border);
 	transition: top 0.12s ease, left 0.12s ease, box-shadow 0.12s ease;
 	cursor: pointer;
 	position: relative;
 	overflow: hidden;
-	max-height: var(--wise-view-sticky-note-max-height, 480px);
+	max-height: var(--unimian-sticky-note-max-height, 480px);
 }
 
-.wise-view-sticky-note-card:hover,
-.wise-view-sticky-note-card:focus-visible {
+.unimian-sticky-note-card:hover,
+.unimian-sticky-note-card:focus-visible {
 	box-shadow: 0 2px 8px var(--background-modifier-box-shadow);
 	outline: none;
 }
@@ -77,7 +77,7 @@
  * still-blank placeholder can be genuinely on-screen for a moment — a subtle shimmer marks that
  * as "loading", not "stuck" (maintainer report, 2026-09-23: a fast scroll up-and-down left a
  * visible block of blank cards with no indication they were still on their way). */
-.wise-view-sticky-note-card-placeholder {
+.unimian-sticky-note-card-placeholder {
 	cursor: default;
 	background: linear-gradient(
 		100deg,
@@ -86,42 +86,42 @@
 		var(--background-secondary) 60%
 	);
 	background-size: 200% 100%;
-	animation: wise-view-sticky-note-shimmer 1.4s ease-in-out infinite;
+	animation: unimian-sticky-note-shimmer 1.4s ease-in-out infinite;
 }
 
-.wise-view-sticky-note-card-placeholder:hover {
+.unimian-sticky-note-card-placeholder:hover {
 	box-shadow: none;
 }
 
-@keyframes wise-view-sticky-note-shimmer {
+@keyframes unimian-sticky-note-shimmer {
 	from { background-position: 150% 0; }
 	to { background-position: -50% 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.wise-view-sticky-note-card-placeholder {
+	.unimian-sticky-note-card-placeholder {
 		animation: none;
 		background: var(--background-secondary);
 	}
 }
 
-.wise-view-sticky-note-card-placeholder::after {
+.unimian-sticky-note-card-placeholder::after {
 	display: none;
 }
 
-.wise-view-sticky-note-card::after {
+.unimian-sticky-note-card::after {
 	content: '';
 	position: absolute;
 	inset: auto 0 0 0;
 	height: 48px;
-	background: linear-gradient(to bottom, transparent, var(--wise-view-color-bg, var(--background-secondary)));
+	background: linear-gradient(to bottom, transparent, var(--unimian-color-bg, var(--background-secondary)));
 	pointer-events: none;
 }
 
 /* Cover banner: the `height:0`/`padding-top` percentage technique already proven in this
  * project's Swimlane cover treatment, not `aspect-ratio` (one of Grid's three original failure
  * modes). */
-.wise-view-sticky-note-cover {
+.unimian-sticky-note-cover {
 	position: relative;
 	width: calc(100% + 2 * var(--size-4-3));
 	margin: calc(-1 * var(--size-4-3)) calc(-1 * var(--size-4-3)) var(--size-4-3);
@@ -132,22 +132,22 @@
 	background: var(--background-modifier-border);
 }
 
-.wise-view-sticky-note-cover img {
+.unimian-sticky-note-cover img {
 	position: absolute;
 	inset: 0;
 	width: 100%;
 	height: 100%;
 }
 
-.wise-view-sticky-note-fit-cover .wise-view-sticky-note-cover img {
+.unimian-sticky-note-fit-cover .unimian-sticky-note-cover img {
 	object-fit: cover;
 }
 
-.wise-view-sticky-note-fit-contain .wise-view-sticky-note-cover img {
+.unimian-sticky-note-fit-contain .unimian-sticky-note-cover img {
 	object-fit: contain;
 }
 
-.wise-view-sticky-note-pin-btn {
+.unimian-sticky-note-pin-btn {
 	position: absolute;
 	top: var(--size-4-2);
 	right: var(--size-4-2);
@@ -164,33 +164,33 @@
 	transition: opacity 0.15s ease;
 }
 
-.wise-view-sticky-note-card:hover .wise-view-sticky-note-pin-btn,
-.wise-view-sticky-note-card:focus-within .wise-view-sticky-note-pin-btn,
-.wise-view-sticky-note-pin-btn.is-pinned {
+.unimian-sticky-note-card:hover .unimian-sticky-note-pin-btn,
+.unimian-sticky-note-card:focus-within .unimian-sticky-note-pin-btn,
+.unimian-sticky-note-pin-btn.is-pinned {
 	opacity: 1;
 }
 
-.wise-view-sticky-note-pin-btn.is-pinned {
+.unimian-sticky-note-pin-btn.is-pinned {
 	color: var(--interactive-accent);
 }
 
-.wise-view-sticky-note-pin-btn svg {
+.unimian-sticky-note-pin-btn svg {
 	width: 14px;
 	height: 14px;
 }
 
-.wise-view-sticky-note-title {
+.unimian-sticky-note-title {
 	margin: 0 0 var(--size-4-1) 0;
 	font-size: var(--font-ui-medium);
 	overflow-wrap: break-word;
 }
 
-.wise-view-sticky-note-body {
+.unimian-sticky-note-body {
 	font-size: var(--font-ui-small);
 	overflow-wrap: break-word;
 }
 
-.wise-view-sticky-note-body img {
+.unimian-sticky-note-body img {
 	max-width: 100%;
 	height: auto;
 }
@@ -198,18 +198,18 @@
 /* Normalize excerpt content to the card's own compact scale instead of full reading-view sizes
  * (maintainer feedback 2026-09-22, referencing the reference plugin's own card typography):
  * a heading or table rendered at document scale reads as visual noise at card width. */
-.wise-view-sticky-note-body :is(h1, h2, h3, h4, h5, h6) {
+.unimian-sticky-note-body :is(h1, h2, h3, h4, h5, h6) {
 	margin: var(--size-4-2) 0 var(--size-4-1) 0;
 	font-size: var(--font-ui-medium);
 	font-weight: var(--font-semibold);
 	line-height: var(--line-height-tight);
 }
 
-.wise-view-sticky-note-body :is(h1, h2, h3, h4, h5, h6):first-child {
+.unimian-sticky-note-body :is(h1, h2, h3, h4, h5, h6):first-child {
 	margin-top: 0;
 }
 
-.wise-view-sticky-note-body p {
+.unimian-sticky-note-body p {
 	margin: 0 0 var(--size-4-2) 0;
 }
 
@@ -217,23 +217,23 @@
  * expected/native, not a Sticky Note bug. Just keep it from bursting out of the card's width,
  * and shrink it to the card's own compact scale (a full-size table header wraps awkwardly at
  * card width otherwise). */
-.wise-view-sticky-note-body table,
-.wise-view-sticky-note-body .table-wrapper {
+.unimian-sticky-note-body table,
+.unimian-sticky-note-body .table-wrapper {
 	max-width: 100%;
 }
 
-.wise-view-sticky-note-body table {
+.unimian-sticky-note-body table {
 	font-size: var(--font-ui-smaller);
 }
 
-.wise-view-sticky-note-body table th,
-.wise-view-sticky-note-body table td {
+.unimian-sticky-note-body table th,
+.unimian-sticky-note-body table td {
 	padding: var(--size-2-1) var(--size-2-2);
 }
 
-.wise-view-sticky-note-empty,
-.wise-view-sticky-note-error,
-.wise-view-sticky-note-embed-placeholder {
+.unimian-sticky-note-empty,
+.unimian-sticky-note-error,
+.unimian-sticky-note-embed-placeholder {
 	color: var(--text-muted);
 	font-style: italic;
 }

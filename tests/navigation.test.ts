@@ -47,11 +47,11 @@ describe("triggerHoverPreview", () => {
 		const event = new MouseEvent("mouseenter");
 		const hoverParent = {} as never;
 
-		triggerHoverPreview({ app, hoverParent, sourceId: "wise-view-timeline", event, filePath: "A.md", targetEl });
+		triggerHoverPreview({ app, hoverParent, sourceId: "unimian-timeline", event, filePath: "A.md", targetEl });
 
 		expect(trigger).toHaveBeenCalledWith("hover-link", {
 			event,
-			source: "wise-view-timeline",
+			source: "unimian-timeline",
 			hoverParent,
 			targetEl,
 			linktext: "A.md",

@@ -1,6 +1,6 @@
 # Gantt
 
-Gantt menampilkan note Bases sebagai jadwal berjenjang. Wise View tidak menentukan nama
+Gantt menampilkan note Bases sebagai jadwal berjenjang. Unimian tidak menentukan nama
 properti atau alur kerja Anda: pilih sendiri properti frontmatter yang akan menjadi tanggal,
 label, fase, urutan, progres, warna, dan dependensi.
 
@@ -30,7 +30,7 @@ Di pengaturan Gantt, petakan `mulai` ke **Start date**, `selesai` ke **End date*
 | Membuat fase dan subtask | **Parent (phase)** + aktifkan **Phases** | Isi Parent dengan link ke note induk, misalnya `[[Fondasi]]`. |
 | Mengurutkan anak dalam fase | **Order** + aktifkan **Phases** | Gunakan angka. Order membandingkan note yang berada dalam parent/group yang sama. |
 | Menampilkan persentase selesai | **Progress** + aktifkan **Show progress** | Nilai dinormalisasi ke rentang 0–100. |
-| Mewarnai menurut kategori | **Color by** | Pilih properti seperti status, tim, atau kategori. Warna mengikuti konfigurasi warna Wise View/Pretty Properties. |
+| Mewarnai menurut kategori | **Color by** | Pilih properti seperti status, tim, atau kategori. Warna mengikuti konfigurasi warna Unimian/Pretty Properties. |
 | Menampilkan hubungan antar-task | **Depends on** | Task ini mulai setelah semua task yang ditautkan selesai. Garis chart menjadi bahasa utamanya. |
 | Membuat fase dari kategori Bases | **Group by** bawaan Bases + **Phases** | Group by bukan properti Gantt. Ia membuat fase tingkat teratas dari hasil query Bases. |
 | Melihat lebih banyak ruang chart | Nonaktifkan **Task list** atau **Detail panel** | **Row numbers**, **Tooltip**, dan **Row height** hanya mengubah presentasi. |

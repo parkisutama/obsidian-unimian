@@ -43,7 +43,7 @@ import timeGridPlugin from 'fullcalendar/timegrid';
 import listPlugin from 'fullcalendar/list';
 import interactionPlugin from 'fullcalendar/interaction';
 import multiMonthPlugin from 'fullcalendar/multimonth';
-import type WiseViewPlugin from '../main';
+import type UnimianPlugin from '../main';
 import { openFileInNewTab, showOpenFileMenuWithItems } from '../utils/openFile';
 import { activateEntry } from '../platform/navigation/NavigationService';
 import type { NoteTemplateDefaults, WeekDay } from '../types/settings';
@@ -58,7 +58,7 @@ import { weekAnchor, weekLabel } from './calendar/periodic/weekLinks';
 import { hasPeriodLinks, hasTitleLinks, renderTitleLinks } from './calendar/periodic/titleLinks';
 import { eventTemplateDefaults, existingPeriodicNotePath, isPeriodicNote, openPeriodicNote } from './calendar/periodic/notes';
 
-export const BASES_CALENDAR_VIEW_ID = 'wise-view-calendar';
+export const BASES_CALENDAR_VIEW_ID = 'unimian-calendar';
 
 type CalendarViewType = 'multiMonthYear' | 'dayGridYear' | 'dayGridMonth' | 'timeGridWeek' | 'timeGridThreeDay' | 'timeGridDay' | 'listWeek';
 
@@ -77,7 +77,7 @@ const isYearView = (view: string | null | undefined): boolean =>
  */
 export class BasesCalendarView extends BasesView {
   type = BASES_CALENDAR_VIEW_ID;
-  private plugin: WiseViewPlugin;
+  private plugin: UnimianPlugin;
   private containerEl: HTMLElement;
   private readonly runtime: ViewRuntime;
   private readonly mutations: LegacyMutationGateway;
@@ -179,7 +179,7 @@ export class BasesCalendarView extends BasesView {
   constructor(
     controller: QueryController,
     containerEl: HTMLElement,
-    plugin: WiseViewPlugin
+    plugin: UnimianPlugin
   ) {
     super(controller);
     this.plugin = plugin;
@@ -753,7 +753,7 @@ export class BasesCalendarView extends BasesView {
 /**
  * Create the Bases view registration for the Calendar
  */
-export function createCalendarViewRegistration(plugin: WiseViewPlugin): BasesViewRegistration {
+export function createCalendarViewRegistration(plugin: UnimianPlugin): BasesViewRegistration {
   return {
     name: 'Calendar',
     icon: 'calendar-range',

@@ -10,11 +10,11 @@
 
 /* Obsidian's .bases-view wrapper is this same element, and its own rules for display/overflow-y
    win the cascade against ours at equal specificity (confirmed via devtools: computed overflow-y
-   stayed "auto" and .wise-view-timeline__main rendered at full content height — ~22700px instead
+   stayed "auto" and .unimian-timeline__main rendered at full content height — ~22700px instead
    of the ~645px flex:1 should have given it — meaning `display: flex` here wasn't actually taking
    effect, so `.main`'s `flex: 1` had no flex container to size against). The properties below are
    load-bearing for the whole column layout, so they're !important rather than losing quietly. */
-.wise-view-timeline {
+.unimian-timeline {
 	position: relative;
 	display: flex !important;
 	flex-direction: column !important;
@@ -26,11 +26,11 @@
 	font-family: var(--font-interface);
 }
 
-.bases-view.wise-view-timeline {
+.bases-view.unimian-timeline {
 	padding: 0;
 }
 
-.wise-view-timeline__toolbar {
+.unimian-timeline__toolbar {
 	display: flex;
 	flex: 0 0 auto;
 	align-items: center;
@@ -40,7 +40,7 @@
 	overflow-x: auto;
 }
 
-.wise-view-timeline__sidebar-row button {
+.unimian-timeline__sidebar-row button {
 	border: 0;
 	border-radius: var(--radius-s);
 	color: var(--text-normal);
@@ -49,11 +49,11 @@
 	cursor: pointer;
 }
 
-.wise-view-timeline__zoom {
+.unimian-timeline__zoom {
 	min-width: 7rem;
 }
 
-.wise-view-timeline__toolbar-button {
+.unimian-timeline__toolbar-button {
 	display: inline-flex;
 	align-items: center;
 	gap: var(--size-2-1);
@@ -61,16 +61,16 @@
 	padding-inline: var(--size-2-2);
 }
 
-.wise-view-timeline__row--unscheduled {
+.unimian-timeline__row--unscheduled {
 	background: transparent;
 	cursor: crosshair;
 }
 
-.wise-view-timeline__row--item:hover {
+.unimian-timeline__row--item:hover {
 	background: var(--background-modifier-hover);
 }
 
-.wise-view-timeline__empty {
+.unimian-timeline__empty {
 	position: absolute;
 	z-index: var(--layer-popover);
 	top: 50%;
@@ -88,23 +88,23 @@
 
 /* No start property configured: hide the toolbar/sidebar/chart chrome entirely instead of
    showing a fully-formed-looking calendar around "today" that tracks no real property. Only
-   the centered configuration hint (.wise-view-timeline__empty) remains visible. */
-.wise-view-timeline--unconfigured .wise-view-timeline__toolbar,
-.wise-view-timeline--unconfigured .wise-view-timeline__main {
+   the centered configuration hint (.unimian-timeline__empty) remains visible. */
+.unimian-timeline--unconfigured .unimian-timeline__toolbar,
+.unimian-timeline--unconfigured .unimian-timeline__main {
 	display: none;
 }
 
-.wise-view-timeline__sidebar-row button:hover {
+.unimian-timeline__sidebar-row button:hover {
 	background: var(--background-modifier-hover);
 }
 
-.wise-view-timeline__sidebar-row button:focus-visible,
-.wise-view-timeline__bar:focus-visible {
+.unimian-timeline__sidebar-row button:focus-visible,
+.unimian-timeline__bar:focus-visible {
 	outline: 2px solid var(--interactive-accent);
 	outline-offset: -2px;
 }
 
-.wise-view-timeline__main {
+.unimian-timeline__main {
 	display: grid;
 	grid-template-rows: minmax(0, 1fr);
 	grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
@@ -113,7 +113,7 @@
 	overflow: hidden;
 }
 
-.wise-view-timeline__sidebar-panel {
+.unimian-timeline__sidebar-panel {
 	display: grid;
 	grid-template-rows: 3rem minmax(0, 1fr);
 	min-width: 0;
@@ -123,65 +123,65 @@
 	transition: width 0.25s ease;
 }
 
-.wise-view-timeline__sidebar-corner {
+.unimian-timeline__sidebar-corner {
 	border-bottom: 1px solid var(--background-modifier-border);
 	background: var(--background-secondary);
 }
 
-.wise-view-timeline__sidebar,
-.wise-view-timeline__scroller {
+.unimian-timeline__sidebar,
+.unimian-timeline__scroller {
 	min-height: 0;
 	overflow: auto;
 	scrollbar-gutter: stable;
 }
 
-.wise-view-timeline__scroller {
+.unimian-timeline__scroller {
 	position: relative;
 }
 
-.wise-view-timeline__sidebar {
+.unimian-timeline__sidebar {
 	background: var(--background-secondary);
 }
 
-.wise-view-timeline--sidebar-collapsed .wise-view-timeline__main {
+.unimian-timeline--sidebar-collapsed .unimian-timeline__main {
 	grid-template-columns: 0 minmax(0, 1fr);
 }
 
-.wise-view-timeline--sidebar-collapsed .wise-view-timeline__sidebar-panel {
+.unimian-timeline--sidebar-collapsed .unimian-timeline__sidebar-panel {
 	width: 0;
 	border-right-color: transparent;
 }
 
-.wise-view-timeline__chart {
+.unimian-timeline__chart {
 	display: grid;
 	grid-template-rows: 3rem minmax(0, 1fr);
 	min-width: 0;
 	min-height: 0;
 }
 
-.wise-view-timeline__header {
+.unimian-timeline__header {
 	position: relative;
 	border-bottom: 1px solid var(--background-modifier-border);
 	background: var(--background-secondary);
 	overflow: hidden;
 }
 
-.wise-view-timeline__header-canvas {
+.unimian-timeline__header-canvas {
 	position: relative;
-	width: var(--wise-view-timeline-width);
+	width: var(--unimian-timeline-width);
 	min-width: 100%;
 	will-change: transform;
 }
 
-.wise-view-timeline__periods {
+.unimian-timeline__periods {
 	position: relative;
 	height: 1.625rem;
 }
 
-.wise-view-timeline__period {
+.unimian-timeline__period {
 	position: absolute;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-period-width);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-period-width);
 	height: 100%;
 	box-sizing: border-box;
 	padding-inline: var(--size-4-2);
@@ -193,15 +193,15 @@
 	overflow: hidden;
 }
 
-.wise-view-timeline__ticks {
+.unimian-timeline__ticks {
 	position: relative;
 	height: 1.375rem;
 }
 
-.wise-view-timeline__tick {
+.unimian-timeline__tick {
 	position: absolute;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-tick-width, auto);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-tick-width, auto);
 	height: 100%;
 	box-sizing: border-box;
 	padding-inline: var(--size-4-1);
@@ -212,57 +212,57 @@
 	white-space: nowrap;
 }
 
-.wise-view-timeline__tick--weekend {
+.unimian-timeline__tick--weekend {
 	opacity: 0.55;
 }
 
-.wise-view-timeline__scroller .wise-view-virtual-linear-content,
-.wise-view-timeline__row {
-	min-width: var(--wise-view-timeline-width);
+.unimian-timeline__scroller .unimian-virtual-linear-content,
+.unimian-timeline__row {
+	min-width: var(--unimian-timeline-width);
 }
 
-.wise-view-timeline__scroller .wise-view-virtual-linear-content {
+.unimian-timeline__scroller .unimian-virtual-linear-content {
 	z-index: 1;
 }
 
-.wise-view-timeline__grid {
+.unimian-timeline__grid {
 	position: absolute;
 	z-index: 0;
 	top: 0;
 	left: 0;
-	width: var(--wise-view-timeline-width);
+	width: var(--unimian-timeline-width);
 	pointer-events: none;
 }
 
-.wise-view-timeline__weekend {
+.unimian-timeline__weekend {
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-weekend-width);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-weekend-width);
 	background: var(--background-secondary);
 	opacity: 0.45;
 }
 
-.wise-view-timeline__gridline {
+.unimian-timeline__gridline {
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	left: var(--wise-view-timeline-left);
+	left: var(--unimian-timeline-left);
 	width: 1px;
 	background: var(--background-modifier-border);
 	opacity: 0.6;
 }
 
-.wise-view-timeline__sidebar-row,
-.wise-view-timeline__row {
+.unimian-timeline__sidebar-row,
+.unimian-timeline__row {
 	display: flex;
 	align-items: center;
 	box-sizing: border-box;
 	border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.wise-view-timeline__sidebar-row button {
+.unimian-timeline__sidebar-row button {
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
@@ -275,7 +275,7 @@
 	white-space: nowrap;
 }
 
-.wise-view-timeline--wrap-titles .wise-view-timeline__sidebar-row--item button {
+.unimian-timeline--wrap-titles .unimian-timeline__sidebar-row--item button {
 	display: -webkit-box;
 	padding-block: var(--size-2-2);
 	padding-inline: var(--size-4-3);
@@ -286,8 +286,8 @@
 	word-break: break-word;
 }
 
-.wise-view-timeline__sidebar-row--group,
-.wise-view-timeline__row--group {
+.unimian-timeline__sidebar-row--group,
+.unimian-timeline__row--group {
 	/* A translucent wash plus a border reads as a section break without the heavier solid
 	   fill dominating the row of card-like bars underneath it. */
 	background: var(--background-modifier-hover);
@@ -296,17 +296,17 @@
 	font-weight: var(--font-semibold);
 }
 
-.wise-view-timeline__group-label {
+.unimian-timeline__group-label {
 	position: sticky;
 	left: var(--size-4-2);
 	color: var(--text-muted);
 }
 
-.wise-view-timeline__bar {
+.unimian-timeline__bar {
 	position: absolute;
 	top: 7px;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-bar-width);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-bar-width);
 	height: 30px;
 	max-width: none;
 	box-sizing: border-box;
@@ -314,7 +314,7 @@
 	/* Bordered pill on a plain background by default; the border picks up the configured
 	   color-by value when one resolves, but the fill and text stay neutral either way so a
 	   bar never looks like a solid accent-colored block. */
-	border: 1px solid var(--wise-view-color-bg, var(--background-modifier-border));
+	border: 1px solid var(--unimian-color-bg, var(--background-modifier-border));
 	border-radius: var(--radius-s);
 	color: var(--text-normal);
 	background: var(--background-primary);
@@ -325,22 +325,22 @@
 	transition: filter 120ms ease;
 }
 
-.wise-view-timeline__bar:hover {
+.unimian-timeline__bar:hover {
 	filter: brightness(1.08);
 }
 
-.wise-view-timeline__bar--dragging {
+.unimian-timeline__bar--dragging {
 	cursor: grabbing;
 }
 
-.wise-view-timeline__bar-label {
+.unimian-timeline__bar-label {
 	display: block;
 	min-width: max-content;
 	overflow: visible;
 	pointer-events: none;
 }
 
-.wise-view-timeline__handle {
+.unimian-timeline__handle {
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -350,25 +350,25 @@
 	cursor: col-resize;
 }
 
-.wise-view-timeline__bar:hover .wise-view-timeline__handle {
+.unimian-timeline__bar:hover .unimian-timeline__handle {
 	border-color: color-mix(in srgb, currentColor 35%, transparent);
 }
 
-.wise-view-timeline__handle--left {
+.unimian-timeline__handle--left {
 	left: 0;
 	border-left: 2px solid;
 }
 
-.wise-view-timeline__handle--right {
+.unimian-timeline__handle--right {
 	right: 0;
 	border-right: 2px solid;
 }
 
-.wise-view-timeline__date-label {
+.unimian-timeline__date-label {
 	position: absolute;
 	z-index: 3;
 	top: 50%;
-	left: var(--wise-view-timeline-left);
+	left: var(--unimian-timeline-left);
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 	white-space: nowrap;
@@ -376,18 +376,18 @@
 	opacity: 0;
 }
 
-.wise-view-timeline__row:hover > .wise-view-timeline__date-label,
-.wise-view-timeline__date-label--active {
+.unimian-timeline__row:hover > .unimian-timeline__date-label,
+.unimian-timeline__date-label--active {
 	opacity: 1;
 }
 
-.wise-view-timeline__date-label--start { transform: translate(-100%, -50%); }
-.wise-view-timeline__date-label--end { transform: translateY(-50%); }
+.unimian-timeline__date-label--start { transform: translate(-100%, -50%); }
+.unimian-timeline__date-label--end { transform: translateY(-50%); }
 
-.wise-view-timeline__ghost {
+.unimian-timeline__ghost {
 	position: absolute;
-	left: var(--wise-view-timeline-left);
-	width: var(--wise-view-timeline-bar-width);
+	left: var(--unimian-timeline-left);
+	width: var(--unimian-timeline-bar-width);
 	max-width: none;
 	padding: var(--size-4-1) var(--size-4-2);
 	border: 1px dashed var(--interactive-accent);
@@ -401,15 +401,15 @@
 	cursor: pointer;
 }
 
-.wise-view-timeline__ghost:hover {
+.unimian-timeline__ghost:hover {
 	background: var(--background-modifier-hover);
 }
 
-.wise-view-timeline__today {
+.unimian-timeline__today {
 	position: absolute;
 	z-index: var(--layer-popover);
 	top: 50%;
-	left: var(--wise-view-timeline-left);
+	left: var(--unimian-timeline-left);
 	min-width: 18px;
 	height: 18px;
 	padding-inline: 3px;
@@ -424,12 +424,12 @@
 	pointer-events: none;
 }
 
-.wise-view-timeline__today-line {
+.unimian-timeline__today-line {
 	position: absolute;
 	z-index: 2;
 	top: 0;
 	bottom: 0;
-	left: var(--wise-view-timeline-left);
+	left: var(--unimian-timeline-left);
 	width: 2px;
 	margin-left: -1px;
 	background: var(--color-red);
@@ -437,7 +437,7 @@
 	pointer-events: none;
 }
 
-.wise-view-timeline__edge {
+.unimian-timeline__edge {
 	position: absolute;
 	z-index: var(--layer-popover);
 	top: var(--size-4-2);
@@ -447,32 +447,32 @@
 	background: var(--interactive-accent);
 }
 
-.wise-view-timeline__edge--before { left: var(--size-4-2); }
-.wise-view-timeline__edge--after { right: var(--size-4-2); }
+.unimian-timeline__edge--before { left: var(--size-4-2); }
+.unimian-timeline__edge--after { right: var(--size-4-2); }
 
-.wise-view-timeline--narrow .wise-view-timeline__main {
+.unimian-timeline--narrow .unimian-timeline__main {
 	grid-template-columns: minmax(7rem, 38%) minmax(0, 1fr);
 }
 
-.wise-view-timeline--narrow .wise-view-timeline__toolbar {
+.unimian-timeline--narrow .unimian-timeline__toolbar {
 	padding: var(--size-4-1);
 }
 
 @media (max-width: 600px) {
-	.wise-view-timeline__toolbar-label {
+	.unimian-timeline__toolbar-label {
 		display: none;
 	}
 
-	.wise-view-timeline__toolbar-button {
+	.unimian-timeline__toolbar-button {
 		padding-inline: var(--size-2-1);
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.wise-view-timeline__bar,
-	.wise-view-timeline__sidebar-panel { transition: none; }
+	.unimian-timeline__bar,
+	.unimian-timeline__sidebar-panel { transition: none; }
 }
 
 @media (pointer: coarse) {
-	.wise-view-timeline__handle { width: 16px; }
+	.unimian-timeline__handle { width: 16px; }
 }

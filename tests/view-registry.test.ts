@@ -14,9 +14,9 @@ import { BASES_TIMELINE_VIEW_ID, createTimelineViewRegistration, getTimelineView
 import { BASES_GANTT_VIEW_ID, createGanttViewRegistration } from "../src/views/gantt";
 import { BASES_STICKY_NOTE_VIEW_ID } from "../src/views/sticky-note";
 import { DEFAULT_SETTINGS } from "../src/types/settings";
-import WiseViewPlugin from "../src/main";
+import UnimianPlugin from "../src/main";
 
-const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as WiseViewPlugin;
+const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as UnimianPlugin;
 
 function throwIfCalled(): never {
 	throw new Error("factory must not be called while building or validating a descriptor");
@@ -28,11 +28,11 @@ function describedView(id: string, name: string, icon: string): ViewDescriptor {
 }
 
 describe("validateViewDescriptor", () => {
-	it("accepts an id under the wise-view- prefix", () => {
-		expect(() => validateViewDescriptor(describedView("wise-view-timeline", "Timeline", "clock"))).not.toThrow();
+	it("accepts an id under the unimian- prefix", () => {
+		expect(() => validateViewDescriptor(describedView("unimian-timeline", "Timeline", "clock"))).not.toThrow();
 	});
 
-	it("rejects an id without the wise-view- prefix", () => {
+	it("rejects an id without the unimian- prefix", () => {
 		expect(() => validateViewDescriptor(describedView("timeline", "Timeline", "clock"))).toThrow(InvalidViewIdError);
 	});
 });
@@ -40,14 +40,14 @@ describe("validateViewDescriptor", () => {
 describe("ViewRegistry", () => {
 	it("registers descriptors without calling their factory", () => {
 		const registry = new ViewRegistry();
-		expect(() => registry.register(describedView("wise-view-timeline", "Timeline", "clock"))).not.toThrow();
-		expect(registry.has("wise-view-timeline")).toBe(true);
+		expect(() => registry.register(describedView("unimian-timeline", "Timeline", "clock"))).not.toThrow();
+		expect(registry.has("unimian-timeline")).toBe(true);
 	});
 
 	it("fails deterministically on a duplicate id", () => {
 		const registry = new ViewRegistry();
-		registry.register(describedView("wise-view-timeline", "Timeline", "clock"));
-		expect(() => registry.register(describedView("wise-view-timeline", "Timeline 2", "clock"))).toThrow(
+		registry.register(describedView("unimian-timeline", "Timeline", "clock"));
+		expect(() => registry.register(describedView("unimian-timeline", "Timeline 2", "clock"))).toThrow(
 			DuplicateViewIdError,
 		);
 	});
@@ -60,9 +60,9 @@ describe("ViewRegistry", () => {
 
 	it("lists descriptors in registration order", () => {
 		const registry = new ViewRegistry();
-		registry.register(describedView("wise-view-a", "A", "a"));
-		registry.register(describedView("wise-view-b", "B", "b"));
-		expect(registry.list().map((d) => d.id)).toEqual(["wise-view-a", "wise-view-b"]);
+		registry.register(describedView("unimian-a", "A", "a"));
+		registry.register(describedView("unimian-b", "B", "b"));
+		expect(registry.list().map((d) => d.id)).toEqual(["unimian-a", "unimian-b"]);
 	});
 
 	it("expresses all views without view-specific registry branching", () => {
@@ -141,10 +141,10 @@ describe("ViewRegistry", () => {
 	});
 });
 
-describe("WiseViewPlugin.onload view registration", () => {
+describe("UnimianPlugin.onload view registration", () => {
 	it("registers each Bases view and hover source exactly once, and no command", async () => {
 		const app = { plugins: { plugins: {} }, vault: { on: () => ({} as never), getAbstractFileByPath: () => null } };
-		const realPlugin = new WiseViewPlugin(app as never, {} as never);
+		const realPlugin = new UnimianPlugin(app as never, {} as never);
 		const registeredViews: string[] = [];
 		const registeredHovers: string[] = [];
 		const registeredCommands: string[] = [];
@@ -189,33 +189,33 @@ describe("scoped mutation grants (GBETA-003)", () => {
 
 	it("gives a descriptor without a grant no capability at all", () => {
 		const registry = new ViewRegistry();
-		registry.register(describedView("wise-view-a", "A", "a"));
+		registry.register(describedView("unimian-a", "A", "a"));
 
-		expect(registry.mutationsFor("wise-view-a", app)).toEqual({});
-		expect(registry.mutationsFor("wise-view-unknown", app)).toEqual({});
+		expect(registry.mutationsFor("unimian-a", app)).toEqual({});
+		expect(registry.mutationsFor("unimian-unknown", app)).toEqual({});
 	});
 
 	it("gives a legacy-mutation descriptor no scoped capability", () => {
 		const registry = new ViewRegistry();
-		registry.register({ ...describedView("wise-view-a", "A", "a"), capabilities: { legacyMutation: true } });
+		registry.register({ ...describedView("unimian-a", "A", "a"), capabilities: { legacyMutation: true } });
 
-		expect(registry.mutationsFor("wise-view-a", app)).toEqual({});
+		expect(registry.mutationsFor("unimian-a", app)).toEqual({});
 	});
 
 	it("gives an approved descriptor exactly the capabilities it declared", () => {
 		const registry = new ViewRegistry();
 		registry.register({
-			...describedView("wise-view-gantt", "Gantt", "gantt"),
+			...describedView("unimian-gantt", "Gantt", "gantt"),
 			capabilities: { mutations: ["date", "fileCreate"] },
 		});
 
-		const granted = registry.mutationsFor("wise-view-gantt", app);
+		const granted = registry.mutationsFor("unimian-gantt", app);
 		expect(Object.keys(granted).sort()).toEqual(["date", "fileCreate"]);
 		expect(Object.keys(granted.date ?? {})).toEqual(["updateRange"]);
 	});
 
 	it("rejects scoped mutations on a view that is not approved", () => {
-		const descriptor = { ...describedView("wise-view-other", "Other", "x"), capabilities: { mutations: ["date"] as const } };
+		const descriptor = { ...describedView("unimian-other", "Other", "x"), capabilities: { mutations: ["date"] as const } };
 
 		expect(() => validateViewDescriptor(descriptor)).toThrow(UnapprovedMutationGrantError);
 		expect(() => new ViewRegistry().register(descriptor)).toThrow(UnapprovedMutationGrantError);
@@ -223,7 +223,7 @@ describe("scoped mutation grants (GBETA-003)", () => {
 
 	it("rejects a descriptor that declares both legacy and scoped mutations", () => {
 		const descriptor = {
-			...describedView("wise-view-gantt", "Gantt", "gantt"),
+			...describedView("unimian-gantt", "Gantt", "gantt"),
 			capabilities: { legacyMutation: true, mutations: ["date"] as const },
 		};
 

@@ -26,7 +26,7 @@ cause unbounded synchronous DOM construction on first render, for:
 - **Swimlane**: card construction across all columns/swimlanes.
 - **Calendar**: FullCalendar's own event rendering (verify FullCalendar's built-in virtualization
   is actually engaged for the configured view modes, not assumed).
-- **Gantt**: the chart library virtualizes rows and time cells; Wise View's own mapping and write-back cost was measured and fixed in GBETA-016 (`tests/gantt-scale.test.ts`).
+- **Gantt**: the chart library virtualizes rows and time cells; Unimian's own mapping and write-back cost was measured and fixed in GBETA-016 (`tests/gantt-scale.test.ts`).
 - **Timeline**: already has `VirtualLinearCollection`-based row virtualization from the prior
   program — confirm it still holds after Timeline's own workstream changes land, don't re-derive
   it.

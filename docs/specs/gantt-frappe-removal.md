@@ -1,6 +1,9 @@
 # Spec: Remove Frappe Gantt and make Gantt the only Gantt view
 
 Status: Approved 2026-09-20 (maintainer decision recorded in [gantt.md §11](gantt.md))
+Historical note: the 2026-09-29 Unimian rebrand renamed the current Bases view id to
+`unimian-gantt`. This record preserves the identifier and migration assumptions in effect when this
+workstream was completed; existing `.base` files using `wise-view-gantt` need a manual type update.
 Baseline branch: `dev`
 Prepared: 2026-09-20
 Roadmap: [../../ROADMAP.md](../../ROADMAP.md)

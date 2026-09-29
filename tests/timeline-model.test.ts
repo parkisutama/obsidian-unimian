@@ -120,7 +120,7 @@ describe('Timeline model', () => {
 			timelineSnapshot('B.md', { 'note.owner': text('Team') }),
 		], options);
 		expect(flattenTimelineRows(model).map(row => [row.kind, row.path])).toEqual([
-			['group', 'wise-view-timeline-group:text%3ATeam'],
+			['group', 'unimian-timeline-group:text%3ATeam'],
 			['item', 'A.md'],
 			['item', 'B.md'],
 		]);

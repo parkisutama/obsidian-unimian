@@ -9,7 +9,7 @@ import { BUNDLE_MARKER, composeStyles, createCssMergePlugin, packageLicenseNotic
 const fixtures = fileURLToPath(new URL("./fixtures/css-merge/", import.meta.url));
 const tempDirs = [];
 const makeTempDir = () => {
-	const dir = mkdtempSync(path.join(tmpdir(), "wise-view-css-"));
+	const dir = mkdtempSync(path.join(tmpdir(), "unimian-css-"));
 	tempDirs.push(dir);
 	return dir;
 };

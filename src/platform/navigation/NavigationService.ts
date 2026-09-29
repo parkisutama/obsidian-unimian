@@ -14,7 +14,7 @@
 
 import { Keymap, type App, type Component, type PaneType, type UserEvent } from 'obsidian';
 import { QuickPreviewModal, type OpenFull } from '../preview/QuickPreviewModal';
-import type { WiseViewSettings } from '../../types/settings';
+import type { UnimianSettings } from '../../types/settings';
 
 export type OpenDestination = 'active' | PaneType;
 
@@ -66,7 +66,7 @@ export function isActivationKey(event: KeyboardEvent): boolean {
 
 export interface ActivateEntryOptions {
 	app: App;
-	settings: WiseViewSettings;
+	settings: UnimianSettings;
 	path: string;
 	event?: UserEvent | null;
 	/** Falls back to the view's own pane-opening logic when the popup is skipped or dismissed. */

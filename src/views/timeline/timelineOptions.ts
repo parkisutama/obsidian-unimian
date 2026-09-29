@@ -23,7 +23,7 @@ function compatibleProperty(config: ViewConfigReader, key: string, legacyKey: st
 /** Reads only explicit Bases view options; no workflow property is guessed or defaulted. */
 export function readTimelineOptions(config: ViewConfigReader): TimelineOptions {
 	return {
-		// `start`/`end` are the upstream Timeline keys. Keep the early Wise View
+		// `start`/`end` are the upstream Timeline keys. Keep the early Unimian
 		// `startDate`/`endDate` keys readable so existing Bases do not break.
 		startProperty: compatibleProperty(config, 'start', 'startDate'),
 		endProperty: compatibleProperty(config, 'end', 'endDate'),

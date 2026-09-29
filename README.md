@@ -1,8 +1,8 @@
-# Wise View
+# Unimian
 
 > **A focused, task-management-agnostic view enrichment plugin for Obsidian Bases.**
 
-Wise View adds Calendar, Swimlane, Gantt, and Timeline views directly into Obsidian Bases — without
+Unimian adds Calendar, Swimlane, Gantt, and Timeline views directly into Obsidian Bases — without
 any opinion about *how* you manage your tasks or which plugin you use for that.  Your data model is
 yours. This plugin just gives you richer ways to look at it.
 
@@ -19,10 +19,10 @@ under GPL v3**. See the [License](#license) section for details.
 
 ### What was changed from the original
 
-The original Planner is a full-featured planning and task management plugin. Wise View intentionally
+The original Planner is a full-featured planning and task management plugin. Unimian intentionally
 **narrows the scope**:
 
-| Original (Planner) | Wise View |
+| Original (Planner) | Unimian |
 | --- | --- |
 | Task List view | ✗ Removed |
 | Item Modal / Quick Capture | ✗ Removed |
@@ -91,7 +91,7 @@ introduce no hidden task schema.
 2. Copy `main.js`, `manifest.json`, and `styles.css` to your vault:
 
    ```text
-   <Vault>/.obsidian/plugins/wise-view/
+   <Vault>/.obsidian/plugins/unimian/
    ```
 
 3. Enable the plugin in **Settings → Community plugins**.
@@ -110,7 +110,7 @@ dropdown to **Calendar**, **Swimlane**, **Gantt**, or **Timeline**.
 
 ### Recommended frontmatter shape
 
-Wise View does not enforce a schema. Any dated frontmatter works. Common example:
+Unimian does not enforce a schema. Any dated frontmatter works. Common example:
 
 ```yaml
 ---
@@ -127,7 +127,7 @@ progress: 40
 
 ## Platform support
 
-Wise View is designed for Obsidian desktop and does not use Electron-only runtime APIs in the
+Unimian is designed for Obsidian desktop and does not use Electron-only runtime APIs in the
 plugin source. Mobile support is enabled for beta testing, but complex Calendar, Swimlane, Gantt, and Timeline
 interactions may need platform-specific testing on Android and iOS.
 
@@ -135,7 +135,7 @@ interactions may need platform-specific testing on Android and iOS.
 
 ## Privacy and data handling
 
-Wise View reads and writes notes through Obsidian's vault APIs. It does not use network requests,
+Unimian reads and writes notes through Obsidian's vault APIs. It does not use network requests,
 telemetry, analytics, account sign-in, payments, ads, or files outside your vault.
 
 ---
@@ -144,13 +144,12 @@ telemetry, analytics, account sign-in, payments, ads, or files outside your vaul
 
 ### Kanban view renamed to Swimlane
 
-The Kanban view is now the **Swimlane** view, and its view type changed from `wise-view-kanban`
-to `wise-view-swimlane`. Bases created with the old view no longer find it. Update each `.base`
-file that uses it:
+The Kanban view is now the **Swimlane** view. The Unimian view type is `unimian-swimlane`.
+Older Bases files may still contain the previous type; update that value manually if needed:
 
 ```yaml
 views:
-  - type: wise-view-swimlane # was: wise-view-kanban
+  - type: unimian-swimlane # previously: wise-view-kanban or wise-view-swimlane
 ```
 
 Views no longer preselect properties. Choose **Columns by** (the board shows a prompt until you
@@ -162,8 +161,8 @@ all-day events come from the new **All-day field** option instead of a fixed `al
 
 ## Migrating from the earlier Gantt view
 
-The Frappe-based Gantt view was replaced. Its view type (`wise-view-gantt`) is reused, so a base saved with
-it opens in the new **Gantt** view; there is nothing to convert by hand.
+The Frappe-based Gantt view was replaced. The Unimian view type is `unimian-gantt`. Older Bases files
+that refer to `wise-view-gantt` need that type changed manually if they are still used.
 
 - **Your settings are imported once**, on first open: start, end, label, dependencies, parent, progress,
   color by, view mode, task list, note template and folder, and the "move dependent tasks" policy. A notice
@@ -173,12 +172,12 @@ it opens in the new **Gantt** view; there is nothing to convert by hand.
 - **Not carried over:** expected progress, bar height, the Hour / Quarter day / Half day scales (imported as
   Day), the right-click menu, the WBS sidebar (replaced by the task list and phases), the Gantt
   command-palette commands, and the "Gantt defaults" settings.
-- If you tried a development build with view type `wise-view-gantt-beta`, change that type to
-  `wise-view-gantt` in the `.base` file; the beta id was never released.
+- A development build with view type `wise-view-gantt-beta` was never released; use `unimian-gantt`
+  if that configuration is still present.
 
 ## Known limitations
 
-- Wise View requires the Obsidian Bases API, so older Obsidian versions are not supported.
+- Unimian requires the Obsidian Bases API, so older Obsidian versions are not supported.
 - Gantt is read-only until you turn off **Read only** in its view options. Once editing is on, it
   writes dates, progress, Depends on, Parent, and Order only to the properties you mapped, and only
   when you drag, draw, or edit in the view.
@@ -193,8 +192,8 @@ it opens in the new **Gantt** view; there is nothing to convert by hand.
 ## Troubleshooting
 
 - If the plugin does not load, confirm `main.js`, `manifest.json`, and `styles.css` are in
-  `<Vault>/.obsidian/plugins/wise-view/`.
-- If the view types do not appear, disable and re-enable Wise View in **Settings → Community
+  `<Vault>/.obsidian/plugins/unimian/`.
+- If the view types do not appear, disable and re-enable Unimian in **Settings → Community
   plugins**.
 - If a Base shows no entries, confirm your notes have values in the configured frontmatter
   properties.
@@ -227,7 +226,7 @@ the combined work is distributed under that version.
 
 ```text
 Copyright (C) 2025  Sawyer Rensel  (original Planner codebase)
-Copyright (C) 2026  Parkis Utama   (modifications in Wise View)
+Copyright (C) 2026  Parkis Utama   (modifications in Unimian)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -39,7 +39,7 @@ already organized by it works without moving files.
    Calendar concern, because Calendar is where the date exists. The daily-note flow has evolved
    into the periodic-notes flow and is owned here.
 7. **(Withdrawn by decision 11.)** ~~Date tokens for a period template are applied by Calendar.~~ This was not a reversal of Note
-   Template decision 3: `note-template.md` §3.2 already says Wise View's own tokens apply to
+   Template decision 3: `note-template.md` §3.2 already says Unimian's own tokens apply to
    values the view itself computed. The clicked date is such a value. Scope stays narrow: only
    date tokens of the period being created (`{{date:FORMAT}}`, `{{title}}`, weekday tokens for
    weekly notes, matching Notebook Navigator's), evaluated on the **start of the period**, and
@@ -64,7 +64,7 @@ already organized by it works without moving files.
     each path field's placeholder; users can enter any vault-relative path, including a custom root.
     It does not read Notebook Navigator settings.
 11. **Templater is the preferred engine.** It is already first in `detectTemplateEngine`. Decision
-    7 is withdrawn: Wise View does not resolve date tokens in period templates; templates read the
+    7 is withdrawn: Unimian does not resolve date tokens in period templates; templates read the
     date from the file name (`tp.file.title`), as the maintainer's do. Core Templates users get the
     engine's own behavior (documented limitation: its `{{date}}` is today).
 12. **Periodic notes are not drawn as events; they are linked.** A note that is the period note for
@@ -86,7 +86,7 @@ already organized by it works without moving files.
 14. **Unconfigured means no links.** A period with no path pattern set on the Base gets no link,
     no underline, no dot, and no created notes; the rest of the calendar is unchanged. There is no
     global fallback (decision 2).
-15. **Who decides the folder.** Wise View only supplies the *initial* folder; whatever the template
+15. **Who decides the folder.** Unimian only supplies the *initial* folder; whatever the template
     engine does afterwards wins, because it runs after creation.
     - **Event notes:** template move (`tp.file.move`, Templater folder templates) > the Base's
       `targetFolder` > the start day's daily folder > Obsidian's new-note folder.
@@ -207,7 +207,7 @@ types. Layout and styling were not visible there, so placement is confirmed nati
 - No support for reading another plugin's settings (see decision 4).
 - No event splitting, no `part_of`, no sync between notes (decision 1).
 - No recurrence, no task logic, no automatic creation of notes in advance
-  (`AGENTS.md`: Wise View is a view enrichment plugin, not a task manager).
+  (`AGENTS.md`: Unimian is a view enrichment plugin, not a task manager).
 - No change to Gantt, Swimlane, or Timeline. Periodic notes are Calendar-only until another view
   asks for them.
 - No global (plugin-level) periodic settings; per-view only (decision 2).

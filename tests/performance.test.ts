@@ -135,7 +135,7 @@ describe("Gantt bounded initial render (PERF-001)", () => {
 			const mountedRows = container.querySelectorAll(".gantt-rows > *").length;
 			// Before/after: 2,000 logical tasks (aria-rowcount) but only a viewport-sized window of
 			// row DOM nodes is ever mounted — this is the library's own virtualization, not
-			// Wise View's, and it was previously only asserted in the spec's prose (§2.1), never
+			// Unimian's, and it was previously only asserted in the spec's prose (§2.1), never
 			// exercised by a test.
 			expect(mountedRows).toBeGreaterThan(0);
 			expect(mountedRows).toBeLessThan(100);
@@ -175,8 +175,8 @@ describe("Timeline bounded initial render (PERF-001)", () => {
 		view.data.groupedData = [{ entries, hasKey: () => false }];
 		view.onDataUpdated();
 
-		const mountedSidebarRows = timelineHarness.host.querySelectorAll(".wise-view-timeline__sidebar-row").length;
-		const mountedTimelineRows = timelineHarness.host.querySelectorAll(".wise-view-timeline__row").length;
+		const mountedSidebarRows = timelineHarness.host.querySelectorAll(".unimian-timeline__sidebar-row").length;
+		const mountedTimelineRows = timelineHarness.host.querySelectorAll(".unimian-timeline__row").length;
 
 		// 5,000 items in the model, but VirtualLinearCollection (src/platform/dom/VirtualLinearCollection.ts)
 		// only mounts rows for the viewport plus overscan — this confirms that still holds.
@@ -333,11 +333,11 @@ describe("Gantt fast path for identical updates (PERF-002)", () => {
 //     gesture through a single this.queue promise chain (one link per call, not N concurrent
 //     writes) - already safe, verified here.
 //   - Calendar (src/views/BasesCalendarView.ts): view-mode switching calls FullCalendar's own
-//     changeView() directly; Wise View adds no timer/rAF/listener of its own on that path and
+//     changeView() directly; Unimian adds no timer/rAF/listener of its own on that path and
 //     never tears down/recreates the Calendar instance for it - already safe, verified here.
 //   - Gantt's dependency-line editor: docs/specs/gantt.md's D5/onDependencyCreate is implemented
 //     through the library's own built-in line-drawing UI (superseded, not custom drag code per
-//     gantt.md line 323), so there is no separate Wise View drag surface to test beyond the
+//     gantt.md line 323), so there is no separate Unimian drag surface to test beyond the
 //     onDependencyCreate/onTasksChange write-back path already covered above.
 
 describe("Swimlane drag-and-drop does not accumulate timers under rapid triggers (PERF-003)", () => {
@@ -492,7 +492,7 @@ describe("Calendar view-mode switching does not accumulate work under rapid swit
 				view.calendar.changeView(modes[i % modes.length]!);
 			}
 
-			// Wise View's own code path for view-mode switching adds no timer/rAF of its own and
+			// Unimian's own code path for view-mode switching adds no timer/rAF of its own and
 			// never tears down and recreates the Calendar instance the way onDataUpdated()'s full
 			// render() does - so 40 rapid switches must not touch destroy().
 			expect(destroySpy).not.toHaveBeenCalled();

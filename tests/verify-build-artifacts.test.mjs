@@ -13,7 +13,7 @@ import { verifyBuildArtifacts } from "../scripts/verify-build-artifacts.mjs";
 const tempDirs = [];
 
 function makeTempDir() {
-	const cwd = mkdtempSync(path.join(tmpdir(), "wise-view-artifacts-"));
+	const cwd = mkdtempSync(path.join(tmpdir(), "unimian-artifacts-"));
 	tempDirs.push(cwd);
 	return cwd;
 }
@@ -71,7 +71,7 @@ describe("buildLicenseBanner", () => {
 		expect(css).not.toContain("Preact");
 
 		const js = buildLicenseBanner("main.js", "1.2.3");
-		expect(js).toContain("Wise View v1.2.3");
+		expect(js).toContain("Unimian v1.2.3");
 		for (const fragment of requiredNoticeFragments("main.js")) {
 			expect(js).toContain(fragment);
 		}

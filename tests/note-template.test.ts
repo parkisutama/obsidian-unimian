@@ -134,7 +134,7 @@ describe("NoteTemplateService", () => {
 		expect(notices).toEqual([PLAIN_TEMPLATE_NOTICE, PLAIN_TEMPLATE_NOTICE]);
 	});
 
-	it("applies Wise View's own tokens to the title format only", async () => {
+	it("applies Unimian's own tokens to the title format only", async () => {
 		const f = createApp({ templater: true });
 		await new NoteTemplateService(f.app, { ...settings, titleFormat: "Meeting {{date}} {{time}}" }).createNote({} as never, context);
 		expect(f.templater.mock.calls[0]?.[2]).toBe("Meeting 2026-09-19 10-30");

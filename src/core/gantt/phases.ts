@@ -3,7 +3,7 @@
 
 import { buildDepthFirstSequence, compareSequence } from './sequence';
 
-export const SYNTHETIC_PHASE_PREFIX = 'wise-view-synthetic://';
+export const SYNTHETIC_PHASE_PREFIX = 'unimian-synthetic://';
 
 export interface PhaseParentLink { id: string; name: string; resolved: boolean }
 export interface PhaseGroup { key: string; label: string }

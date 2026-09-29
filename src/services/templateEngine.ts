@@ -6,7 +6,7 @@ import { type App, Notice, type TFile, type TFolder, normalizePath } from 'obsid
 /**
  * The one place a note is created from a template file (docs/specs/note-template.md).
  *
- * Wise View never substitutes tokens in a template file's body. A template-application plugin
+ * Unimian never substitutes tokens in a template file's body. A template-application plugin
  * does that, or nobody does and the user is told so:
  *   1. Templater, through its own "create new note from template" API;
  *   2. the core Templates plugin, by inserting the template into the freshly created note;

@@ -48,7 +48,7 @@ export class TooltipGuard {
 		const existing = this.labels.get(owner);
 		if (existing?.isConnected) return existing;
 		const label = this.root.ownerDocument.createElement('span');
-		label.id = `wise-view-gantt-label-${nextLabelId++}`;
+		label.id = `unimian-gantt-label-${nextLabelId++}`;
 		label.className = 'gantt-sr-only';
 		this.root.appendChild(label);
 		this.labels.set(owner, label);

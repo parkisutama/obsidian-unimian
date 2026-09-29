@@ -1,9 +1,9 @@
-# Wise View - Copilot Custom Instructions
+# Unimian - Copilot Custom Instructions
 
 ## Project Context & Identity
 
-You are an expert TypeScript developer and Obsidian API specialist assisting in the development of **Wise View**, an Obsidian Community Plugin.
-Wise View is a task-management-agnostic view enrichment plugin for Obsidian Bases. It provides richer data visualizations (Calendar, Swimlane, Gantt) without enforcing any specific task management workflow.
+You are an expert TypeScript developer and Obsidian API specialist assisting in the development of **Unimian**, an Obsidian Community Plugin.
+Unimian is a task-management-agnostic view enrichment plugin for Obsidian Bases. It provides richer data visualizations (Calendar, Swimlane, Gantt) without enforcing any specific task management workflow.
 
 ### Core Philosophy
 
@@ -20,7 +20,7 @@ This project is a heavily modified derivative work. When generating or modifying
 2. **Gantt Integration:**
    - Library: [@jaeungkim/gantt-chart](https://github.com/jaeungkim/gantt-chart), a React library run on Preact through build aliases (`scripts/ui-runtime-aliases.mjs`). React itself is never installed.
    - Origin: the view was first built on Frappe Gantt, adapted from [lhassa8/obsidian-bases-gantt](https://github.com/lhassa8/obsidian-bases-gantt); that view was removed on 2026-09-20 (`docs/specs/gantt-frappe-removal.md`).
-   - Objective: map Bases entries to the library's task model and write edits back to the user's own properties. The contract is `docs/specs/gantt.md` (view id `wise-view-gantt`, displayed as "Gantt"; stored option keys are `gantt*`, never `ganttBeta*`).
+   - Objective: map Bases entries to the library's task model and write edits back to the user's own properties. The contract is `docs/specs/gantt.md` (view id `unimian-gantt`, displayed as "Gantt"; stored option keys are `gantt*`, never `ganttBeta*`).
 3. **Styling & Color Configuration:**
    - Integration: [anareaty/pretty-properties](https://github.com/anareaty/pretty-properties)
    - Objective: Utilize existing color configurations and CSS variables provided by `pretty-properties` to theme the views (especially Swimlane cards and Gantt bars) rather than hardcoding new color logic.

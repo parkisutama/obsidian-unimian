@@ -41,7 +41,7 @@ export type TimelineVirtualRow =
 	| { path: string; kind: 'group'; groupKey: string; label: string; count: number }
 	| { path: string; kind: 'item'; groupKey: string; item: TimelineItem };
 
-const GROUP_ROW_PREFIX = 'wise-view-timeline-group:';
+const GROUP_ROW_PREFIX = 'unimian-timeline-group:';
 const UNGROUPED_KEY = '__timeline-all-items__';
 
 /** Produces the single row identity/order consumed by both sidebar and timeline surfaces. */

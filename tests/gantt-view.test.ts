@@ -84,7 +84,7 @@ afterEach(() => {
 describe('Gantt skeleton (GBETA-004)', () => {
 	it('registers the permanent id and display name', () => {
 		const registration = createGanttViewRegistration({} as never);
-		expect(BASES_GANTT_VIEW_ID).toBe('wise-view-gantt');
+		expect(BASES_GANTT_VIEW_ID).toBe('unimian-gantt');
 		expect(registration.name).toBe('Gantt');
 		expect(registration.factory).toBeTypeOf('function');
 	});
@@ -135,7 +135,7 @@ describe('Gantt skeleton (GBETA-004)', () => {
 
 		expect(harness.renders.at(-1)).toBeNull();
 		expect(harness.host.childElementCount).toBe(0);
-		expect(harness.host.classList.contains('wise-view-gantt')).toBe(false);
+		expect(harness.host.classList.contains('unimian-gantt')).toBe(false);
 
 		document.body.classList.add('theme-dark');
 		await flush();
@@ -255,8 +255,8 @@ describe('Gantt skeleton (GBETA-004)', () => {
 		});
 		const detailHost = document.createElement('div');
 		renderPreact(detail, detailHost);
-		expect(detailHost.querySelector('.wise-view-gantt-detail__property-value')?.textContent).toBe('Parkis');
-		(detailHost.querySelector('.wise-view-gantt-detail__title') as HTMLButtonElement).click();
+		expect(detailHost.querySelector('.unimian-gantt-detail__property-value')?.textContent).toBe('Parkis');
+		(detailHost.querySelector('.unimian-gantt-detail__title') as HTMLButtonElement).click();
 		expect(harness.openLinkText).toHaveBeenCalledWith('A.md', '', false);
 		const rendersBeforePropertyChange = harness.renders.length;
 		harness.setConfig('__order', []);

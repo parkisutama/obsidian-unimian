@@ -348,9 +348,9 @@ describe('Gantt write-back (GBETA-010)', () => {
 
 	it('batches a summary drag into one date write per real descendant', async () => {
 		const before = [
-			task('wise-view-synthetic://group/Project', { endDate: '2026-10-05' }),
-			task('Tasks/A.md', { parentId: 'wise-view-synthetic://group/Project', sequence: '1.1' }),
-			task('Tasks/B.md', { parentId: 'wise-view-synthetic://group/Project', sequence: '1.2' }),
+			task('unimian-synthetic://group/Project', { endDate: '2026-10-05' }),
+			task('Tasks/A.md', { parentId: 'unimian-synthetic://group/Project', sequence: '1.1' }),
+			task('Tasks/B.md', { parentId: 'unimian-synthetic://group/Project', sequence: '1.2' }),
 		];
 		const h = harness();
 		h.writer.replaceBaseline(before);
@@ -459,7 +459,7 @@ describe('Gantt write-back (GBETA-010)', () => {
 	it('rejects synthetic reparenting and reorder without an Order property', () => {
 		const h = harness();
 		const synthetic = { taskId: 'Tasks/A.md', fromParentId: null, fromIndex: 0,
-			toParentId: 'wise-view-synthetic://group/X', toIndex: 0, afterId: null, beforeId: null };
+			toParentId: 'unimian-synthetic://group/X', toIndex: 0, afterId: null, beforeId: null };
 		expect(h.writer.onTaskMove(synthetic)).toBe(false);
 
 		const noOrder = harness({ properties: undefined });

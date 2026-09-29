@@ -4,7 +4,7 @@
 allowBuilds:
   esbuild: true
 
-# @jaeungkim/gantt-chart declares react/react-dom peers; Wise View resolves them to preact/compat
+# @jaeungkim/gantt-chart declares react/react-dom peers; Unimian resolves them to preact/compat
 # through build aliases (scripts/ui-runtime-aliases.mjs) and must not install React.
 minimumReleaseAgeExclude:
   - dotenv@18.0.2

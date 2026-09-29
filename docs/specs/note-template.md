@@ -14,7 +14,7 @@ recorded the decisions in §5. Native acceptance (§6.4) is still required befor
 
 ## 1. Objective
 
-Replace Wise View's two duplicated, hand-rolled `{{...}}`-substitution engines with a single,
+Replace Unimian's two duplicated, hand-rolled `{{...}}`-substitution engines with a single,
 general note-creation path that actually integrates with Templater (when installed) or Obsidian's
 core Templates plugin (as a fallback), implemented once at a level every view's note-creation
 feature can use — not per-view.
@@ -57,10 +57,10 @@ API (`app.plugins.plugins['templater-obsidian']`) or the core Templates plugin
    Templater is not installed, fall back to Obsidian's core Templates plugin's insertion behavior
    if enabled. Only as a last resort — with the fallback made explicit in the UI/documentation,
    not silent — keep something like today's plain-text-with-frontmatter-merge behavior.
-2. **Scope Wise View's own `{{date}}`/`{{title}}`/etc. tokens correctly.** These should only ever
+2. **Scope Unimian's own `{{date}}`/`{{title}}`/etc. tokens correctly.** These should only ever
    apply to values the *view itself* computed (the clicked date, for the title-format field), and
    never act as a second, competing substitution engine against the template file's own body —
-   that competition is the actual defect, not the existence of Wise View's own tokens.
+   that competition is the actual defect, not the existence of Unimian's own tokens.
 3. **Implement it once, generally**, at a level both Calendar's event-creation flow, Gantt's
    create-note flow, and Calendar's daily-note flow can all call — retiring both
    `NoteTemplateService.renderTemplate()`'s and `processTemplateVariables()`'s duplicated
@@ -74,7 +74,7 @@ API (`app.plugins.plugins['templater-obsidian']`) or the core Templates plugin
   `targetFolder`, `titleFormat`) unless the redesign specifically requires it — and if it does,
   that is a breaking-enough change to call out explicitly for maintainer sign-off, not slip in
   quietly.
-- No bundling of Templater as a dependency — Wise View integrates with it when present, the same
+- No bundling of Templater as a dependency — Unimian integrates with it when present, the same
   way it already treats Pretty Properties as an optional integration
   (`src/integrations/PrettyPropertiesAdapter.ts`), not a hard dependency.
 - No redesign of daily-note handling beyond fixing its template-substitution path — its
@@ -88,7 +88,7 @@ API (`app.plugins.plugins['templater-obsidian']`) or the core Templates plugin
 2. **Rewrite `NoteTemplateService` in place.** It stays the single entry point; the engine
    dispatch lives in `src/services/templateEngine.ts`. Scoped-write views (Gantt) pass
    `NoteCreationRequest.templatePath` and the mutation gateway dispatches to the same engine.
-3. **Backward compatibility.** Wise View no longer substitutes `{{title|date|time|start|end}}`
+3. **Backward compatibility.** Unimian no longer substitutes `{{title|date|time|start|end}}`
    (Calendar/Gantt) or `{{weekday|month|date:FORMAT}}` (daily notes) inside template files. With
    Templater or core Templates enabled the plugin handles its own syntax (core Templates knows
    `{{title}}`, `{{date}}`, `{{time}}`); `{{start}}`/`{{end}}` in a template body are no longer

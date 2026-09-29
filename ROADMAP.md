@@ -1,16 +1,16 @@
-# Wise View roadmap
+# Unimian roadmap
 
 Status: Active
 Last updated: 2026-09-22
 
-This is the navigation hub for Wise View's current work: which workstream is being worked on,
+This is the navigation hub for Unimian's current work: which workstream is being worked on,
 what depends on what, and where each workstream's own specification, plan, and task list live.
 Update the status table below whenever a workstream's phase changes — this file does not carry
 implementation detail itself, only pointers and sequencing.
 
 ## Why this replaced the extensible-view-platform program
 
-Wise View previously ran one program-wide specification covering Calendar, Gantt, Swimlane,
+Unimian previously ran one program-wide specification covering Calendar, Gantt, Swimlane,
 Timeline, and five planned new views (Grid, Masonry, Feed, Keep). Timeline shipped and was
 accepted; Grid did not — three rounds of native testing each surfaced a different CSS Grid layout
 failure even after direct, evidence-based fixes, and the maintainer removed it rather than keep
@@ -30,7 +30,7 @@ the same `dev` branch, instead of one large document that has to move together.
 | Calendar | [docs/specs/calendar.md](docs/specs/calendar.md) | [tasks/calendar/plan.md](tasks/calendar/plan.md) | [tasks/calendar/todo.md](tasks/calendar/todo.md) | Done (native-accepted 2026-09-22) — [record](tasks/calendar/native-acceptance.md) |
 | Gantt (Frappe) | [docs/specs/gantt-frappe.md](docs/specs/gantt-frappe.md) | [tasks/gantt-frappe/plan.md](tasks/gantt-frappe/plan.md) | [tasks/gantt-frappe/todo.md](tasks/gantt-frappe/todo.md) | Superseded 2026-09-20 — view removed by Gantt Frappe removal |
 | Gantt | [docs/specs/gantt.md](docs/specs/gantt.md) | [tasks/gantt/plan.md](tasks/gantt/plan.md) | [tasks/gantt/todo.md](tasks/gantt/todo.md) | Done (native-accepted 2026-09-20 with waivers: mobile, popout, keyboard unverified) — [record](tasks/gantt/native-acceptance.md) |
-| Gantt Frappe removal | [docs/specs/gantt-frappe-removal.md](docs/specs/gantt-frappe-removal.md) | [tasks/gantt-frappe-removal/plan.md](tasks/gantt-frappe-removal/plan.md) | [tasks/gantt-frappe-removal/todo.md](tasks/gantt-frappe-removal/todo.md) | Done 2026-09-20; permanent id and keys set to `wise-view-gantt` / `gantt*` 2026-09-21 (GFR-006). The obsidian-bases-gantt attribution (kept) awaits maintainer confirmation |
+| Gantt Frappe removal | [docs/specs/gantt-frappe-removal.md](docs/specs/gantt-frappe-removal.md) | [tasks/gantt-frappe-removal/plan.md](tasks/gantt-frappe-removal/plan.md) | [tasks/gantt-frappe-removal/todo.md](tasks/gantt-frappe-removal/todo.md) | Done 2026-09-20; historical id and keys set to `wise-view-gantt` / `gantt*` 2026-09-21 (GFR-006); current view id renamed to `unimian-gantt` in 2026-09-29 rebrand. The obsidian-bases-gantt attribution (kept) awaits maintainer confirmation |
 | Timeline | [docs/specs/timeline.md](docs/specs/timeline.md) | [tasks/timeline/plan.md](tasks/timeline/plan.md) | [tasks/timeline/todo.md](tasks/timeline/todo.md) | Done (native-accepted 2026-09-22 with waiver: mobile UX deferred, see Follow-ups) — [record](tasks/timeline/native-acceptance.md) |
 | Performance | [docs/specs/performance.md](docs/specs/performance.md) | [tasks/performance/plan.md](tasks/performance/plan.md) | [tasks/performance/todo.md](tasks/performance/todo.md) | In progress — Phases 1-3 complete (PERF-001–003); Phase 4 native acceptance (PERF-004) pending |
 | Note Template | [docs/specs/note-template.md](docs/specs/note-template.md) | [tasks/note-template/plan.md](tasks/note-template/plan.md) | [tasks/note-template/todo.md](tasks/note-template/todo.md) | Done 2026-09-21 (native-accepted with waivers: core Templates and no-engine paths unverified) — [record](tasks/note-template/native-acceptance.md) |

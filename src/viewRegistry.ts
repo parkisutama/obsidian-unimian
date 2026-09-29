@@ -13,8 +13,8 @@
 import type { App, BasesViewFactory, BasesAllOptions, BasesViewConfig, Command, HoverLinkSource } from 'obsidian';
 import { createGrantedMutations, type GrantedMutations, type MutationGrant } from './platform/mutations/grants';
 
-/** Every Wise View type ID must use this prefix; enforced by validateViewDescriptor. */
-export const VIEW_ID_PREFIX = 'wise-view-';
+/** Every Unimian type ID must use this prefix; enforced by validateViewDescriptor. */
+export const VIEW_ID_PREFIX = 'unimian-';
 
 /**
  * Capabilities a descriptor may declare. `legacyMutation` marks a view that keeps existing
@@ -34,7 +34,7 @@ export interface ViewCapabilities {
  * View ids approved to declare `capabilities.mutations`. Each entry must have a matching section
  * in docs/architecture/view-write-access.md; adding one is a compatibility decision, not a refactor.
  */
-export const APPROVED_MUTATION_GRANT_VIEW_IDS: readonly string[] = ['wise-view-gantt'];
+export const APPROVED_MUTATION_GRANT_VIEW_IDS: readonly string[] = ['unimian-gantt'];
 
 /**
  * Everything needed to register one Bases view with Obsidian: the view registration itself,
@@ -43,7 +43,7 @@ export const APPROVED_MUTATION_GRANT_VIEW_IDS: readonly string[] = ['wise-view-g
  * in the registry or in `main.ts`.
  */
 export interface ViewDescriptor {
-	/** Stable type ID, e.g. `wise-view-calendar`. Never changes once released (spec §8). */
+	/** Bases type ID, e.g. `unimian-calendar`. */
 	id: string;
 	name: string;
 	icon: string;

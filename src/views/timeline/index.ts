@@ -2,12 +2,12 @@
 // Copyright (C) 2026 Parkis Utama
 
 import type { BasesAllOptions, BasesViewRegistration, QueryController } from 'obsidian';
-import type WiseViewPlugin from '../../main';
+import type UnimianPlugin from '../../main';
 import { BASES_TIMELINE_VIEW_ID, BasesTimelineView } from './BasesTimelineView';
 
 export { BASES_TIMELINE_VIEW_ID, BasesTimelineView } from './BasesTimelineView';
 
-export function createTimelineViewRegistration(plugin: WiseViewPlugin): BasesViewRegistration {
+export function createTimelineViewRegistration(plugin: UnimianPlugin): BasesViewRegistration {
 	return {
 		name: 'Timeline',
 		icon: 'calendar-range',

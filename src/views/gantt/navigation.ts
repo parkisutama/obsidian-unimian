@@ -20,7 +20,7 @@ export interface GanttNavigationOptions {
 }
 
 /** Set on the root while Ctrl/Cmd is held, so the library's hover card can step aside for Page Preview. */
-export const PREVIEWING_CLASS = 'wise-view-gantt-previewing';
+export const PREVIEWING_CLASS = 'unimian-gantt-previewing';
 
 /**
  * Note-opening behaviour Obsidian users expect, as delegated listeners so it survives the chart's

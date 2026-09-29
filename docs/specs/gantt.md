@@ -3,6 +3,10 @@
 Formerly named "Gantt Beta"; the task ids below keep the `GBETA-` prefix from that time, because commits and reviews refer to them.
 
 Status: Accepted 2026-09-20 — replaces Frappe Gantt (see §11); removal tracked in gantt-frappe-removal.md
+Identity update: on 2026-09-29, the registered view id changed from `wise-view-gantt` to
+`unimian-gantt` for the Unimian rebrand. Stored option keys and view behavior are unchanged. Any
+existing `.base` file using the former id must be updated manually; no vault files are changed by
+the local rebrand preparation.
 Baseline branch: `dev`
 Prepared: 2026-09-19
 Roadmap: [../../ROADMAP.md](../../ROADMAP.md)
@@ -20,8 +24,8 @@ and deletion, phases with roll-up and collapse, row reordering, drawing a range 
 working calendar, detail panel), is configured entirely through Bases view options, and writes
 every committed edit back to note properties.
 
-Frappe Gantt (`wise-view-gantt`) stays registered and untouched while Gantt matures. When
-Gantt meets the stability gate (§11), a separate workstream removes Frappe Gantt entirely.
+Frappe Gantt (`wise-view-gantt`) stayed registered and untouched while the replacement Gantt
+matured. The removal workstream in §11 deleted it; the old id is retained here as historical context.
 
 ## 2. Decisions from the 2026-09-19 interview
 
@@ -29,7 +33,7 @@ Gantt meets the stability gate (§11), a separate workstream removes Frappe Gant
 |---|---|---|
 | D1 | UI runtime | `preact/compat`, aliased for `react`, `react-dom`, and `react/jsx-runtime` at build time. `react`/`react-dom` stay forbidden in `package.json` (architecture guard unchanged). A spike proves compatibility before any other work (plan Phase 0). |
 | D2 | Write access | Approved: Gantt may write, **only** through `src/platform/mutations` capabilities, never by calling `processFrontMatter`/`vault.modify` from `src/views/gantt/`. Recorded as a precedent with plugin-compatibility consequences in [view-write-access.md](../architecture/view-write-access.md). |
-| D3 | View ID | **Amended 2026-09-21.** The permanent id is `wise-view-gantt`, and stored option keys use the plain `gantt*` prefix (`ganttStart`, `ganttScale`, ...). The earlier decision (`wise-view-gantt-beta`, never released) was dropped because a permanent id and permanent option keys must not say "beta". Because `wise-view-gantt` was released for the Frappe view (1.0.2, 1.0.3), a base saved by that release opens in this view; its settings, and those of development builds (`ganttBeta*`), are imported once (§3.8). The id never changes again. |
+| D3 | View ID | **Amended 2026-09-21; identity superseded 2026-09-29.** The runtime id is `unimian-gantt`. Before the Unimian rebrand, `wise-view-gantt` was permanent and stored option keys used the plain `gantt*` prefix. The 2026-09-29 identity rename changes only the registered id; stored option keys, their one-time imports, and view behavior remain as specified. A `.base` file using `wise-view-gantt` must have its type updated manually. |
 | D4 | Phases | A phase is a **parent note** referenced by the configured Parent property, **and** each Bases `Group by` group becomes a synthetic, read-only phase row. |
 | D5 | Dependency UX | One Bases-configured **Depends on** list-of-links property. Every stored edge is finish-to-start (FS). Users create/delete it through the line on the chart or the relation property; FS/SS/FF/SF codes are not exposed in the primary UX. |
 | D6 | Schedule response | A three-state **When predecessor moves** policy: do not shift; shift only to resolve overlap; or shift by the same delta and maintain the gap. Every automatic move preserves successor duration and is cycle-safe. |
@@ -44,7 +48,7 @@ Gantt meets the stability gate (§11), a separate workstream removes Frappe Gant
 
 ### 3.1 View registration
 
-- New descriptor in the `ViewRegistry`: id `wise-view-gantt`, name `Gantt`, its own
+- New descriptor in the `ViewRegistry`: id `unimian-gantt`, name `Gantt`, its own
   icon, options, and hover source (`{ display: 'Gantt', defaultMod: true }`).
 - Code lives in `src/views/gantt/`. Pure mapping/scheduling logic lives in
   `src/core/gantt/` (no `obsidian` import — existing core guard).
@@ -154,7 +158,7 @@ Rules:
 ### 3.5 Dependency schedule policy (D6)
 
 Depends on is a descriptive graph in every mode. The **When predecessor moves** option determines
-whether Wise View is also authorized to write downstream dates:
+whether Unimian is also authorized to write downstream dates:
 
 1. **Do not shift automatically** (default): keep every successor date unchanged; the line makes
    the consequence visible without silently changing data.
@@ -249,7 +253,7 @@ earlier settings, and a marker key (`ganttLegacyImported`) is written once so a 
 is not brought back. A Notice says how many settings were imported, and that the chart stays read-only
 until **Read only** is turned off (read-only is the default, so a Frappe-era base cannot write until the
 user opts in). A development-build base saved with `type: wise-view-gantt-beta` must change its type to
-`wise-view-gantt`; that id was never released and is not registered.
+`unimian-gantt`; neither the beta id nor the old `wise-view-gantt` id is registered now.
 
 ## 4. Non-goals
 
@@ -325,7 +329,7 @@ dependency editor for Frappe) is superseded by Gantt's built-in link drawing.
 
 ## 10. Definition of done (Gantt workstream)
 
-1. Gantt is registered as `wise-view-gantt` and every §3 behavior works, including all
+1. Gantt is registered as `unimian-gantt` and every §3 behavior works, including all
    §3.4 write paths.
 2. All options in §3.6 are exposed through Bases and persisted in the view config.
 3. Writes happen only through mutation capabilities; guard tests from §7 pass.
@@ -347,7 +351,7 @@ Gantt may replace Frappe Gantt when all hold:
 
 Then a new workstream ("Gantt Frappe removal") is created with its own spec/plan/tasks: remove
 `frappe-gantt`, `BasesGanttView.ts`, its CSS scoping in `esbuild.config.mjs`, its notices and
-provenance entries, the `wise-view-gantt` registration, and document how users switch their
+provenance entries, the former `wise-view-gantt` registration, and document how users switch their
 `.base` views (D3).
 
 ### Decision (2026-09-20)

@@ -5,7 +5,7 @@
  * Shared color resolution (T020, spec §7.8).
  *
  * Consolidates what used to be duplicated across BasesCalendarView and BasesSwimlaneView:
- * explicit color property, Pretty Properties integration, Wise View `valueStyles`
+ * explicit color property, Pretty Properties integration, Unimian `valueStyles`
  * compatibility settings, and a deterministic theme-aware fallback — in that priority order.
  * Pure and framework-agnostic: callers inject the Pretty Properties lookup and valueStyles
  * lookup rather than this module touching `window`/plugin settings itself (spec §7.9).
@@ -87,7 +87,7 @@ export function resolveColor(inputs: ColorResolverInputs): ResolvedColor {
 /** Semantic CSS variables a renderer can set on an element's `style`, instead of hardcoding properties. */
 export function toCssVariables(resolved: ResolvedColor): Record<string, string> {
 	return {
-		'--wise-view-color-bg': resolved.background,
-		'--wise-view-color-fg': resolved.foreground,
+		'--unimian-color-bg': resolved.background,
+		'--unimian-color-fg': resolved.foreground,
 	};
 }
