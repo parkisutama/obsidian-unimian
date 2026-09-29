@@ -84,6 +84,7 @@ export class BasesCalendarView extends BasesView {
   private calendarEl: HTMLElement | null = null;
   private calendar: Calendar | null = null;
   private currentView: CalendarViewType | null = null; // null means use config default
+  private renderedDefaultView: CalendarViewType | null = null;
   private yearViewSplit: boolean = true; // true = multiMonthYear (split), false = dayGridYear (continuous)
   // Captured from each button's didMount hook; FullCalendar 7 renders buttons with hashed classes.
   private buttonEls: Partial<Record<ManagedButton, HTMLElement>> = {};
@@ -251,15 +252,19 @@ export class BasesCalendarView extends BasesView {
   }
 
   private render(): void {
-    // Preserve current view and date if calendar exists
+    const defaultView = this.getDefaultView();
+    // Preserve the user's in-calendar selection across data refreshes, but honor a changed
+    // defaultView when Obsidian switches this instance to another saved Bases view.
+    const defaultViewChanged = this.renderedDefaultView !== null && this.renderedDefaultView !== defaultView;
     let currentDate: Date | undefined;
     let currentViewType: CalendarViewType | undefined;
     if (this.calendar) {
       currentDate = this.calendar.getDate();
-      currentViewType = this.calendar.view?.type as CalendarViewType;
+      currentViewType = defaultViewChanged ? defaultView : this.calendar.view?.type as CalendarViewType;
       this.calendar.destroy();
       this.calendar = null;
     }
+    this.renderedDefaultView = defaultView;
 
     // Re-setup the container if needed
     if (!this.calendarEl || !this.calendarEl.isConnected) {
