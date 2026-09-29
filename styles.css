@@ -1246,6 +1246,15 @@ body.unimian-quick-preview-active .hover-popover {
 	padding: 8px;
 }
 
+/* On phones, Obsidian's bottom navigation overlays the workspace. Reserve its action-row
+   height plus the device safe area so the last calendar rows can scroll above the overlay. */
+body.is-phone .planner-bases-calendar {
+	padding-bottom: calc(
+		var(--mobile-toolbar-height, 40px) +
+		max(var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)), var(--size-4-4, 16px))
+	);
+}
+
 /* 3.1 — Container & palette
    -------------------------------------------------------------------------- */
 .planner-bases-calendar .planner-calendar-container {
