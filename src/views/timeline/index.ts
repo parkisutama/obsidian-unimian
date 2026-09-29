@@ -10,7 +10,7 @@ export { BASES_TIMELINE_VIEW_ID, BasesTimelineView } from './BasesTimelineView';
 export function createTimelineViewRegistration(plugin: UnimianPlugin): BasesViewRegistration {
 	return {
 		name: 'Timeline',
-		icon: 'calendar-range',
+		icon: 'milestone',
 		factory: (controller: QueryController, containerEl: HTMLElement) =>
 			new BasesTimelineView(controller, containerEl, plugin),
 		options: () => getTimelineViewOptions(),
