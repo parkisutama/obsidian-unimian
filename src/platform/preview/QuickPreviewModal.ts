@@ -85,7 +85,11 @@ export class QuickPreviewModal extends Modal {
 			}
 		}
 
-		const detached = await openDetachedMarkdownLeaf(this.app, file);
+		// Detached Markdown leaves open in the editor's native state on some mobile devices,
+		// which immediately focuses the editor and raises the software keyboard. Mobile quick
+		// preview is intentionally read-only so opening a note remains a viewing action.
+		const isMobile = document.body.classList.contains('is-mobile');
+		const detached = isMobile ? null : await openDetachedMarkdownLeaf(this.app, file);
 		if (this.closed) {
 			if (detached) closeDetachedLeaf(detached);
 			return;
