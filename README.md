@@ -135,8 +135,13 @@ interactions may need platform-specific testing on Android and iOS.
 
 ## Privacy and data handling
 
-Unimian reads and writes notes through Obsidian's vault APIs. It does not use network requests,
-telemetry, analytics, account sign-in, payments, ads, or files outside your vault.
+Unimian reads and writes notes through Obsidian's vault APIs. It does not use telemetry, analytics,
+account sign-in, payments, ads, or files outside your vault, and it sends no data anywhere.
+
+One case loads content from the network: when a note's cover property holds an `http://` or
+`https://` image address, the card shows that image, so Obsidian requests it from that server.
+The server can see your IP address, as with any remote image in a note. Covers that point to files
+in your vault involve no network request.
 
 ---
 

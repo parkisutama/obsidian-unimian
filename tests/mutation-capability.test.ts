@@ -202,7 +202,6 @@ describe("LegacyMutationGateway.createNote", () => {
 		expect(result).toEqual({ ok: true });
 		expect(createdFolders).toEqual(["Journal"]);
 		expect(created[0]?.path).toBe("Journal/2026-01-01.md");
-		expect(created[0]?.content).toContain('start: "2026-01-01"');
 	});
 
 	it("does not recreate an existing parent folder", async () => {

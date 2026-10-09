@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Parkis Utama
 
 import { type App, Notice, normalizePath, type TFile, type TFolder } from "obsidian";
+import { assertInsideVault } from "../core/paths/vaultPath";
 
 /**
  * The one place a note is created from a template file (docs/specs/note-template.md).
@@ -68,6 +69,7 @@ export function noticePlainTemplate(): void {
 }
 
 export async function ensureFolder(app: App, folder: string): Promise<void> {
+	assertInsideVault(folder);
 	if (!folder || app.vault.getFolderByPath(folder)) return;
 	let current = "";
 	for (const part of folder.split("/").filter(Boolean)) {
@@ -79,7 +81,7 @@ export async function ensureFolder(app: App, folder: string): Promise<void> {
 /** First free `Title.md`, `Title 2.md`, ... in the folder. */
 export function availablePath(app: App, folder: string, title: string): string {
 	const join = (name: string) => normalizePath(folder ? `${folder}/${name}.md` : `${name}.md`);
-	let path = join(title);
+	let path = assertInsideVault(join(title));
 	for (let counter = 2; app.vault.getAbstractFileByPath(path); counter += 1) {
 		path = join(`${title} ${counter}`);
 	}
@@ -103,6 +105,7 @@ export async function createNoteFromTemplate(
 	engine: Exclude<TemplateEngine, "plain">,
 	request: TemplateNoteRequest,
 ): Promise<TFile> {
+	assertInsideVault(request.path);
 	const slash = request.path.lastIndexOf("/");
 	const folderPath = slash >= 0 ? request.path.slice(0, slash) : "";
 	const basename = request.path.slice(slash + 1).replace(/\.md$/, "");
