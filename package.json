@@ -7,6 +7,7 @@
 		"node": ">=24"
 	},
 	"scripts": {
+		"prepare": "husky",
 		"dev": "node esbuild.config.mjs",
 		"build": "node esbuild.config.mjs production",
 		"deploy": "pnpm run build && node scripts/vault-copy.mjs",
@@ -21,7 +22,7 @@
 		"conformance": "node --test conformance/standard.test.mjs",
 		"version:sync": "node scripts/sync-version.mjs",
 		"check": "pnpm run typecheck && pnpm run lint && pnpm run lint:obsidian && pnpm run lint:md && pnpm run test",
-		"verify": "pnpm run typecheck && pnpm run lint && pnpm run lint:obsidian && pnpm run lint:md && pnpm run test:coverage && pnpm run build && pnpm run verify:artifacts"
+		"verify": "pnpm run typecheck && pnpm run lint && pnpm run lint:obsidian && pnpm run lint:md && pnpm run test:coverage && pnpm run build && pnpm run verify:artifacts && pnpm run conformance"
 	},
 	"keywords": [
 		"obsidian",
@@ -37,6 +38,8 @@
 	"license": "GPL-3.0-only",
 	"devDependencies": {
 		"@biomejs/biome": "2.5.15",
+		"@commitlint/cli": "^21.2.3",
+		"@commitlint/config-conventional": "^21.2.3",
 		"@eslint/json": "0.14.0",
 		"@types/node": "^24.19.0",
 		"@typescript-eslint/parser": "^8.71.1",
@@ -45,6 +48,7 @@
 		"eslint": "^9.39.5",
 		"eslint-plugin-obsidianmd": "^0.4.2",
 		"happy-dom": "^20.14.5",
+		"husky": "^9.1.7",
 		"obsidian": "1.14.4",
 		"rumdl": "^0.2.78",
 		"typescript": "^6.0.3",
