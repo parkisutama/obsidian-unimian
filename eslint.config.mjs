@@ -12,14 +12,7 @@ const obsidianRules = Object.fromEntries(
 
 export default defineConfig([
 	{
-		ignores: [
-			"node_modules/**",
-			"dist/**",
-			"main.js",
-			"styles.css",
-			"lint-output.json",
-			"versions.json",
-		],
+		ignores: ["node_modules/**", "dist/**", "lint-output.json", "versions.json"],
 	},
 	{
 		files: ["src/**/*.ts"],

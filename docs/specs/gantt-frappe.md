@@ -132,7 +132,6 @@ Record here any change in a shared module that affects Frappe Gantt (gantt.md §
   phase dates" option is on, those can differ from Gantt's rolled-up summary dates.
 - **Order property.** Gantt may write an Order property. Frappe Gantt ignores it and
   keeps following the Bases sort.
-
 - **GBETA-016 review.** Shared modules touched by Gantt (`src/core/gantt/dependencies.ts`,
   `NoteTemplateService.prepareNote`, `LegacyMutationGateway.setDependencies`) changed only additively
   for Frappe: the one helper Frappe imports (`toGanttWikiLink`) is unchanged. Gantt's

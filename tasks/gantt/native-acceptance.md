@@ -177,4 +177,3 @@ test regresi.
   scan kuadratik di GBETA-016).
 
 Ditutup sementara oleh maintainer 2026-09-23: cukup untuk saat ini, lanjut nanti kalau ada temuan baru.
-

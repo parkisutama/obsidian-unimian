@@ -484,9 +484,9 @@ Final decision:
 
 ---
 
-# LLM audit prompt pack
+## LLM audit prompt pack
 
-## Prompt 1 — Full repository audit
+### Prompt 1 — Full repository audit
 
 Use this prompt when the LLM can read the whole repository.
 
@@ -587,7 +587,7 @@ Rules:
 
 ---
 
-## Prompt 2 — Policy, privacy, and security audit
+### Prompt 2 — Policy, privacy, and security audit
 
 ```text
 Audit this Obsidian plugin for policy, privacy, and security risks.
@@ -615,6 +615,7 @@ rg "api[_-]?key|token|secret|password|bearer|authorization" .
 ```
 
 Output:
+
 1. Executive risk summary.
 2. Blocker findings.
 3. High-risk findings.
@@ -623,11 +624,13 @@ Output:
 6. Exact fixes and verification steps.
 
 Rules:
+
 - Treat hidden telemetry and self-update mechanisms as blockers.
 - Treat undisclosed network use as high severity or blocker depending on impact.
 - Treat unsafe DOM with user-controlled input as high severity or blocker.
 - Do not assume network use is acceptable just because it is documented in code; it must be disclosed to users.
-```
+
+```text
 
 ---
 
@@ -671,7 +674,7 @@ Use this final decision:
 
 ---
 
-## Prompt 4 — Obsidian API and lifecycle audit
+### Prompt 4 — Obsidian API and lifecycle audit
 
 ```text
 Audit the plugin’s use of the Obsidian API and lifecycle patterns.
@@ -702,6 +705,7 @@ rg "vault\.modify|vault\.process|processFrontMatter|vault\.adapter|getFiles\(\).
 ```
 
 Output:
+
 - API misuse findings.
 - Lifecycle leak risks.
 - File operation risks.
@@ -709,9 +713,11 @@ Output:
 - Verification plan.
 
 Rules:
+
 - Do not recommend large rewrites unless the current pattern creates clear risk.
 - Prefer small, reviewable refactors.
-```
+
+```text
 
 ---
 
@@ -769,7 +775,7 @@ Rules:
 
 ---
 
-## Prompt 6 — Beta test plan generator
+### Prompt 6 — Beta test plan generator
 
 ```text
 Create a beta test plan for this Obsidian plugin.
@@ -801,7 +807,7 @@ Use clear numbered steps for procedures and concise tables for test cases.
 
 ---
 
-## Prompt 7 — Fix plan from audit findings
+### Prompt 7 — Fix plan from audit findings
 
 ```text
 Convert these Obsidian plugin audit findings into an implementation plan.
@@ -844,7 +850,7 @@ Suggested commit:
 
 ---
 
-## 15. Practical audit workflow
+### 15. Practical audit workflow
 
 Use this workflow with an LLM coding agent or manual review.
 
@@ -863,7 +869,7 @@ Use this workflow with an LLM coding agent or manual review.
 
 ---
 
-## 16. Recommended repository commands
+### 16. Recommended repository commands
 
 Adapt these to the plugin repository.
 
@@ -893,7 +899,7 @@ rg "innerHTML|outerHTML|insertAdjacentHTML|eval\(|new Function|fetch\(|requestUr
 
 ---
 
-## 17. Minimum release gate
+### 17. Minimum release gate
 
 Do not release or submit until all of these are true:
 
@@ -911,4 +917,3 @@ Do not release or submit until all of these are true:
 - GitHub release has individual `main.js`, `manifest.json`, and optional `styles.css` assets.
 - README explains purpose, usage, platform support, privacy/data handling, and limitations.
 - Beta testers have validated the main workflows on supported platforms.
-

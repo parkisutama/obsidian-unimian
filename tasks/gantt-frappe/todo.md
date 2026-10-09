@@ -43,6 +43,7 @@ listener leak — characterize its presence, don't fix it here).
 ## Phase 2: Extract modules
 
 ### GAN-002: Extract task data mapping, the Frappe Gantt lifecycle wrapper, WBS sidebar, and options
+
 **Status:** Deferred (frozen 2026-09-19)
 
 **Description:** Move each concern in `docs/specs/gantt-frappe.md` §5's table into its own module under
@@ -64,6 +65,7 @@ listener leak — characterize its presence, don't fix it here).
 ## Phase 3: Frappe Gantt listener leak
 
 ### GAN-003: Investigate a version/API fix for the listener leak
+
 **Status:** Deferred (frozen 2026-09-19)
 
 **Description:** Check for a Frappe Gantt version newer than 1.2.2 that fixes the leak, and any
@@ -83,6 +85,7 @@ supported teardown/suppress option added since. Record findings in `docs/specs/g
 **Estimated scope:** S
 
 ### GAN-004: Implement the chosen listener-leak resolution
+
 **Status:** Deferred (frozen 2026-09-19)
 
 **Description:** Implement whichever path GAN-003's findings and the maintainer's sign-off
@@ -133,6 +136,7 @@ the interaction approach).
 ## Phase 5: Native acceptance
 
 ### GAN-006: Native desktop/mobile smoke test
+
 **Status:** Deferred (frozen 2026-09-19)
 
 **Description:** Manually verify bar drag/resize, WBS sidebar, view-mode switching, progress

@@ -6,7 +6,7 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"includes": ["**", "!pnpm-lock.yaml", "!styles.css", "!tests/fixtures/css-merge"]
+		"includes": ["**", "!pnpm-lock.yaml", "!tests/fixtures/css-merge"]
 	},
 	"formatter": {
 		"indentStyle": "tab",

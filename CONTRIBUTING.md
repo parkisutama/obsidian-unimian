@@ -26,7 +26,7 @@ Recommended branch naming:
 
 ## Local Development
 
-Unimian builds with esbuild and outputs the Obsidian plugin artifacts at the repo root:
+Unimian builds with esbuild and writes the Obsidian plugin artifacts to `dist/`:
 
 - `main.js`
 - `manifest.json`
@@ -45,6 +45,9 @@ pnpm run dev
 ```
 
 The dev build watches source files and copies the plugin artifacts to the configured vault plugin path when builds succeed.
+`pnpm run deploy` builds and copies once, and fails when the path is not set.
+`pnpm run build` alone never writes outside the repository.
+The copy is refused unless the folder is named `unimian` and its parent `plugins` folder exists.
 
 ## Checks
 
@@ -54,19 +57,19 @@ Run the full local quality gate before opening a pull request:
 pnpm run check
 ```
 
-The gate runs Biome lint, Obsidian ESLint rules, TypeScript `--noEmit`, and Vitest. Linting is read-only. To apply safe formatter/linter writes explicitly, run:
+The gate runs TypeScript `--noEmit`, Biome (lint and format), Obsidian ESLint rules, the Markdown lint, and Vitest. Linting is read-only. To apply safe formatter/linter writes explicitly, run:
 
 ```bash
-pnpm run lint:fix
+pnpm run fix
 ```
 
-CI uses the stricter release-oriented gate:
+CI runs the full gate, which you can run locally with the same command:
 
 ```bash
-pnpm run check:ci
+pnpm run verify
 ```
 
-That command runs the same lint and typecheck steps, runs the tests with coverage thresholds (`pnpm run test:coverage`), creates a production build, and verifies that `main.js`, `manifest.json`, and `styles.css` exist, are non-empty, and start with the license banner defined in `scripts/license-banner.mjs`. The production build also fails when it bundles an npm package version that `THIRD_PARTY_NOTICES.md` does not list.
+That command runs the same lint and typecheck steps, runs the tests with coverage thresholds (`pnpm run test:coverage`), creates a production build, and verifies that `main.js`, `manifest.json`, and `styles.css` exist in `dist/`, are non-empty, and start with the license banner defined in `scripts/license-banner.mjs`. The production build also fails when it bundles an npm package version that `THIRD_PARTY_NOTICES.md` does not list.
 
 ## Tests
 
@@ -90,14 +93,14 @@ gate on Linux, plus the tests on Windows. Make the `Lint, typecheck, test, build
 
 ## Versioning
 
-Use `pnpm version` so the `version` lifecycle script runs. Pass an empty tag prefix: the
-release workflow requires the tag to equal `manifest.json.version` (`1.2.3`, not `v1.2.3`).
+Set the version with `version:sync`. The release workflow requires the tag to equal
+`manifest.json.version` (`1.2.3`, not `v1.2.3`).
 
 ```bash
-pnpm version patch --tag-version-prefix=""
+pnpm run version:sync 1.2.3
 ```
 
-The version script syncs `manifest.json` to the package version and writes `versions[version] = manifest.minAppVersion` in `versions.json`.
+The script writes the version to `package.json` and `manifest.json` and adds `versions[version] = manifest.minAppVersion` to `versions.json`. It does not commit or tag.
 
 Review the resulting diff before tagging or pushing.
 
@@ -110,7 +113,7 @@ git push origin main
 git push origin 1.2.3
 ```
 
-The GitHub release workflow installs with `pnpm install --frozen-lockfile`, runs `pnpm run check:ci`, uploads `main.js`, `manifest.json`, `styles.css`, `LICENSE`, and `THIRD_PARTY_NOTICES.md`, and attaches `unimian.zip` containing all five.
+The GitHub release workflow installs with `pnpm install --frozen-lockfile`, runs `pnpm run verify`, uploads `main.js`, `manifest.json`, and `styles.css` from `dist/` together with `LICENSE` and `THIRD_PARTY_NOTICES.md`, and attaches `unimian.zip` containing all five.
 
 ## Manual QA Checklist
 

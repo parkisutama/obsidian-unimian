@@ -3,7 +3,7 @@
 > **A focused, task-management-agnostic view enrichment plugin for Obsidian Bases.**
 
 Unimian adds Calendar, Swimlane, Gantt, and Timeline views directly into Obsidian Bases — without
-any opinion about *how* you manage your tasks or which plugin you use for that.  Your data model is
+any opinion about *how* you manage your tasks or which plugin you use for that. Your data model is
 yours. This plugin just gives you richer ways to look at it.
 
 ---
@@ -88,7 +88,7 @@ introduce no hidden task schema.
    pnpm run build
    ```
 
-2. Copy `main.js`, `manifest.json`, and `styles.css` to your vault:
+2. Copy `main.js`, `manifest.json`, and `styles.css` from `dist/` to your vault:
 
    ```text
    <Vault>/.obsidian/plugins/unimian/
@@ -214,7 +214,8 @@ pnpm run dev
 pnpm run build
 ```
 
-The build output is `main.js` at the project root.
+The build output (`main.js`, `manifest.json`, `styles.css`) is written to `dist/`.
+`pnpm run deploy` builds and copies it to the test vault named in `.env`.
 
 ---
 

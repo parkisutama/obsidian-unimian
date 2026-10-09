@@ -2,7 +2,6 @@
 	"name": "obsidian-unimian",
 	"version": "1.0.3",
 	"description": "Add Calendar, Swimlane, Gantt, and Timeline views to Bases without prescribing a task management workflow.",
-	"main": "main.js",
 	"packageManager": "pnpm@12.10.1",
 	"engines": {
 		"node": ">=24"
@@ -10,17 +9,19 @@
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "node esbuild.config.mjs production",
+		"deploy": "pnpm run build && node scripts/vault-copy.mjs",
 		"typecheck": "tsc --noEmit",
 		"lint": "biome check --diagnostic-level=error",
-		"lint:fix": "biome check --write",
 		"lint:obsidian": "eslint src manifest.json LICENSE",
+		"lint:md": "rumdl check .",
+		"fix": "biome check --write && rumdl check --fix .",
 		"test": "node scripts/run-vitest.mjs",
 		"test:coverage": "node scripts/run-vitest.mjs --coverage",
 		"verify:artifacts": "node scripts/verify-build-artifacts.mjs",
 		"conformance": "node --test conformance/standard.test.mjs",
-		"check": "pnpm run lint && pnpm run lint:obsidian && pnpm run typecheck && pnpm run test",
-		"check:ci": "pnpm run lint && pnpm run lint:obsidian && pnpm run typecheck && pnpm run test:coverage && pnpm run build && pnpm run verify:artifacts",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
+		"version:sync": "node scripts/sync-version.mjs",
+		"check": "pnpm run typecheck && pnpm run lint && pnpm run lint:obsidian && pnpm run lint:md && pnpm run test",
+		"verify": "pnpm run typecheck && pnpm run lint && pnpm run lint:obsidian && pnpm run lint:md && pnpm run test:coverage && pnpm run build && pnpm run verify:artifacts"
 	},
 	"keywords": [
 		"obsidian",
@@ -45,6 +46,7 @@
 		"eslint-plugin-obsidianmd": "^0.4.2",
 		"happy-dom": "^20.14.5",
 		"obsidian": "1.14.4",
+		"rumdl": "^0.2.78",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.71.1",
 		"vitest": "^5.0.3"
@@ -54,5 +56,6 @@
 		"fullcalendar": "^7.1.0",
 		"preact": "^10.29.8",
 		"temporal-polyfill": "^1.0.5"
-	}
+	},
+	"private": true
 }

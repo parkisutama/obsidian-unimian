@@ -104,8 +104,8 @@ one property serves both cases without asking the user to pick a mode.
 
 - [x] Card accent color matches the configured property.
 - [~] Falls through Pretty Properties → valueStyles → deterministic fallback exactly like
-      Swimlane — code path confirmed identical (`resolveFieldColor`'s pattern reused); native
-      confirmation against a Pretty-Properties-configured Base still pending (STICKY-010).
+  Swimlane — code path confirmed identical (`resolveFieldColor`'s pattern reused); native
+  confirmation against a Pretty-Properties-configured Base still pending (STICKY-010).
 
 **Dependencies:** STICKY-003.
 
@@ -260,6 +260,7 @@ Five real causes found and fixed 2026-09-22–23, ending with the virtualization
 maintainer explicitly asked for.
 
 **Fixes landed:**
+
 1. **Layout thrashing in `masonry.ts`** — write-then-read-then-write per card forced a
    synchronous reflow on every single card. Restructured into three passes (write all widths,
    read all heights once, compute placement in pure JS, write all positions).
@@ -286,6 +287,7 @@ maintainer explicitly asked for.
    is now scoped specifically to `file.extension === 'base'`, since it doesn't apply to images/PDFs.
 
 **Retest findings (2026-09-23, real 515-note Base) and fixes:**
+
 - Quick Preview now "feels natural, faster than before" — confirms its earlier reported delay
   was downstream contention from the Sticky Note view's own render cost, not a separate bug in
   Quick Preview itself. Nothing further changed there.
