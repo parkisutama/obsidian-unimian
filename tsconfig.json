@@ -3,8 +3,9 @@
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"module": "ESNext",
-		"target": "ES6",
+		"target": "ES2022",
 		"allowJs": true,
+		"strict": true,
 		"noImplicitAny": true,
 		"noImplicitThis": true,
 		"noImplicitReturns": true,
@@ -25,7 +26,6 @@
 	},
 	"include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.mts"],
 	"exclude": [
-		"node_modules",
-		"src/services/LpcHost.ts"
+		"node_modules"
 	]
 }

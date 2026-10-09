@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import esbuild from "esbuild";
 import process from "process";
 import { builtinModules } from 'node:module';
@@ -16,8 +15,8 @@ import { UI_RUNTIME_ALIASES } from "./scripts/ui-runtime-aliases.mjs";
 const prod = (process.argv[2] === "production");
 
 // Load environment variables from .env file for development copy targets.
-if (!prod) {
-	dotenv.config();
+if (!prod && fs.existsSync(".env")) {
+	process.loadEnvFile(".env");
 }
 
 // Plugin to load HTML files as strings for mobile-compatible bundled assets.
