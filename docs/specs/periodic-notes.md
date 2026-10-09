@@ -55,7 +55,6 @@ already organized by it works without moving files.
    template are all resolved from the clicked (target) date, including dates in the future that
    have no note yet. With Templater this removes the "today" problem, because the file name
    carries the date and the template reads it (decision 11).
-
 10. **ISO 8601 is the default and the preset.** Week: `GGGG`/`WW` (Monday start, week one holds
     4 January). Preset patterns, root supplied by the user: day `YYYY/YYYY-MM/YYYY-MM-DD`, week
     `GGGG/GGGG-[W]WW`, month `YYYY/YYYY-MM`, quarter `YYYY/YYYY-[Q]Q` (ISO 8601 has no quarter
@@ -213,6 +212,7 @@ types. Layout and styling were not visible there, so placement is confirmed nati
 - No global (plugin-level) periodic settings; per-view only (decision 2).
 
 ## 5. Open questions (resolved in PN-001 — see §2/§2b's decisions; kept below as the record of
+
 what was asked)
 
 - Week numbering: ISO weeks (`gggg-[W]ww`, Monday start) versus following the view's

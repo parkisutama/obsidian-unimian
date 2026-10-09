@@ -3,6 +3,7 @@
 # esbuild runs a postinstall script that validates its platform binary.
 allowBuilds:
   esbuild: true
+  rumdl: true
 
 # @jaeungkim/gantt-chart declares react/react-dom peers; Unimian resolves them to preact/compat
 # through build aliases (scripts/ui-runtime-aliases.mjs) and must not install React.

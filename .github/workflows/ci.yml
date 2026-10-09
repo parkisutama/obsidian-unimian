@@ -33,14 +33,10 @@ jobs:
                   cache: "pnpm"
             - run: pnpm install --frozen-lockfile
 
-            - name: Lint
-              run: pnpm run lint
-            - name: Obsidian lint
-              run: pnpm run lint:obsidian
-            - name: Typecheck (src and tests)
-              run: pnpm run typecheck
-            - name: Test with coverage thresholds
-              run: pnpm run test:coverage
+            # The same entry point a developer runs locally: typecheck, lint, tests with coverage,
+            # build (fails on unattributed bundled packages), and artifact verification.
+            - name: Verify
+              run: pnpm run verify
             - name: Upload coverage report
               if: ${{ !cancelled() }}
               uses: actions/upload-artifact@v7
@@ -48,10 +44,6 @@ jobs:
                   name: coverage
                   path: coverage/
                   if-no-files-found: ignore
-            - name: Build (fails on unattributed bundled packages)
-              run: pnpm run build
-            - name: Verify build artifacts and license banners
-              run: pnpm run verify:artifacts
 
     test-windows:
         # The test runner once failed only on Windows (pnpm is a .cmd shim there).

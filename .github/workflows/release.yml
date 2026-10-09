@@ -41,10 +41,10 @@ jobs:
                   fi
 
             - name: Check and build plugin
-              run: pnpm run check:ci
+              run: pnpm run verify
 
             - name: Package plugin zip
-              run: zip unimian.zip main.js manifest.json styles.css LICENSE THIRD_PARTY_NOTICES.md
+              run: zip -j unimian.zip dist/main.js dist/manifest.json dist/styles.css LICENSE THIRD_PARTY_NOTICES.md
 
             - name: Create release
               env:
@@ -55,4 +55,4 @@ jobs:
                   gh release create "$tag" \
                     --title="$tag" \
                     --generate-notes \
-                    main.js manifest.json styles.css LICENSE THIRD_PARTY_NOTICES.md unimian.zip
+                    dist/main.js dist/manifest.json dist/styles.css LICENSE THIRD_PARTY_NOTICES.md unimian.zip

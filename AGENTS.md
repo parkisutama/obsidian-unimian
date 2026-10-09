@@ -29,7 +29,7 @@ This project is a heavily modified derivative work. When generating or modifying
 
 - **Language:** TypeScript (`"strict": true`).
 - **Target:** Obsidian Desktop and Mobile (`isDesktopOnly: false`).
-- **Bundler:** esbuild (Output: `main.js`).
+- **Bundler:** esbuild (Output: `dist/`).
 - **Libraries:**
   - `obsidian` (Obsidian Plugin API)
   - `@jaeungkim/gantt-chart` and `preact` (Gantt chart visualization)
@@ -63,4 +63,4 @@ This project is a heavily modified derivative work. When generating or modifying
 
 - Use sentence case for UI elements.
 - Ensure all views remain responsive to Obsidian's pane resizing.
-- Delegate UI styling to `styles.css` using Obsidian's standard CSS variables (`var(--background-primary)`, `var(--text-normal)`, etc.) combined with `pretty-properties` variables.
+- Delegate UI styling to the CSS modules under `src/styles/` (merged into `dist/styles.css`) using Obsidian's standard CSS variables (`var(--background-primary)`, `var(--text-normal)`, etc.) combined with `pretty-properties` variables.

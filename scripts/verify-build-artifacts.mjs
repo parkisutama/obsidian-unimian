@@ -52,7 +52,7 @@ export function verifyBuildArtifacts({
 
 const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
 if (isDirectRun) {
-	const result = verifyBuildArtifacts();
+	const result = verifyBuildArtifacts({ cwd: path.join(process.cwd(), "dist") });
 	if (!result.ok) {
 		console.error("Build artifact verification failed.");
 		if (result.missing.length > 0) {
@@ -69,5 +69,5 @@ if (isDirectRun) {
 		}
 		process.exit(1);
 	}
-	console.log(`Verified build artifacts: ${REQUIRED_BUILD_ARTIFACTS.join(", ")}`);
+	console.log(`Verified build artifacts in dist/: ${REQUIRED_BUILD_ARTIFACTS.join(", ")}`);
 }

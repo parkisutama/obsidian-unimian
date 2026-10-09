@@ -96,7 +96,6 @@ API (`app.plugins.plugins['templater-obsidian']`) or the core Templates plugin
    in the `titleFormat` option, and only there.
 4. **Calendar notes with a template but no `targetFolder`** are created in Obsidian's new-note
    folder instead of through `createFileForView`, which was the source of the overwrite race.
-
 5. **Scope boundary (maintainer, 2026-09-21).** Note Template covers only the Templater / core
    Templates integration for event and task notes (Calendar event creation, Gantt create-note).
    The daily-note flow is not owned here: it has evolved into Periodic Notes
