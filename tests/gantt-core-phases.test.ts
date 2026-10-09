@@ -65,7 +65,10 @@ describe('Gantt phase tree (GBETA-007)', () => {
 
 	it('maintains parent/sequence consistency across deterministic random trees', () => {
 		let state = 0x5eed;
-		const random = () => (state = (state * 1664525 + 1013904223) >>> 0) / 0x1_0000_0000;
+		const random = () => {
+			state = (state * 1664525 + 1013904223) >>> 0;
+			return state / 0x1_0000_0000;
+		};
 		for (let run = 0; run < 100; run += 1) {
 			const inputs: PhaseInput[] = [];
 			for (let index = 0; index < 40; index += 1) {

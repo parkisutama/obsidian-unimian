@@ -59,9 +59,9 @@ describe("syncVersionFiles", () => {
 });
 
 describe("manifest compatibility and naming", () => {
-	it("declares the minimum Obsidian version that createFileForView already requires", () => {
+	it("declares the minimum supported Obsidian version", () => {
 		const manifest = readRepoJson("manifest.json");
-		expect(manifest.minAppVersion).toBe("1.10.2");
+		expect(manifest.minAppVersion).toBe("1.14.4");
 	});
 
 	it("describes the plugin's current views without stale Kanban naming", () => {

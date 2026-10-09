@@ -218,7 +218,7 @@ export class BasesGanttView extends BasesView {
 		const taskNames = new Map(chartTasks.map(task => [task.id, task.name]));
 		const freshCycles = mapped.cycles.filter(path => !this.reportedCycles.has(path));
 		if (freshCycles.length) {
-			freshCycles.forEach(path => this.reportedCycles.add(path));
+			freshCycles.forEach(path => { this.reportedCycles.add(path); });
 			new Notice(`Gantt ignored cyclic parent links: ${freshCycles.join(', ')}`);
 		}
 		const freshUnresolved = mapped.unresolved.filter(link => !this.reportedUnresolved.has(`${link.path}::${link.target}`));

@@ -308,6 +308,16 @@ body.unimian-quick-preview-active .hover-popover {
 	box-shadow: none !important;
 }
 
+.unimian-quick-preview .view-header-title-container {
+	min-width: 0;
+}
+
+.unimian-quick-preview .view-header-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .unimian-quick-preview-title {
 	margin: 0 0 12px;
 	overflow: hidden;
@@ -379,20 +389,72 @@ body.unimian-quick-preview-active .hover-popover {
 
 @media (max-width: 600px) {
 	.unimian-quick-preview.modal {
-		width: 96vw;
-		height: 92vh;
+		width: calc(100vw - 20px);
+		height: min(92dvh, calc(100dvh - 32px));
+		max-width: calc(100vw - 20px);
+		max-height: calc(100dvh - 32px);
+		border-radius: var(--radius-l);
+		overflow: hidden;
+	}
+
+	.unimian-quick-preview .modal-content {
+		padding: 24px 14px 12px;
+	}
+
+	.unimian-quick-preview .view-header {
+		flex: 0 0 var(--header-height);
+		min-width: 0;
+		padding-inline: 4px;
+	}
+
+	.unimian-quick-preview .view-header-title-container {
+		flex: 1 1 auto;
+	}
+
+	.unimian-quick-preview .view-header-title {
+		font-size: var(--font-ui-medium);
+	}
+
+	.unimian-quick-preview .view-actions {
+		flex: 0 0 auto;
 	}
 
 	.unimian-quick-preview-layout {
 		flex-direction: column;
+		gap: 12px;
+		overflow: hidden;
 	}
 
 	.unimian-quick-preview-body {
-		flex: 2 1 0;
+		flex: 1 1 auto;
+		width: 100%;
+		font-size: var(--font-text-size);
+		line-height: var(--line-height-normal);
+	}
+
+	.unimian-quick-preview-body > :first-child {
+		margin-top: 0;
+	}
+
+	.unimian-quick-preview-body > * {
+		max-width: 100%;
+	}
+
+	.unimian-quick-preview-body--leaf .workspace-leaf-content,
+	.unimian-quick-preview-body--leaf .markdown-reading-view,
+	.unimian-quick-preview-body--leaf .markdown-source-view {
+		min-width: 0;
+		font-size: var(--font-text-size);
+	}
+
+	.unimian-quick-preview-body--leaf .markdown-preview-sizer,
+	.unimian-quick-preview-body--leaf .markdown-source-view.mod-cm6 .cm-content {
+		max-width: 100%;
 	}
 
 	.unimian-quick-preview-backlinks {
-		flex: 1 1 0;
+		flex: 0 0 auto;
+		max-height: 24%;
 		border-left: none;
 		border-top: 1px solid var(--background-modifier-border);
 		padding-left: 0;
@@ -1563,7 +1625,6 @@ body.is-phone .planner-bases-calendar {
 	opacity: 0.6;
 	text-decoration: line-through;
 }
-
 
 /*! SPDX-License-Identifier: GPL-3.0-only AND MIT
  * Portions adapted from obsidian-project-manager styles.css

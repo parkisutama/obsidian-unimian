@@ -652,7 +652,7 @@ export class TimelineRenderer {
 	}
 
 	private renderToday(layout: TimelineLayout): void {
-		this.containerEl.querySelectorAll('.unimian-timeline__today, .unimian-timeline__today-line, .unimian-timeline__edge').forEach(el => el.remove());
+		this.containerEl.querySelectorAll('.unimian-timeline__today, .unimian-timeline__today-line, .unimian-timeline__edge').forEach(el => { el.remove(); });
 		if (layout.todayEdge === 'inside') {
 			const ticks = this.headerCanvas.querySelector<HTMLElement>('.unimian-timeline__ticks') ?? this.headerCanvas;
 			const marker = ticks.createDiv({ cls: 'unimian-timeline__today', text: String(this.currentToday?.day ?? '') });

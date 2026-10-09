@@ -70,7 +70,7 @@ introduce no hidden task schema.
 
 ## Requirements
 
-- Obsidian **1.10.0** or later (requires Bases API)
+- Obsidian **1.14.4** or later
 - Desktop is supported.
 - Mobile is enabled (`isDesktopOnly: false`) and should be treated as best-effort until Android
   and iOS testing is complete.

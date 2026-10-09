@@ -602,7 +602,7 @@ export class BasesSwimlaneView extends BasesView {
     );
 
     // Observe all placeholders
-    placeholders.forEach(placeholder => observer.observe(placeholder));
+    placeholders.forEach(placeholder => { observer.observe(placeholder); });
 
     // Store observer for cleanup
     this.virtualScrollObservers.set(container, observer);

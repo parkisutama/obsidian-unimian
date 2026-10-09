@@ -45,7 +45,7 @@
 		"eslint-plugin-obsidianmd": "^0.4.2",
 		"happy-dom": "^20.14.5",
 		"jiti": "^2.6.1",
-		"obsidian": "1.13.1",
+		"obsidian": "1.14.4",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.70.0",
 		"ultracite": "7.12.0",

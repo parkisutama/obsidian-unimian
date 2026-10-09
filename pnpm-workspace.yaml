@@ -8,6 +8,7 @@ allowBuilds:
 # through build aliases (scripts/ui-runtime-aliases.mjs) and must not install React.
 minimumReleaseAgeExclude:
   - dotenv@18.0.2
+  - obsidian@1.14.4
 
 peerDependencyRules:
   ignoreMissing:

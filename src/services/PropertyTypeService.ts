@@ -215,7 +215,7 @@ export class PropertyTypeService {
     if (propertyCategoryCache.size >= CACHE_MAX_SIZE) {
       // Clear oldest entries (simple approach: clear half the cache)
       const keysToDelete = Array.from(propertyCategoryCache.keys()).slice(0, CACHE_MAX_SIZE / 2);
-      keysToDelete.forEach(key => propertyCategoryCache.delete(key));
+      keysToDelete.forEach(key => { propertyCategoryCache.delete(key); });
     }
     propertyCategoryCache.set(cacheKey, category);
 

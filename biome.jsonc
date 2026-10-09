@@ -1,16 +1,10 @@
 {
 	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-	"extends": ["ultracite/biome/core"],
 	"linter": {
+		"enabled": true,
 		"rules": {
-			"a11y": "warn",
-			"complexity": "warn",
-			"correctness": "warn",
-			"nursery": "warn",
-			"performance": "warn",
-			"security": "warn",
-			"style": "warn",
-			"suspicious": "warn"
+			// Biome's recommended set at its own severities, so `pnpm run lint` fails on real errors.
+			"recommended": true
 		}
 	}
 }
