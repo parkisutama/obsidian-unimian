@@ -3,7 +3,8 @@
 # MD013: prose uses semantic line breaks, not a column limit.
 disable = ["MD013"]
 
-exclude = [".git", ".github", "node_modules", "dist", "coverage", ".claude"]
+# CHANGELOG.md is written by the release tooling in its own format.
+exclude = [".git", ".github", "node_modules", "dist", "coverage", ".claude", "CHANGELOG.md"]
 
 respect-gitignore = true
 
