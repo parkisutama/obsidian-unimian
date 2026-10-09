@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import { describe, expect, it } from "vitest";
 import { parseTemporalValue } from "../src/core/temporal/TemporalValue";
 import type { TimeDomain } from "../src/core/temporal/TimeDomain";

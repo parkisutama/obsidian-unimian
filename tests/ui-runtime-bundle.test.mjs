@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import esbuild from "esbuild";
 import path from "path";
 import { fileURLToPath } from "url";

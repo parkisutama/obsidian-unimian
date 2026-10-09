@@ -1,4 +1,7 @@
 // @vitest-environment happy-dom
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import { describe, expect, it, vi } from "vitest";
 import {
 	isActivationKey,

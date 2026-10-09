@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import { describe, expect, it } from "vitest";
 import type { EntrySnapshot } from "../src/core/entries/EntrySnapshot";
 import { MISSING_VALUE } from "../src/core/entries/NormalizedValue";

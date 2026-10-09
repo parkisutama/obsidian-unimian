@@ -1,0 +1,9 @@
+version = 1
+
+# Source files under src/, scripts/, tests/, and conformance/ carry their own SPDX header.
+# This entry covers the files that cannot carry one (JSON, lockfile, Markdown, configuration).
+[[annotations]]
+path = "**"
+precedence = "closest"
+SPDX-FileCopyrightText = ["2025 Sawyer Rensel", "2026 Parkis Utama"]
+SPDX-License-Identifier = "GPL-3.0-only"

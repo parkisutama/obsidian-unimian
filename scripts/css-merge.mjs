@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 // esbuild plugin that merges imported stylesheets into the plugin's styles.css.
 // Obsidian loads a single styles.css, so CSS imported from src/ (and extra vendor CSS) is
 // appended after BUNDLE_MARKER on every build, each file prefixed with its license notice.

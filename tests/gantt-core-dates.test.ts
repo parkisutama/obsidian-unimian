@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { readGanttDate, writeGanttDate } from "../src/core/gantt/dates";
 import { parseGanttProgress } from "../src/core/gantt/progress";

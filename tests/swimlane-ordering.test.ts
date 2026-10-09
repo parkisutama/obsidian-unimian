@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import { describe, expect, it } from "vitest";
 import { createSwimlaneOptions } from "../src/views/swimlane/options";
 import { orderKeys, parseCustomOrder, reorderKeys } from "../src/views/swimlane/ordering";

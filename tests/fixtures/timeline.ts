@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import type { EntrySnapshot } from "../../src/core/entries/EntrySnapshot";
 import type { NormalizedValue } from "../../src/core/entries/NormalizedValue";
 import type UnimianPlugin from "../../src/main";

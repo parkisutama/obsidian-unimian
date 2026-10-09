@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import type { BasesEntry, BasesEntryGroup } from "obsidian";
 import { describe, expect, it } from "vitest";
 import { MISSING_VALUE } from "../src/core/entries/NormalizedValue";

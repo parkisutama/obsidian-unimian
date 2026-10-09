@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
 
 import type { GanttDetailRenderProps, Task } from "@jaeungkim/gantt-chart";
 import { render } from "preact";
