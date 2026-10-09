@@ -10,14 +10,24 @@
  * or returns a `BasesEntry`, `Value`, or any object Obsidian recreates after an update.
  */
 
-export type MutationFailureReason = 'file-not-found' | 'formula-property' | 'error';
+export type MutationFailureReason = "file-not-found" | "formula-property" | "error";
 
-export type MutationResult = { ok: true } | { ok: false; reason: MutationFailureReason; message: string };
-export type MoveMutationResult = { ok: true; path: string } | { ok: false; reason: MutationFailureReason; message: string };
+export type MutationResult =
+	| { ok: true }
+	| { ok: false; reason: MutationFailureReason; message: string };
+export type MoveMutationResult =
+	| { ok: true; path: string }
+	| { ok: false; reason: MutationFailureReason; message: string };
 
 /** Writes a start/end date pair, e.g. from a calendar drag or a Gantt bar move/resize. */
 export interface DateMutationCapability {
-	updateRange(path: string, startPropertyId: string, start: string, endPropertyId?: string | null, end?: string | null): Promise<MutationResult>;
+	updateRange(
+		path: string,
+		startPropertyId: string,
+		start: string,
+		endPropertyId?: string | null,
+		end?: string | null,
+	): Promise<MutationResult>;
 }
 
 /** Writes one arbitrary property, e.g. moving a Swimlane card to a different column. */

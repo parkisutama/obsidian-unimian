@@ -8,8 +8,8 @@
 
 import type { EntrySnapshot } from "../../src/core/entries/EntrySnapshot";
 import type { NormalizedValue } from "../../src/core/entries/NormalizedValue";
-import type { NoteFixture as SwimlaneNoteFixture } from "./swimlane";
 import type { NoteFixture as CalendarNoteFixture } from "./calendar";
+import type { NoteFixture as SwimlaneNoteFixture } from "./swimlane";
 
 export const LARGE_BASE_SIZE = 5000;
 

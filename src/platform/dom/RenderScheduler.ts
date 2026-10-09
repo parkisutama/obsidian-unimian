@@ -10,10 +10,10 @@
  * Layout-specific rendering policy stays in the view/layout strategy.
  */
 
-import { areAllCssOnly, type ViewOptionSchema } from '../bases/viewOptionTypes';
-import { diffRenderSignatures, type RenderSignature } from '../bases/changeDetection';
+import { diffRenderSignatures, type RenderSignature } from "../bases/changeDetection";
+import { areAllCssOnly, type ViewOptionSchema } from "../bases/viewOptionTypes";
 
-export type RenderDecision = 'skip' | 'css-only' | 'full';
+export type RenderDecision = "skip" | "css-only" | "full";
 
 export interface RenderEpoch {
 	epoch: number;
@@ -52,18 +52,28 @@ export class RenderScheduler {
 	 * - `'full'`: entries, order, or groups changed (or config changed with no schema/changed
 	 *   keys to prove it was CSS-only); re-render fully.
 	 */
-	decide(next: RenderSignature, schema?: ViewOptionSchema, changedConfigKeys?: readonly string[]): RenderDecision {
+	decide(
+		next: RenderSignature,
+		schema?: ViewOptionSchema,
+		changedConfigKeys?: readonly string[],
+	): RenderDecision {
 		const prev = this.signature;
 		this.signature = next;
 		const diff = diffRenderSignatures(prev, next);
 
-		if (diff.identical) return 'skip';
+		if (diff.identical) return "skip";
 
-		const onlyConfigChanged = !diff.entriesChanged && !diff.orderChanged && !diff.groupsChanged && diff.configChanged;
-		if (onlyConfigChanged && schema && changedConfigKeys && areAllCssOnly(schema, changedConfigKeys)) {
-			return 'css-only';
+		const onlyConfigChanged =
+			!diff.entriesChanged && !diff.orderChanged && !diff.groupsChanged && diff.configChanged;
+		if (
+			onlyConfigChanged &&
+			schema &&
+			changedConfigKeys &&
+			areAllCssOnly(schema, changedConfigKeys)
+		) {
+			return "css-only";
 		}
 
-		return 'full';
+		return "full";
 	}
 }

@@ -5,10 +5,19 @@
 // checks for. Used by tests/architecture.test.ts to prove each forbidden pattern is caught;
 // this file is never imported by production code or by src/**.
 
-export async function mutateFromNewView(app: {
-	fileManager: { processFrontMatter(file: unknown, fn: (fm: Record<string, unknown>) => void): Promise<void> };
-	vault: { modify(file: unknown, data: string): Promise<void>; trashFile(file: unknown): Promise<void> };
-}, file: unknown, editor: { setValue(value: string): void }): Promise<void> {
+export async function mutateFromNewView(
+	app: {
+		fileManager: {
+			processFrontMatter(file: unknown, fn: (fm: Record<string, unknown>) => void): Promise<void>;
+		};
+		vault: {
+			modify(file: unknown, data: string): Promise<void>;
+			trashFile(file: unknown): Promise<void>;
+		};
+	},
+	file: unknown,
+	editor: { setValue(value: string): void },
+): Promise<void> {
 	await app.fileManager.processFrontMatter(file, (fm) => {
 		fm.done = true;
 	});

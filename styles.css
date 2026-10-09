@@ -137,7 +137,6 @@
 .planner-drag-over {
 	opacity: 0.7;
 }
-
 /* ==========================================================================
    5. SETTINGS & MODAL STYLES
    ========================================================================== */
@@ -229,11 +228,7 @@
 }
 
 .planner-calendar-item.planner-drag-over {
-	background-color: color-mix(
-		in srgb,
-		var(--interactive-accent) 20%,
-		transparent
-	);
+	background-color: color-mix(in srgb, var(--interactive-accent) 20%, transparent);
 }
 
 .planner-status-list,
@@ -258,7 +253,6 @@
 	color: var(--text-on-accent);
 	vertical-align: middle;
 }
-
 /* ==========================================================================
    6. QUICK PREVIEW MODAL
    ========================================================================== */
@@ -706,16 +700,14 @@ body.unimian-quick-preview-active .hover-popover {
 }
 
 .planner-kanban-card-base--left-accent {
-	border-left: 4px solid
-		var(--card-accent-color, var(--background-modifier-border));
+	border-left: 4px solid var(--card-accent-color, var(--background-modifier-border));
 	border-top: none;
 	border-right: none;
 	border-bottom: none;
 }
 
 .planner-kanban-card-base--full-border {
-	border: 2px solid
-		var(--card-accent-color, var(--background-modifier-border));
+	border: 2px solid var(--card-accent-color, var(--background-modifier-border));
 }
 
 .planner-kanban-card-base--default-border {
@@ -1292,7 +1284,6 @@ body.unimian-quick-preview-active .hover-popover {
 		padding: 10px;
 	}
 }
-
 /* ==========================================================================
    3. CALENDAR VIEW STYLES                          [ACTIVE]
    ========================================================================== */
@@ -1625,7 +1616,6 @@ body.is-phone .planner-bases-calendar {
 	opacity: 0.6;
 	text-decoration: line-through;
 }
-
 /*! SPDX-License-Identifier: GPL-3.0-only AND MIT
  * Portions adapted from obsidian-project-manager styles.css
  * Copyright (c) 2026 mmattia09. MIT License, see THIRD_PARTY_NOTICES.md
@@ -2009,8 +1999,12 @@ body.is-phone .planner-bases-calendar {
 	opacity: 1;
 }
 
-.unimian-timeline__date-label--start { transform: translate(-100%, -50%); }
-.unimian-timeline__date-label--end { transform: translateY(-50%); }
+.unimian-timeline__date-label--start {
+	transform: translate(-100%, -50%);
+}
+.unimian-timeline__date-label--end {
+	transform: translateY(-50%);
+}
 
 .unimian-timeline__ghost {
 	position: absolute;
@@ -2075,8 +2069,12 @@ body.is-phone .planner-bases-calendar {
 	background: var(--interactive-accent);
 }
 
-.unimian-timeline__edge--before { left: var(--size-4-2); }
-.unimian-timeline__edge--after { right: var(--size-4-2); }
+.unimian-timeline__edge--before {
+	left: var(--size-4-2);
+}
+.unimian-timeline__edge--after {
+	right: var(--size-4-2);
+}
 
 .unimian-timeline--narrow .unimian-timeline__main {
 	grid-template-columns: minmax(7rem, 38%) minmax(0, 1fr);
@@ -2098,11 +2096,15 @@ body.is-phone .planner-bases-calendar {
 
 @media (prefers-reduced-motion: reduce) {
 	.unimian-timeline__bar,
-	.unimian-timeline__sidebar-panel { transition: none; }
+	.unimian-timeline__sidebar-panel {
+		transition: none;
+	}
 }
 
 @media (pointer: coarse) {
-	.unimian-timeline__handle { width: 16px; }
+	.unimian-timeline__handle {
+		width: 16px;
+	}
 }
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* Copyright (C) 2026 Parkis Utama */
@@ -2388,7 +2390,11 @@ body.is-phone .planner-bases-calendar {
  * end. The library sets --gantt-progress-color inline on colored bars, hence !important.
  */
 .unimian-gantt-chart .gantt-task-bar[style*="--gantt-progress-color"]:not(.summary) {
-	--gantt-progress-color: color-mix(in srgb, var(--gantt-bar-color) 50%, var(--gantt-bar-text-color)) !important;
+	--gantt-progress-color: color-mix(
+		in srgb,
+		var(--gantt-bar-color) 50%,
+		var(--gantt-bar-text-color)
+	) !important;
 }
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* Copyright (C) 2026 Parkis Utama */
@@ -2449,7 +2455,10 @@ body.is-phone .planner-bases-calendar {
 	border-radius: var(--radius-m);
 	background: var(--unimian-color-bg, var(--background-secondary));
 	border: 1px solid var(--background-modifier-border);
-	transition: top 0.12s ease, left 0.12s ease, box-shadow 0.12s ease;
+	transition:
+		top 0.12s ease,
+		left 0.12s ease,
+		box-shadow 0.12s ease;
 	cursor: pointer;
 	position: relative;
 	overflow: hidden;
@@ -2486,8 +2495,12 @@ body.is-phone .planner-bases-calendar {
 }
 
 @keyframes unimian-sticky-note-shimmer {
-	from { background-position: 150% 0; }
-	to { background-position: -50% 0; }
+	from {
+		background-position: 150% 0;
+	}
+	to {
+		background-position: -50% 0;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2502,11 +2515,15 @@ body.is-phone .planner-bases-calendar {
 }
 
 .unimian-sticky-note-card::after {
-	content: '';
+	content: "";
 	position: absolute;
 	inset: auto 0 0 0;
 	height: 48px;
-	background: linear-gradient(to bottom, transparent, var(--unimian-color-bg, var(--background-secondary)));
+	background: linear-gradient(
+		to bottom,
+		transparent,
+		var(--unimian-color-bg, var(--background-secondary))
+	);
 	pointer-events: none;
 }
 

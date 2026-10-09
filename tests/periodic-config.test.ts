@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_SETTINGS } from "../src/types/settings";
 import type UnimianPlugin from "../src/main";
+import { DEFAULT_SETTINGS } from "../src/types/settings";
 import { createCalendarOptions } from "../src/views/calendar/options";
 import {
 	configuredKinds,
@@ -26,7 +26,8 @@ describe("periodic config", () => {
 		const config = read({});
 		expect(configuredKinds(config)).toEqual([]);
 		expect(config.weekRule).toEqual(ISO_WEEK);
-		for (const kind of PERIODIC_KINDS) expect(config.periods[kind]).toEqual({ pattern: "", template: "" });
+		for (const kind of PERIODIC_KINDS)
+			expect(config.periods[kind]).toEqual({ pattern: "", template: "" });
 	});
 
 	it("configures only the periods that have a pattern, trimmed", () => {
@@ -47,33 +48,55 @@ describe("periodic config", () => {
 	it("uses ISO weeks unless locale numbering is chosen", () => {
 		expect(read({ [WEEK_NUMBERING_KEY]: "iso" }, 0).weekRule).toEqual(ISO_WEEK);
 		expect(read({ [WEEK_NUMBERING_KEY]: "nonsense" }, 0).weekRule).toEqual(ISO_WEEK);
-		expect(read({ [WEEK_NUMBERING_KEY]: "locale" }, 0).weekRule).toEqual({ firstDay: 0, minDays: 1 });
+		expect(read({ [WEEK_NUMBERING_KEY]: "locale" }, 0).weekRule).toEqual({
+			firstDay: 0,
+			minDays: 1,
+		});
 	});
 });
 
 describe("calendar options schema", () => {
-	const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as UnimianPlugin;
+	const plugin = {
+		app: {},
+		settings: structuredClone(DEFAULT_SETTINGS),
+	} as unknown as UnimianPlugin;
 	const keys = collectKeys(createCalendarOptions(plugin));
 
 	it("keeps every existing key", () => {
-		expect(keys).toEqual(expect.arrayContaining([
-			"weekStartsOn", "fontSize", "defaultView", "colorBy", "titleField", "dateStartField",
-			"dateEndField", "allDayField", "templatePath", "targetFolder", "titleFormat",
-			"yearContinuousRowHeight", "yearSplitRowHeight",
-		]));
+		expect(keys).toEqual(
+			expect.arrayContaining([
+				"weekStartsOn",
+				"fontSize",
+				"defaultView",
+				"colorBy",
+				"titleField",
+				"dateStartField",
+				"dateEndField",
+				"allDayField",
+				"templatePath",
+				"targetFolder",
+				"titleFormat",
+				"yearContinuousRowHeight",
+				"yearSplitRowHeight",
+			]),
+		);
 	});
 
 	it("adds a path and a template key for each period, all prefixed and unique", () => {
 		const periodic = keys.filter((key) => key.startsWith("periodic"));
-		expect(periodic).toEqual(expect.arrayContaining(
-			PERIODIC_KINDS.flatMap((kind) => [periodicKeys(kind).path, periodicKeys(kind).template]),
-		));
+		expect(periodic).toEqual(
+			expect.arrayContaining(
+				PERIODIC_KINDS.flatMap((kind) => [periodicKeys(kind).path, periodicKeys(kind).template]),
+			),
+		);
 		expect(periodic).toContain(WEEK_NUMBERING_KEY);
 		expect(new Set(keys).size).toBe(keys.length);
 	});
 
 	it("does not preselect any period pattern or template", () => {
-		const defaults = (createCalendarOptions(plugin) as Array<{ items?: Array<{ key?: string; default?: unknown }> }>)
+		const defaults = (
+			createCalendarOptions(plugin) as Array<{ items?: Array<{ key?: string; default?: unknown }> }>
+		)
 			.flatMap((option) => option.items ?? [])
 			.filter((item) => item.key?.startsWith("periodic") && item.key !== WEEK_NUMBERING_KEY)
 			.map((item) => item.default);

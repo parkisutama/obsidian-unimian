@@ -43,7 +43,11 @@ export function installDomHelpers(): void {
 	proto.createSpan = function (this: HTMLElement, options?: DomOptions) {
 		return createChild(this, "span", options);
 	};
-	proto.createEl = function <K extends keyof HTMLElementTagNameMap>(this: HTMLElement, tag: K, options?: DomOptions) {
+	proto.createEl = function <K extends keyof HTMLElementTagNameMap>(
+		this: HTMLElement,
+		tag: K,
+		options?: DomOptions,
+	) {
 		return createChild(this, tag, options);
 	};
 	proto.setCssProps = function (this: HTMLElement, props: Record<string, string>) {
@@ -105,7 +109,15 @@ export class Notice {
 
 /** Mirrors the real Keymap.isModEvent convention documented in obsidian.d.ts. */
 export class Keymap {
-	static isModEvent(evt?: { ctrlKey?: boolean; metaKey?: boolean; altKey?: boolean; shiftKey?: boolean; button?: number } | null): "tab" | "split" | "window" | boolean {
+	static isModEvent(
+		evt?: {
+			ctrlKey?: boolean;
+			metaKey?: boolean;
+			altKey?: boolean;
+			shiftKey?: boolean;
+			button?: number;
+		} | null,
+	): "tab" | "split" | "window" | boolean {
 		if (!evt) return false;
 		if ("button" in evt && evt.button === 1) return "tab";
 		const mod = Boolean(evt.ctrlKey || evt.metaKey);

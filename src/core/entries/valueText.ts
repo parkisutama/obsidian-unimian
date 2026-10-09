@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Parkis Utama
 
-import type { NormalizedValue } from './NormalizedValue';
+import type { NormalizedValue } from "./NormalizedValue";
 
 /**
  * Renders any `NormalizedValue` as a single display string, or `null` for a missing/empty
@@ -10,23 +10,26 @@ import type { NormalizedValue } from './NormalizedValue';
  * the same value always displays the same way everywhere.
  */
 export function valueText(value: NormalizedValue | undefined): string | null {
-	if (!value || value.kind === 'missing') return null;
+	if (!value || value.kind === "missing") return null;
 	switch (value.kind) {
-		case 'text':
-		case 'date':
+		case "text":
+		case "date":
 			return value.value;
-		case 'number':
-		case 'boolean':
+		case "number":
+		case "boolean":
 			return String(value.value);
-		case 'link':
+		case "link":
 			return value.display || value.target;
-		case 'file':
+		case "file":
 			return value.path;
-		case 'list': {
-			const text = value.items.map(valueText).filter((item): item is string => item != null).join(', ');
+		case "list": {
+			const text = value.items
+				.map(valueText)
+				.filter((item): item is string => item != null)
+				.join(", ");
 			return text || null;
 		}
-		case 'unsupported':
+		case "unsupported":
 			return value.raw == null ? null : String(value.raw);
 	}
 }

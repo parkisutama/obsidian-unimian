@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { RenderScheduler } from "../src/platform/dom/RenderScheduler";
 import { computeRenderSignature } from "../src/platform/bases/changeDetection";
 import { createViewOptionSchema } from "../src/platform/bases/viewOptionTypes";
+import { RenderScheduler } from "../src/platform/dom/RenderScheduler";
 
 const baseInput = {
 	entries: [{ path: "A.md", mtime: 1 }],
@@ -26,7 +26,10 @@ describe("RenderScheduler.decide", () => {
 		const scheduler = new RenderScheduler();
 		const schema = createViewOptionSchema(["cardWidth"]);
 		scheduler.decide(computeRenderSignature(baseInput));
-		const next = computeRenderSignature({ ...baseInput, config: { ...baseInput.config, cardWidth: 260 } });
+		const next = computeRenderSignature({
+			...baseInput,
+			config: { ...baseInput.config, cardWidth: 260 },
+		});
 		expect(scheduler.decide(next, schema, ["cardWidth"])).toBe("css-only");
 	});
 
@@ -34,7 +37,10 @@ describe("RenderScheduler.decide", () => {
 		const scheduler = new RenderScheduler();
 		const schema = createViewOptionSchema(["cardWidth"]);
 		scheduler.decide(computeRenderSignature(baseInput));
-		const next = computeRenderSignature({ ...baseInput, config: { titleField: "note.name", cardWidth: 260 } });
+		const next = computeRenderSignature({
+			...baseInput,
+			config: { titleField: "note.name", cardWidth: 260 },
+		});
 		expect(scheduler.decide(next, schema, ["cardWidth", "titleField"])).toBe("full");
 	});
 

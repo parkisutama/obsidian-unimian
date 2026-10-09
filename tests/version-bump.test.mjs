@@ -25,7 +25,10 @@ function makeFixture({ manifestVersion = "1.0.0", minAppVersion = "0.15.0" } = {
 			"\t",
 		)}\n`,
 	);
-	writeFileSync(path.join(cwd, "versions.json"), `${JSON.stringify({ "1.0.0": minAppVersion }, null, "\t")}\n`);
+	writeFileSync(
+		path.join(cwd, "versions.json"),
+		`${JSON.stringify({ "1.0.0": minAppVersion }, null, "\t")}\n`,
+	);
 	return cwd;
 }
 

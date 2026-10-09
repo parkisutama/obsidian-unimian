@@ -1,7 +1,10 @@
-import { describe, expect, it } from "vitest";
 import type { App } from "obsidian";
-import { TFile } from "./fixtures/obsidian";
-import { periodicKeys, readPeriodicConfig, WEEK_NUMBERING_KEY } from "../src/views/calendar/periodic/config";
+import { describe, expect, it } from "vitest";
+import {
+	periodicKeys,
+	readPeriodicConfig,
+	WEEK_NUMBERING_KEY,
+} from "../src/views/calendar/periodic/config";
 import {
 	eventTemplateDefaults,
 	existingPeriodicNotePath,
@@ -9,17 +12,27 @@ import {
 	openPeriodicNote,
 	periodicNoteTarget,
 } from "../src/views/calendar/periodic/notes";
+import { TFile } from "./fixtures/obsidian";
 
 const configFrom = (values: Record<string, unknown>, weekStartsOn = 1) =>
 	readPeriodicConfig((key) => values[key], weekStartsOn);
 const DAY = "timeline/YYYY/YYYY-MM/YYYY-MM-DD";
-const dayConfig = (extra: Record<string, unknown> = {}) => configFrom({ [periodicKeys("day").path]: DAY, ...extra });
+const dayConfig = (extra: Record<string, unknown> = {}) =>
+	configFrom({ [periodicKeys("day").path]: DAY, ...extra });
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
 
 /** A vault of `files` (path -> content) plus recorders for what the code under test does. */
-function fakeApp(files: Record<string, string> = {}, options: { templater?: boolean; movedTo?: string } = {}) {
+function fakeApp(
+	files: Record<string, string> = {},
+	options: { templater?: boolean; movedTo?: string } = {},
+) {
 	const store = new Map(Object.entries(files));
-	const calls = { created: [] as string[], folders: [] as string[], opened: [] as string[], templater: [] as string[] };
+	const calls = {
+		created: [] as string[],
+		folders: [] as string[],
+		opened: [] as string[],
+		templater: [] as string[],
+	};
 	const app = {
 		vault: {
 			getAbstractFileByPath: (path: string) => (store.has(path) ? new TFile(path) : null),
@@ -47,10 +60,16 @@ function fakeApp(files: Record<string, string> = {}, options: { templater?: bool
 					plugins: {
 						"templater-obsidian": {
 							templater: {
-								create_new_note_from_template: async (_template: TFile, _folder: unknown, name: string) => {
+								create_new_note_from_template: async (
+									_template: TFile,
+									_folder: unknown,
+									name: string,
+								) => {
 									calls.templater.push(name);
 									// A template may move the note (tp.file.move); otherwise it lands in the folder given.
-									return new TFile(options.movedTo ?? `${calls.folders[calls.folders.length - 1]}/${name}.md`);
+									return new TFile(
+										options.movedTo ?? `${calls.folders[calls.folders.length - 1]}/${name}.md`,
+									);
 								},
 							},
 						},
@@ -63,7 +82,9 @@ function fakeApp(files: Record<string, string> = {}, options: { templater?: bool
 
 describe("periodicNoteTarget", () => {
 	it("is unconfigured without a pattern, and resolves the clicked date otherwise", () => {
-		expect(periodicNoteTarget(d(2026, 9, 22), "day", configFrom({}))).toEqual({ status: "unconfigured" });
+		expect(periodicNoteTarget(d(2026, 9, 22), "day", configFrom({}))).toEqual({
+			status: "unconfigured",
+		});
 		expect(periodicNoteTarget(d(2026, 9, 22), "day", dayConfig())).toEqual({
 			status: "ok",
 			path: "timeline/2026/2026-09/2026-09-22.md",
@@ -73,7 +94,9 @@ describe("periodicNoteTarget", () => {
 
 	it("resolves the ISO week of a future date by default", () => {
 		const config = configFrom({ [periodicKeys("week").path]: "timeline/GGGG/GGGG-[W]WW" });
-		expect(periodicNoteTarget(d(2026, 12, 31), "week", config)).toMatchObject({ path: "timeline/2026/2026-W53.md" });
+		expect(periodicNoteTarget(d(2026, 12, 31), "week", config)).toMatchObject({
+			path: "timeline/2026/2026-W53.md",
+		});
 	});
 
 	it("refuses an unsafe pattern", () => {
@@ -83,15 +106,22 @@ describe("periodicNoteTarget", () => {
 
 	it("follows the locale week rule when chosen", () => {
 		// Sunday 29 Dec 2024 is week 1 of 2025 under a Sunday-start rule (first weekday 0).
-		const config = configFrom({ [periodicKeys("week").path]: "gggg-[W]ww", [WEEK_NUMBERING_KEY]: "locale" }, 0);
-		expect(periodicNoteTarget(d(2024, 12, 29), "week", config)).toMatchObject({ path: "2025-W01.md" });
+		const config = configFrom(
+			{ [periodicKeys("week").path]: "gggg-[W]ww", [WEEK_NUMBERING_KEY]: "locale" },
+			0,
+		);
+		expect(periodicNoteTarget(d(2024, 12, 29), "week", config)).toMatchObject({
+			path: "2025-W01.md",
+		});
 	});
 });
 
 describe("existingPeriodicNotePath", () => {
 	it("finds the configured path only, not a legacy root-level note", () => {
 		const { app } = fakeApp({ "timeline/2026/2026-09/2026-09-22.md": "", "2026-09-23.md": "" });
-		expect(existingPeriodicNotePath(app, d(2026, 9, 22), "day", dayConfig())).toBe("timeline/2026/2026-09/2026-09-22.md");
+		expect(existingPeriodicNotePath(app, d(2026, 9, 22), "day", dayConfig())).toBe(
+			"timeline/2026/2026-09/2026-09-22.md",
+		);
 		expect(existingPeriodicNotePath(app, d(2026, 9, 23), "day", dayConfig())).toBeNull();
 		expect(existingPeriodicNotePath(app, d(2026, 9, 22), "day", configFrom({}))).toBeNull();
 	});
@@ -106,7 +136,10 @@ describe("openPeriodicNote", () => {
 	});
 
 	it("creates a missing future note through Templater, named from the clicked date", async () => {
-		const { app, calls } = fakeApp({ "templates/daily.md": "<% tp.file.title %>" }, { templater: true });
+		const { app, calls } = fakeApp(
+			{ "templates/daily.md": "<% tp.file.title %>" },
+			{ templater: true },
+		);
 		const config = dayConfig({ [periodicKeys("day").template]: "templates/daily.md" });
 		await openPeriodicNote(app, d(2026, 9, 22), "day", config);
 		expect(calls.templater).toEqual(["2026-09-22"]);
@@ -114,10 +147,13 @@ describe("openPeriodicNote", () => {
 	});
 
 	it("opens the path a template moved the note to, never the pattern's path", async () => {
-		const { app, calls } = fakeApp({ "templates/daily.md": "<%* await tp.file.move('Inbox/x') %>" }, {
-			templater: true,
-			movedTo: "Inbox/2026-09-22.md",
-		});
+		const { app, calls } = fakeApp(
+			{ "templates/daily.md": "<%* await tp.file.move('Inbox/x') %>" },
+			{
+				templater: true,
+				movedTo: "Inbox/2026-09-22.md",
+			},
+		);
 		const config = dayConfig({ [periodicKeys("day").template]: "templates/daily.md" });
 		await openPeriodicNote(app, d(2026, 9, 22), "day", config);
 		expect(calls.opened).toEqual(["Inbox/2026-09-22.md"]);
@@ -138,14 +174,24 @@ describe("openPeriodicNote", () => {
 		expect(first.calls.created).toEqual(["timeline/2026/2026-09/2026-09-22.md"]);
 
 		const second = fakeApp();
-		await openPeriodicNote(second.app, d(2026, 9, 22), "day", dayConfig({ [periodicKeys("day").template]: "nope.md" }));
+		await openPeriodicNote(
+			second.app,
+			d(2026, 9, 22),
+			"day",
+			dayConfig({ [periodicKeys("day").template]: "nope.md" }),
+		);
 		expect(second.calls.created).toEqual(["timeline/2026/2026-09/2026-09-22.md"]);
 	});
 
 	it("does nothing for an unconfigured period and creates nothing for an unsafe one", async () => {
 		const { app, calls } = fakeApp();
 		await openPeriodicNote(app, d(2026, 9, 22), "day", configFrom({}));
-		await openPeriodicNote(app, d(2026, 9, 22), "day", configFrom({ [periodicKeys("day").path]: "/abs/YYYY" }));
+		await openPeriodicNote(
+			app,
+			d(2026, 9, 22),
+			"day",
+			configFrom({ [periodicKeys("day").path]: "/abs/YYYY" }),
+		);
 		expect(calls.created).toEqual([]);
 		expect(calls.opened).toEqual([]);
 	});
@@ -178,7 +224,9 @@ describe("isPeriodicNote", () => {
 	});
 
 	it("hides nothing when no period is configured", () => {
-		expect(isPeriodicNote("timeline/2026/2026-09/2026-09-21.md", "2026-09-21", configFrom({}))).toBe(false);
+		expect(
+			isPeriodicNote("timeline/2026/2026-09/2026-09-21.md", "2026-09-21", configFrom({})),
+		).toBe(false);
 	});
 });
 
@@ -191,7 +239,10 @@ describe("eventTemplateDefaults", () => {
 	});
 
 	it("keeps an explicit target folder and leaves unconfigured Bases alone", () => {
-		expect(eventTemplateDefaults({ ...defaults, targetFolder: "Events" }, d(2026, 9, 22), dayConfig())?.targetFolder).toBe("Events");
+		expect(
+			eventTemplateDefaults({ ...defaults, targetFolder: "Events" }, d(2026, 9, 22), dayConfig())
+				?.targetFolder,
+		).toBe("Events");
 		expect(eventTemplateDefaults(defaults, d(2026, 9, 22), configFrom({}))).toBe(defaults);
 	});
 

@@ -1,12 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { orderKeys, parseCustomOrder, reorderKeys } from "../src/views/swimlane/ordering";
 import { createSwimlaneOptions } from "../src/views/swimlane/options";
+import { orderKeys, parseCustomOrder, reorderKeys } from "../src/views/swimlane/ordering";
 import { formatDate, looksLikeDateString, valueToString } from "../src/views/swimlane/values";
 
 describe("swimlane ordering", () => {
 	it("defaults to an alphabetical order (deliberately not Bases' own sort)", () => {
 		expect(orderKeys(["Todo", "Done", "Doing"], [])).toEqual(["Doing", "Done", "Todo"]);
-		expect(orderKeys(new Map([["b", 1], ["a", 2]]).keys(), [])).toEqual(["a", "b"]);
+		expect(
+			orderKeys(
+				new Map([
+					["b", 1],
+					["a", 2],
+				]).keys(),
+				[],
+			),
+		).toEqual(["a", "b"]);
 	});
 
 	it("respects a saved order, drops stale keys, and appends new keys alphabetically", () => {
@@ -49,9 +57,24 @@ describe("swimlane options schema", () => {
 	it("keeps its persisted keys stable and avoids Bases-reserved ones", () => {
 		const keys = createSwimlaneOptions({} as never).map((o) => ("key" in o ? o.key : ""));
 		expect(keys).toEqual([
-			"plannerGroupBy", "swimlaneBy", "colorBy", "titleBy", "borderStyle", "coverField", "coverDisplay",
-			"coverHeight", "summaryField", "dateStartField", "dateEndField", "dateFormat", "badgePlacement",
-			"columnWidth", "hideEmptyColumns", "freezeHeaders", "swimHeaderDisplay", "showPropertyLabels",
+			"plannerGroupBy",
+			"swimlaneBy",
+			"colorBy",
+			"titleBy",
+			"borderStyle",
+			"coverField",
+			"coverDisplay",
+			"coverHeight",
+			"summaryField",
+			"dateStartField",
+			"dateEndField",
+			"dateFormat",
+			"badgePlacement",
+			"columnWidth",
+			"hideEmptyColumns",
+			"freezeHeaders",
+			"swimHeaderDisplay",
+			"showPropertyLabels",
 		]);
 		expect(keys).not.toContain("order");
 		expect(keys).not.toContain("sort");

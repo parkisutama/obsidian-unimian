@@ -1,12 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Parkis Utama
 
-import { buildDepthFirstSequence, compareSequence } from './sequence';
+import { buildDepthFirstSequence, compareSequence } from "./sequence";
 
-export const SYNTHETIC_PHASE_PREFIX = 'unimian-synthetic://';
+export const SYNTHETIC_PHASE_PREFIX = "unimian-synthetic://";
 
-export interface PhaseParentLink { id: string; name: string; resolved: boolean }
-export interface PhaseGroup { key: string; label: string }
+export interface PhaseParentLink {
+	id: string;
+	name: string;
+	resolved: boolean;
+}
+export interface PhaseGroup {
+	key: string;
+	label: string;
+}
 export interface PhaseInput {
 	id: string;
 	name: string;
@@ -24,14 +31,20 @@ export interface PhaseNode {
 	synthetic: boolean;
 	sourceId: string | null;
 }
-export interface PhaseTreeResult { nodes: PhaseNode[]; cycles: string[] }
+export interface PhaseTreeResult {
+	nodes: PhaseNode[];
+	cycles: string[];
+}
 
 const groupKey = (input: PhaseInput) => input.group?.key ?? null;
 const groupId = (key: string) => `${SYNTHETIC_PHASE_PREFIX}group/${encodeURIComponent(key)}`;
 const externalId = (group: string | null, parent: string) =>
-	`${SYNTHETIC_PHASE_PREFIX}parent/${encodeURIComponent(group ?? '')}/${encodeURIComponent(parent)}`;
+	`${SYNTHETIC_PHASE_PREFIX}parent/${encodeURIComponent(group ?? "")}/${encodeURIComponent(parent)}`;
 
-function cycleMembers(inputs: readonly PhaseInput[], byId: ReadonlyMap<string, PhaseInput>): Set<string> {
+function cycleMembers(
+	inputs: readonly PhaseInput[],
+	byId: ReadonlyMap<string, PhaseInput>,
+): Set<string> {
 	const state = new Map<string, 0 | 1 | 2>();
 	const stack: string[] = [];
 	const cycles = new Set<string>();
@@ -54,18 +67,30 @@ function cycleMembers(inputs: readonly PhaseInput[], byId: ReadonlyMap<string, P
 }
 
 export function buildPhaseTree(inputs: readonly PhaseInput[], useOrder = false): PhaseTreeResult {
-	const byId = new Map(inputs.map(input => [input.id, input]));
+	const byId = new Map(inputs.map((input) => [input.id, input]));
 	const cycles = cycleMembers(inputs, byId);
-	const nodes: Omit<PhaseNode, 'sequence'>[] = [];
-	const synthetic = new Map<string, Omit<PhaseNode, 'sequence'>>();
-	const ensureSynthetic = (node: Omit<PhaseNode, 'sequence'>) => {
-		if (!synthetic.has(node.id)) { synthetic.set(node.id, node); nodes.push(node); }
+	const nodes: Omit<PhaseNode, "sequence">[] = [];
+	const synthetic = new Map<string, Omit<PhaseNode, "sequence">>();
+	const ensureSynthetic = (node: Omit<PhaseNode, "sequence">) => {
+		if (!synthetic.has(node.id)) {
+			synthetic.set(node.id, node);
+			nodes.push(node);
+		}
 	};
 
 	for (const [index, input] of inputs.entries()) {
 		const group = input.group ?? null;
 		const rootParent = group ? groupId(group.key) : null;
-		if (group) ensureSynthetic({ id: rootParent!, name: group.label.trim() || 'No value', parentId: null, order: null, inputIndex: index, synthetic: true, sourceId: null });
+		if (group)
+			ensureSynthetic({
+				id: rootParent!,
+				name: group.label.trim() || "No value",
+				parentId: null,
+				order: null,
+				inputIndex: index,
+				synthetic: true,
+				sourceId: null,
+			});
 
 		let parentId = rootParent;
 		const parent = input.parent;
@@ -74,16 +99,34 @@ export function buildPhaseTree(inputs: readonly PhaseInput[], useOrder = false):
 			if (internal && groupKey(internal) === groupKey(input)) parentId = internal.id;
 			else if (!internal) {
 				parentId = externalId(groupKey(input), parent.id);
-				ensureSynthetic({ id: parentId, name: parent.name, parentId: rootParent, order: null, inputIndex: index, synthetic: true, sourceId: parent.id });
+				ensureSynthetic({
+					id: parentId,
+					name: parent.name,
+					parentId: rootParent,
+					order: null,
+					inputIndex: index,
+					synthetic: true,
+					sourceId: parent.id,
+				});
 			}
 		}
-		nodes.push({ id: input.id, name: input.name, parentId, order: input.order ?? null, inputIndex: index, synthetic: false, sourceId: input.id });
+		nodes.push({
+			id: input.id,
+			name: input.name,
+			parentId,
+			order: input.order ?? null,
+			inputIndex: index,
+			synthetic: false,
+			sourceId: input.id,
+		});
 	}
 
-	const sequenceById = new Map(buildDepthFirstSequence(nodes, useOrder).map(item => [item.id, item.sequence]));
+	const sequenceById = new Map(
+		buildDepthFirstSequence(nodes, useOrder).map((item) => [item.id, item.sequence]),
+	);
 	return {
 		nodes: nodes
-			.map(node => ({ ...node, sequence: sequenceById.get(node.id)! }))
+			.map((node) => ({ ...node, sequence: sequenceById.get(node.id)! }))
 			.sort((left, right) => compareSequence(left.sequence, right.sequence)),
 		cycles: [...cycles].sort(),
 	};

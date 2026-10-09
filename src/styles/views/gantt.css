@@ -282,5 +282,9 @@
  * end. The library sets --gantt-progress-color inline on colored bars, hence !important.
  */
 .unimian-gantt-chart .gantt-task-bar[style*="--gantt-progress-color"]:not(.summary) {
-	--gantt-progress-color: color-mix(in srgb, var(--gantt-bar-color) 50%, var(--gantt-bar-text-color)) !important;
+	--gantt-progress-color: color-mix(
+		in srgb,
+		var(--gantt-bar-color) 50%,
+		var(--gantt-bar-text-color)
+	) !important;
 }

@@ -18,22 +18,28 @@
 //     package description.
 //   - Timeline: VirtualLinearCollection-based row virtualization still holds against a large Base.
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import type { Task } from "@jaeungkim/gantt-chart";
+import { type GanttHandle, ReactGanttChart } from "@jaeungkim/gantt-chart";
+import type { ComponentChild, VNode } from "preact";
 import { h } from "preact";
 import { render } from "preact/compat";
-import type { ComponentChild, VNode } from "preact";
-import type { Task } from "@jaeungkim/gantt-chart";
-import { ReactGanttChart, type GanttHandle } from "@jaeungkim/gantt-chart";
-import { createSwimlaneHarness, waitForRender, type SwimlaneHarness } from "./fixtures/swimlane";
-import { createCalendarHarness, dayOffset, type CalendarHarness } from "./fixtures/calendar";
-import { createTimelineHarness, type TimelineHarness } from "./fixtures/timeline";
-import { largeSwimlaneNotes, largeCalendarNotes, largeGanttTasks, largeEntrySnapshots, LARGE_BASE_SIZE } from "./fixtures/large-base";
-import { DateValue } from "./fixtures/obsidian";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { MutationResult } from "../src/platform/mutations/types";
 import { BasesGanttView } from "../src/views/gantt";
 import type { ChartRender } from "../src/views/gantt/chartHost";
-import { DragController, type DragHost } from "../src/views/swimlane/dragAndDrop";
 import { GanttWriteBack } from "../src/views/gantt/writeBack";
-import type { MutationResult } from "../src/platform/mutations/types";
+import { DragController, type DragHost } from "../src/views/swimlane/dragAndDrop";
+import { type CalendarHarness, createCalendarHarness, dayOffset } from "./fixtures/calendar";
+import {
+	LARGE_BASE_SIZE,
+	largeCalendarNotes,
+	largeEntrySnapshots,
+	largeGanttTasks,
+	largeSwimlaneNotes,
+} from "./fixtures/large-base";
+import { DateValue } from "./fixtures/obsidian";
+import { createSwimlaneHarness, type SwimlaneHarness, waitForRender } from "./fixtures/swimlane";
+import { createTimelineHarness, type TimelineHarness } from "./fixtures/timeline";
 
 let swimlaneHarness: SwimlaneHarness | null = null;
 let calendarHarness: CalendarHarness | null = null;
@@ -58,7 +64,9 @@ describe("Swimlane bounded initial render (PERF-001)", () => {
 		await waitForRender();
 
 		const cards = swimlaneHarness.host.querySelectorAll(".planner-kanban-card").length;
-		const placeholders = swimlaneHarness.host.querySelectorAll(".planner-kanban-card-placeholder").length;
+		const placeholders = swimlaneHarness.host.querySelectorAll(
+			".planner-kanban-card-placeholder",
+		).length;
 
 		// Before this task, createSwimlaneCell() (src/views/swimlane/boardRenderer.ts) built one
 		// full card DOM subtree per entry in every swimlane x column cell with no threshold check,
@@ -94,7 +102,11 @@ describe("Calendar bounded initial render (PERF-001)", () => {
 		// Give every note "today" (timeGridDay's initial visible date, via the calendar fixture's
 		// own dayOffset helper) so a single timeGridDay view sees the full pile-up; this is the
 		// worst case for a per-day view (no day-count bound helps).
-		const notes = largeCalendarNotes(500).map((note) => ({ ...note, date_start: dayOffset(0, 9), date_end: dayOffset(0, 9) }));
+		const notes = largeCalendarNotes(500).map((note) => ({
+			...note,
+			date_start: dayOffset(0, 9),
+			date_end: dayOffset(0, 9),
+		}));
 		calendarHarness = createCalendarHarness({ notes, config: { defaultView: "timeGridDay" } });
 
 		// FullCalendar's timeGrid view still only mounts DOM for the events on the displayed day
@@ -117,11 +129,26 @@ describe("Gantt bounded initial render (PERF-001)", () => {
 		const restoreWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "clientWidth");
 		const restoreHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "clientHeight");
 		const restoreRect = HTMLElement.prototype.getBoundingClientRect;
-		Object.defineProperty(HTMLElement.prototype, "clientWidth", { configurable: true, value: 1000 });
-		Object.defineProperty(HTMLElement.prototype, "clientHeight", { configurable: true, value: 600 });
-		HTMLElement.prototype.getBoundingClientRect = function () {
-			return { width: 1000, height: 600, top: 0, left: 0, right: 1000, bottom: 600, x: 0, y: 0, toJSON() {} } as DOMRect;
-		};
+		Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+			configurable: true,
+			value: 1000,
+		});
+		Object.defineProperty(HTMLElement.prototype, "clientHeight", {
+			configurable: true,
+			value: 600,
+		});
+		HTMLElement.prototype.getBoundingClientRect = () =>
+			({
+				width: 1000,
+				height: 600,
+				top: 0,
+				left: 0,
+				right: 1000,
+				bottom: 600,
+				x: 0,
+				y: 0,
+				toJSON() {},
+			}) as DOMRect;
 
 		try {
 			const tasks = largeGanttTasks(2000);
@@ -143,7 +170,8 @@ describe("Gantt bounded initial render (PERF-001)", () => {
 			render(null, container);
 			container.remove();
 			if (restoreWidth) Object.defineProperty(HTMLElement.prototype, "clientWidth", restoreWidth);
-			if (restoreHeight) Object.defineProperty(HTMLElement.prototype, "clientHeight", restoreHeight);
+			if (restoreHeight)
+				Object.defineProperty(HTMLElement.prototype, "clientHeight", restoreHeight);
 			HTMLElement.prototype.getBoundingClientRect = restoreRect;
 		}
 	});
@@ -163,7 +191,13 @@ describe("Timeline bounded initial render (PERF-001)", () => {
 		// Base through the real pipeline — the same shape (`{entries, hasKey}`) the harness itself
 		// builds.
 		const entries = largeEntrySnapshots(LARGE_BASE_SIZE).map((snapshot) => ({
-			file: { path: snapshot.path, basename: snapshot.basename, extension: "md", parent: { path: snapshot.folder }, stat: { ctime: 1, mtime: 2 } },
+			file: {
+				path: snapshot.path,
+				basename: snapshot.basename,
+				extension: "md",
+				parent: { path: snapshot.folder },
+				stat: { ctime: 1, mtime: 2 },
+			},
 			getValue: (id: string) => {
 				const value = snapshot.values.get(id) as { value?: string } | undefined;
 				if (id === "note.start") return { toString: () => value?.value ?? "" };
@@ -175,8 +209,11 @@ describe("Timeline bounded initial render (PERF-001)", () => {
 		view.data.groupedData = [{ entries, hasKey: () => false }];
 		view.onDataUpdated();
 
-		const mountedSidebarRows = timelineHarness.host.querySelectorAll(".unimian-timeline__sidebar-row").length;
-		const mountedTimelineRows = timelineHarness.host.querySelectorAll(".unimian-timeline__row").length;
+		const mountedSidebarRows = timelineHarness.host.querySelectorAll(
+			".unimian-timeline__sidebar-row",
+		).length;
+		const mountedTimelineRows =
+			timelineHarness.host.querySelectorAll(".unimian-timeline__row").length;
 
 		// 5,000 items in the model, but VirtualLinearCollection (src/platform/dom/VirtualLinearCollection.ts)
 		// only mounts rows for the viewport plus overscan — this confirms that still holds.
@@ -200,8 +237,15 @@ function ganttHarness(configOverrides: Record<string, unknown> = {}) {
 	document.body.appendChild(host);
 	const renders: ComponentChild[] = [];
 	const handle = {
-		scrollToDate: vi.fn(), scrollToToday: vi.fn(), scrollToTask: vi.fn(), setScale: vi.fn(), zoomToFit: vi.fn(),
-		getScrollElement: vi.fn().mockReturnValue(null), openDetail: vi.fn(), closeDetail: vi.fn(), addTask: vi.fn(),
+		scrollToDate: vi.fn(),
+		scrollToToday: vi.fn(),
+		scrollToTask: vi.fn(),
+		setScale: vi.fn(),
+		zoomToFit: vi.fn(),
+		getScrollElement: vi.fn().mockReturnValue(null),
+		openDetail: vi.fn(),
+		closeDetail: vi.fn(),
+		addTask: vi.fn(),
 	};
 	const renderChart: ChartRender = (node, container) => {
 		renders.push(node);
@@ -216,15 +260,27 @@ function ganttHarness(configOverrides: Record<string, unknown> = {}) {
 	};
 	const values: Record<string, unknown> = { ganttStart: "note.start", ...configOverrides };
 	const entry = {
-		file: { path: "A.md", basename: "A", extension: "md", parent: null, stat: { ctime: 1, mtime: 2 } },
+		file: {
+			path: "A.md",
+			basename: "A",
+			extension: "md",
+			parent: null,
+			stat: { ctime: 1, mtime: 2 },
+		},
 		getValue: (id: string) => (id === "note.start" ? new DateValue("2026-01-01") : null),
 	};
-	const app = { metadataCache: { getFirstLinkpathDest: () => null }, vault: { getAbstractFileByPath: () => null }, workspace: { openLinkText: vi.fn() } };
+	const app = {
+		metadataCache: { getFirstLinkpathDest: () => null },
+		vault: { getAbstractFileByPath: () => null },
+		workspace: { openLinkText: vi.fn() },
+	};
 	const controller = {
 		app,
 		config: {
 			get: (key: string) => values[key],
-			set: (key: string, value: unknown) => { values[key] = value; },
+			set: (key: string, value: unknown) => {
+				values[key] = value;
+			},
 			getAsPropertyId: (key: string) => values[key] ?? null,
 			getOrder: () => [],
 			getDisplayName: (id: string) => id,
@@ -258,7 +314,11 @@ describe("Swimlane fast path for identical updates (PERF-002)", () => {
 		await waitForRender();
 		const cardBefore = harness.host.querySelector(".planner-kanban-card");
 
-		const data = (harness.view as unknown as { data: { groupedData: Array<{ entries: Array<{ file: { stat: { mtime: number } } }> }> } }).data;
+		const data = (
+			harness.view as unknown as {
+				data: { groupedData: Array<{ entries: Array<{ file: { stat: { mtime: number } } }> }> };
+			}
+		).data;
 		const file = data.groupedData[0]?.entries[0]?.file;
 		if (file) file.stat.mtime += 1;
 		harness.view.onDataUpdated();
@@ -287,7 +347,11 @@ describe("Calendar fast path for identical updates (PERF-002)", () => {
 		const harness = createCalendarHarness({ config: { defaultView: "dayGridMonth" } });
 		const calendarBefore = (harness.view as unknown as { calendar: unknown }).calendar;
 
-		const data = (harness.view as unknown as { data: { groupedData: Array<{ entries: Array<{ file: { stat?: { mtime: number } } }> }> } }).data;
+		const data = (
+			harness.view as unknown as {
+				data: { groupedData: Array<{ entries: Array<{ file: { stat?: { mtime: number } } }> }> };
+			}
+		).data;
 		const file = data.groupedData[0]?.entries[0]?.file;
 		if (file) file.stat = { mtime: (file.stat?.mtime ?? 0) + 1 };
 		harness.view.onDataUpdated();
@@ -312,7 +376,11 @@ describe("Gantt fast path for identical updates (PERF-002)", () => {
 		const harness = ganttHarness();
 		const renderCount = harness.renders.length;
 
-		const data = (harness.view as unknown as { data: { groupedData: Array<{ entries: Array<{ file: { stat: { mtime: number } } }> }> } }).data;
+		const data = (
+			harness.view as unknown as {
+				data: { groupedData: Array<{ entries: Array<{ file: { stat: { mtime: number } } }> }> };
+			}
+		).data;
 		const file = data.groupedData[0]?.entries[0]?.file;
 		if (file) file.stat.mtime += 1;
 		harness.view.onDataUpdated();
@@ -360,7 +428,18 @@ describe("Swimlane drag-and-drop does not accumulate timers under rapid triggers
 		containerEl.appendChild(boardEl);
 		// handleEdgeScroll compares clientX/Y against getBoundingClientRect(); happy-dom returns
 		// all-zero rects by default, so stub one with real edges.
-		boardEl.getBoundingClientRect = () => ({ width: 800, height: 600, top: 0, left: 0, right: 800, bottom: 600, x: 0, y: 0, toJSON() {} }) as DOMRect;
+		boardEl.getBoundingClientRect = () =>
+			({
+				width: 800,
+				height: 600,
+				top: 0,
+				left: 0,
+				right: 800,
+				bottom: 600,
+				x: 0,
+				y: 0,
+				toJSON() {},
+			}) as DOMRect;
 
 		const host = makeHost(document, containerEl, boardEl);
 		const drag = new DragController(host);
@@ -402,7 +481,18 @@ describe("Swimlane drag-and-drop does not accumulate timers under rapid triggers
 		const boardEl = document.createElement("div");
 		document.body.appendChild(containerEl);
 		containerEl.appendChild(boardEl);
-		boardEl.getBoundingClientRect = () => ({ width: 800, height: 600, top: 0, left: 0, right: 800, bottom: 600, x: 0, y: 0, toJSON() {} }) as DOMRect;
+		boardEl.getBoundingClientRect = () =>
+			({
+				width: 800,
+				height: 600,
+				top: 0,
+				left: 0,
+				right: 800,
+				bottom: 600,
+				x: 0,
+				y: 0,
+				toJSON() {},
+			}) as DOMRect;
 
 		const host = makeHost(document, containerEl, boardEl);
 		const drag = new DragController(host);
@@ -413,7 +503,8 @@ describe("Swimlane drag-and-drop does not accumulate timers under rapid triggers
 		const setTimeoutSpy = vi.spyOn(window, "setTimeout");
 		const clearTimeoutSpy = vi.spyOn(window, "clearTimeout");
 
-		const touch = (clientX: number, clientY: number) => ({ touches: [{ clientX, clientY }] }) as unknown as TouchEvent;
+		const touch = (clientX: number, clientY: number) =>
+			({ touches: [{ clientX, clientY }] }) as unknown as TouchEvent;
 		// Rapid repeated touchstarts on the same card (e.g. a flaky touchscreen re-firing before
 		// the hold delay elapses) must not leave more than one hold timer scheduled: touchstart's
 		// handler calls cancelTouchHold() before arming a fresh one.
@@ -432,7 +523,15 @@ describe("Swimlane drag-and-drop does not accumulate timers under rapid triggers
 
 describe("Gantt write-back does not run overlapping writes under rapid drag/resize triggers (PERF-003)", () => {
 	function task(id: string, progress: number): Task {
-		return { id, name: id, startDate: "2026-01-01T00:00:00.000Z", endDate: "2026-01-05T00:00:00.000Z", parentId: null, sequence: "1", progress };
+		return {
+			id,
+			name: id,
+			startDate: "2026-01-01T00:00:00.000Z",
+			endDate: "2026-01-05T00:00:00.000Z",
+			parentId: null,
+			sequence: "1",
+			progress,
+		};
 	}
 
 	it("serializes rapid onTasksChange calls one at a time instead of firing them concurrently", async () => {
@@ -452,7 +551,12 @@ describe("Gantt write-back does not run overlapping writes under rapid drag/resi
 		});
 
 		const writeBack = new GanttWriteBack([task("T1", 0)], {
-			mutations: { property: { setProperties, setProperty: vi.fn(async (): Promise<MutationResult> => ({ ok: true })) } },
+			mutations: {
+				property: {
+					setProperties,
+					setProperty: vi.fn(async (): Promise<MutationResult> => ({ ok: true })),
+				},
+			},
 			properties: { progress: "progress" },
 			revertTasks: vi.fn(),
 			notice: vi.fn(),
@@ -479,7 +583,9 @@ describe("Calendar view-mode switching does not accumulate work under rapid swit
 		let calendarHarness2: CalendarHarness | null = null;
 		try {
 			calendarHarness2 = createCalendarHarness({ config: { defaultView: "dayGridMonth" } });
-			const view = calendarHarness2.view as unknown as { calendar: { changeView(view: string): void; destroy: () => void } };
+			const view = calendarHarness2.view as unknown as {
+				calendar: { changeView(view: string): void; destroy: () => void };
+			};
 			const calendarInstance = view.calendar;
 			expect(calendarInstance).not.toBeNull();
 

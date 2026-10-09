@@ -28,7 +28,11 @@ export const DEFAULT_TARGET_CARD_WIDTH = 240;
  * one target width already adapts continuously to the container, so three fixed tiers would be
  * redundant (see docs/specs/sticky-note.md §2.5's `cardWidth` option).
  */
-export function getColumnCount(containerWidth: number, targetCardWidth: number = DEFAULT_TARGET_CARD_WIDTH, gap = MASONRY_GAP): number {
+export function getColumnCount(
+	containerWidth: number,
+	targetCardWidth: number = DEFAULT_TARGET_CARD_WIDTH,
+	gap = MASONRY_GAP,
+): number {
 	if (containerWidth <= 0 || targetCardWidth <= 0) return 1;
 	return Math.max(1, Math.floor((containerWidth + gap) / (targetCardWidth + gap)));
 }
@@ -38,10 +42,16 @@ export function getColumnCount(containerWidth: number, targetCardWidth: number =
  * order is left untouched (only `top`/`left`/`width` styles change), so keyboard/reading order
  * stays independent of visual placement.
  */
-export function layoutMasonrySection(section: HTMLElement, targetCardWidth: number = DEFAULT_TARGET_CARD_WIDTH, gap = MASONRY_GAP): void {
-	const cards = Array.from(section.children).filter((el): el is HTMLElement => el instanceof HTMLElement);
+export function layoutMasonrySection(
+	section: HTMLElement,
+	targetCardWidth: number = DEFAULT_TARGET_CARD_WIDTH,
+	gap = MASONRY_GAP,
+): void {
+	const cards = Array.from(section.children).filter(
+		(el): el is HTMLElement => el instanceof HTMLElement,
+	);
 	if (cards.length === 0) {
-		section.style.height = '0px';
+		section.style.height = "0px";
 		return;
 	}
 
@@ -57,7 +67,7 @@ export function layoutMasonrySection(section: HTMLElement, targetCardWidth: numb
 	// width can be written for all cards, then every height read once, before any position is
 	// decided or written.
 	for (const card of cards) {
-		card.style.position = 'absolute';
+		card.style.position = "absolute";
 		card.style.width = `${colWidth}px`;
 	}
 
@@ -87,6 +97,6 @@ export function layoutMasonrySection(section: HTMLElement, targetCardWidth: numb
 		card.style.top = `${top}px`;
 	}
 
-	section.style.position = 'relative';
+	section.style.position = "relative";
 	section.style.height = `${Math.max(...columnHeights) - gap}px`;
 }

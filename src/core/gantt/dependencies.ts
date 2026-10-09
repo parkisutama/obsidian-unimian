@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Parkis Utama
 
-import type { DependencyType, TaskDependency } from '@jaeungkim/gantt-chart';
+import type { DependencyType, TaskDependency } from "@jaeungkim/gantt-chart";
 
 export type DependencyValues = Partial<Record<DependencyType, unknown>>;
 export type LinkResolver = (target: string) => string | null;
 
-const TYPES: readonly DependencyType[] = ['FS', 'SS', 'FF', 'SF'];
+const TYPES: readonly DependencyType[] = ["FS", "SS", "FF", "SF"];
 /** How a Depends on property is stored: a YAML list of links, or one text value of links. */
-export type DependencyStorage = 'list' | 'text';
+export type DependencyStorage = "list" | "text";
 
 // Link text never contains a bracket, so a value damaged into "[[[[Note]]" still yields "[[Note]]".
 const WIKILINK_ANYWHERE = /\[\[[^[\]|]+(?:\|[^[\]]+)?\]\]/g;
@@ -16,7 +16,7 @@ const WIKILINK_TARGET = /^\[\[([^[\]|]+)(?:\|[^[\]]+)?\]\]$/;
 
 /** A link target with any stray brackets around it removed. */
 export function cleanLinkTarget(target: string): string {
-	return target.trim().replace(/^\[+/, '').replace(/\]+$/, '').trim();
+	return target.trim().replace(/^\[+/, "").replace(/\]+$/, "").trim();
 }
 
 /** Wraps a target once. Re-wrapping an already wrapped target is what grew "[[[[[[Note]]". */
@@ -31,13 +31,16 @@ export function wikiLinkText(target: string): string {
  */
 function expand(value: unknown): string[] {
 	const raws = Array.isArray(value) ? value : [value];
-	return raws.flatMap(raw => {
-		if (typeof raw !== 'string') return [];
+	return raws.flatMap((raw) => {
+		if (typeof raw !== "string") return [];
 		const text = raw.trim();
 		if (!text) return [];
 		const wikilinks = text.match(WIKILINK_ANYWHERE);
 		if (wikilinks) return wikilinks;
-		return text.split(/[\n,]/).map(part => part.trim()).filter(Boolean);
+		return text
+			.split(/[\n,]/)
+			.map((part) => part.trim())
+			.filter(Boolean);
 	});
 }
 
@@ -46,12 +49,14 @@ function linkTarget(raw: string): string {
 }
 
 export function toGanttWikiLink(filePath: string): string {
-	return `[[${filePath.replace(/\.md$/i, '')}]]`;
+	return `[[${filePath.replace(/\.md$/i, "")}]]`;
 }
 
 /** `onUnresolved` hears every link that names no note, which is otherwise dropped without a trace. */
 export function parseGanttDependencies(
-	values: DependencyValues, resolve: LinkResolver, onUnresolved?: (target: string) => void,
+	values: DependencyValues,
+	resolve: LinkResolver,
+	onUnresolved?: (target: string) => void,
 ): TaskDependency[] {
 	const result: TaskDependency[] = [];
 	const seen = new Set<string>();
@@ -79,29 +84,33 @@ export function appendGanttDependency(
 	value: unknown,
 	targetPath: string,
 	resolve: LinkResolver,
-	storage: DependencyStorage = 'list',
+	storage: DependencyStorage = "list",
 	formatLink: (targetPath: string) => string = toGanttWikiLink,
 ): unknown {
 	const existing = expand(value);
-	if (existing.some(raw => resolve(linkTarget(raw)) === targetPath)) return value;
+	if (existing.some((raw) => resolve(linkTarget(raw)) === targetPath)) return value;
 	const link = formatLink(targetPath);
-	if (storage === 'text') {
+	if (storage === "text") {
 		if (existing.length === 0) return link;
-		const separator = typeof value === 'string' && value.includes('\n') ? '\n' : ', ';
+		const separator = typeof value === "string" && value.includes("\n") ? "\n" : ", ";
 		return [...existing, link].join(separator);
 	}
 	return [...existing, link];
 }
 
 function removeFromValue(value: unknown, targetPath: string, resolve: LinkResolver): unknown {
-	if (!Array.isArray(value) && typeof value !== 'string') return value;
-	const kept = expand(value).filter(raw => resolve(linkTarget(raw)) !== targetPath);
+	if (!Array.isArray(value) && typeof value !== "string") return value;
+	const kept = expand(value).filter((raw) => resolve(linkTarget(raw)) !== targetPath);
 	if (Array.isArray(value)) return kept;
-	return kept.join(value.includes('\n') ? '\n' : ', ');
+	return kept.join(value.includes("\n") ? "\n" : ", ");
 }
 
 /** Removes one resolved dependency while preserving array, comma, or newline storage shape. */
-export function removeGanttDependency(value: unknown, targetPath: string, resolve: LinkResolver): unknown {
+export function removeGanttDependency(
+	value: unknown,
+	targetPath: string,
+	resolve: LinkResolver,
+): unknown {
 	return removeFromValue(value, targetPath, resolve);
 }
 
@@ -111,5 +120,7 @@ export function removeGanttDependencyFromAllTypes(
 	targetPath: string,
 	resolve: LinkResolver,
 ): DependencyValues {
-	return Object.fromEntries(TYPES.map(type => [type, removeFromValue(values[type], targetPath, resolve)]));
+	return Object.fromEntries(
+		TYPES.map((type) => [type, removeFromValue(values[type], targetPath, resolve)]),
+	);
 }

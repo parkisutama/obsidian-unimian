@@ -11,7 +11,7 @@
  * `obsidian`; building one from a live `BasesEntry` is a `platform`-layer concern (T018).
  */
 
-import type { NormalizedValue } from './NormalizedValue';
+import type { NormalizedValue } from "./NormalizedValue";
 
 export interface EntrySnapshot {
 	/** Vault path; the durable identity for caches, virtual rows, and diffing (spec §11 "Always"). */

@@ -1,6 +1,11 @@
 // @vitest-environment happy-dom
 import { describe, expect, it, vi } from "vitest";
-import { isActivationKey, openPath, resolveOpenDestination, triggerHoverPreview } from "../src/platform/navigation/NavigationService";
+import {
+	isActivationKey,
+	openPath,
+	resolveOpenDestination,
+	triggerHoverPreview,
+} from "../src/platform/navigation/NavigationService";
 import { showOpenFileMenuWithItems } from "../src/utils/openFile";
 
 describe("resolveOpenDestination: mouse and keyboard produce the same contract", () => {
@@ -13,12 +18,20 @@ describe("resolveOpenDestination: mouse and keyboard produce the same contract",
 
 	it("resolves Cmd/Ctrl, mouse or keyboard, to 'tab'", () => {
 		expect(resolveOpenDestination(new MouseEvent("click", { ctrlKey: true }))).toBe("tab");
-		expect(resolveOpenDestination(new KeyboardEvent("keydown", { key: "Enter", metaKey: true }))).toBe("tab");
+		expect(
+			resolveOpenDestination(new KeyboardEvent("keydown", { key: "Enter", metaKey: true })),
+		).toBe("tab");
 	});
 
 	it("resolves Cmd/Ctrl+Alt to 'split' and Cmd/Ctrl+Alt+Shift to 'window'", () => {
-		expect(resolveOpenDestination(new MouseEvent("click", { ctrlKey: true, altKey: true }))).toBe("split");
-		expect(resolveOpenDestination(new MouseEvent("click", { ctrlKey: true, altKey: true, shiftKey: true }))).toBe("window");
+		expect(resolveOpenDestination(new MouseEvent("click", { ctrlKey: true, altKey: true }))).toBe(
+			"split",
+		);
+		expect(
+			resolveOpenDestination(
+				new MouseEvent("click", { ctrlKey: true, altKey: true, shiftKey: true }),
+			),
+		).toBe("window");
 	});
 
 	it("resolves a middle-click to 'tab'", () => {
@@ -47,7 +60,14 @@ describe("triggerHoverPreview", () => {
 		const event = new MouseEvent("mouseenter");
 		const hoverParent = {} as never;
 
-		triggerHoverPreview({ app, hoverParent, sourceId: "unimian-timeline", event, filePath: "A.md", targetEl });
+		triggerHoverPreview({
+			app,
+			hoverParent,
+			sourceId: "unimian-timeline",
+			event,
+			filePath: "A.md",
+			targetEl,
+		});
 
 		expect(trigger).toHaveBeenCalledWith("hover-link", {
 			event,

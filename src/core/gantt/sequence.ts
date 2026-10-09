@@ -19,8 +19,8 @@ export interface NodeSequence {
  * every call and dominated the cost of mapping a few thousand notes.
  */
 export function compareSequence(left: string, right: string): number {
-	const a = left.split('.');
-	const b = right.split('.');
+	const a = left.split(".");
+	const b = right.split(".");
 	for (let index = 0; index < Math.min(a.length, b.length); index += 1) {
 		const difference = Number(a[index]) - Number(b[index]);
 		if (difference !== 0) return difference;
@@ -29,8 +29,11 @@ export function compareSequence(left: string, right: string): number {
 }
 
 /** Assigns depth-first dotted sequences, using Order when configured and input order otherwise. */
-export function buildDepthFirstSequence<T extends SequencedNode>(nodes: readonly T[], useOrder: boolean): NodeSequence[] {
-	const ids = new Set(nodes.map(node => node.id));
+export function buildDepthFirstSequence<T extends SequencedNode>(
+	nodes: readonly T[],
+	useOrder: boolean,
+): NodeSequence[] {
+	const ids = new Set(nodes.map((node) => node.id));
 	const children = new Map<string | null, T[]>();
 	for (const node of nodes) {
 		const parent = node.parentId !== null && ids.has(node.parentId) ? node.parentId : null;
@@ -40,7 +43,8 @@ export function buildDepthFirstSequence<T extends SequencedNode>(nodes: readonly
 	}
 	const compare = (left: T, right: T) => {
 		if (useOrder) {
-			const orderDifference = (left.order ?? Number.POSITIVE_INFINITY) - (right.order ?? Number.POSITIVE_INFINITY);
+			const orderDifference =
+				(left.order ?? Number.POSITIVE_INFINITY) - (right.order ?? Number.POSITIVE_INFINITY);
 			if (orderDifference !== 0) return orderDifference;
 		}
 		return left.inputIndex - right.inputIndex || left.id.localeCompare(right.id);
@@ -55,6 +59,6 @@ export function buildDepthFirstSequence<T extends SequencedNode>(nodes: readonly
 			visit(node.id, sequence);
 		}
 	};
-	visit(null, '');
+	visit(null, "");
 	return result;
 }

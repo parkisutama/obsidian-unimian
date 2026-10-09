@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Parkis Utama
 
-import { calculateLinearVirtualRange, type LinearVirtualRange } from '../../core/layouts/linearVirtualRange';
+import {
+	calculateLinearVirtualRange,
+	type LinearVirtualRange,
+} from "../../core/layouts/linearVirtualRange";
 
 export interface VirtualLinearItem {
 	path: string;
@@ -34,19 +37,25 @@ export class VirtualLinearCollection<T extends VirtualLinearItem> {
 	private readonly mounted = new Map<string, MountedRow<T>>();
 	private items: readonly T[] = [];
 	private destroyed = false;
-	private range: LinearVirtualRange = calculateLinearVirtualRange({ itemCount: 0, rowHeight: 1, scrollTop: 0, viewportHeight: 0 });
+	private range: LinearVirtualRange = calculateLinearVirtualRange({
+		itemCount: 0,
+		rowHeight: 1,
+		scrollTop: 0,
+		viewportHeight: 0,
+	});
 	private readonly onScroll = (): void => this.refresh();
 
 	constructor(
 		private readonly viewportEl: HTMLElement,
 		private readonly options: VirtualLinearCollectionOptions<T>,
 	) {
-		if (!Number.isFinite(options.rowHeight) || options.rowHeight <= 0) throw new Error('rowHeight must be positive.');
-		this.contentEl = viewportEl.ownerDocument.createElement('div');
-		this.contentEl.className = 'unimian-virtual-linear-content';
-		this.contentEl.style.position = 'relative';
+		if (!Number.isFinite(options.rowHeight) || options.rowHeight <= 0)
+			throw new Error("rowHeight must be positive.");
+		this.contentEl = viewportEl.ownerDocument.createElement("div");
+		this.contentEl.className = "unimian-virtual-linear-content";
+		this.contentEl.style.position = "relative";
 		viewportEl.appendChild(this.contentEl);
-		viewportEl.addEventListener('scroll', this.onScroll, { passive: true });
+		viewportEl.addEventListener("scroll", this.onScroll, { passive: true });
 	}
 
 	get mountedCount(): number {
@@ -67,8 +76,9 @@ export class VirtualLinearCollection<T extends VirtualLinearItem> {
 		const anchor = preserveAnchor ? this.captureAnchor() : null;
 		this.items = items;
 		if (anchor) {
-			const newIndex = items.findIndex(item => item.path === anchor.path);
-			if (newIndex >= 0) this.viewportEl.scrollTop = newIndex * this.options.rowHeight + anchor.offset;
+			const newIndex = items.findIndex((item) => item.path === anchor.path);
+			if (newIndex >= 0)
+				this.viewportEl.scrollTop = newIndex * this.options.rowHeight + anchor.offset;
 		}
 		this.refresh();
 	}
@@ -92,9 +102,9 @@ export class VirtualLinearCollection<T extends VirtualLinearItem> {
 			if (!row) {
 				const handle = this.options.renderRow(item, index);
 				handle.element.dataset.path = item.path;
-				handle.element.style.position = 'absolute';
-				handle.element.style.left = '0';
-				handle.element.style.right = '0';
+				handle.element.style.position = "absolute";
+				handle.element.style.left = "0";
+				handle.element.style.right = "0";
 				handle.element.style.height = `${this.options.rowHeight}px`;
 				this.contentEl.appendChild(handle.element);
 				row = { item, handle };
@@ -113,16 +123,21 @@ export class VirtualLinearCollection<T extends VirtualLinearItem> {
 	destroy(): void {
 		if (this.destroyed) return;
 		this.destroyed = true;
-		this.viewportEl.removeEventListener('scroll', this.onScroll);
+		this.viewportEl.removeEventListener("scroll", this.onScroll);
 		for (const [path, row] of [...this.mounted]) this.unmount(path, row);
 		this.contentEl.remove();
 	}
 
 	private captureAnchor(): { path: string; offset: number } | null {
 		if (this.items.length === 0) return null;
-		const index = Math.min(this.items.length - 1, Math.max(0, Math.floor(this.viewportEl.scrollTop / this.options.rowHeight)));
+		const index = Math.min(
+			this.items.length - 1,
+			Math.max(0, Math.floor(this.viewportEl.scrollTop / this.options.rowHeight)),
+		);
 		const item = this.items[index];
-		return item ? { path: item.path, offset: this.viewportEl.scrollTop - index * this.options.rowHeight } : null;
+		return item
+			? { path: item.path, offset: this.viewportEl.scrollTop - index * this.options.rowHeight }
+			: null;
 	}
 
 	private unmount(path: string, row: MountedRow<T>): void {

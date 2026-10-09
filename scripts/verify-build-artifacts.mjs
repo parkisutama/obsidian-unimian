@@ -33,7 +33,9 @@ export function verifyBuildArtifacts({
 
 		if (licensedArtifacts.includes(artifact)) {
 			const head = readFileSync(artifactPath, "utf8").slice(0, BANNER_SEARCH_LENGTH);
-			const absent = requiredNoticeFragments(artifact).filter((fragment) => !head.includes(fragment));
+			const absent = requiredNoticeFragments(artifact).filter(
+				(fragment) => !head.includes(fragment),
+			);
 			if (absent.length > 0) {
 				missingNotices[artifact] = absent;
 			}

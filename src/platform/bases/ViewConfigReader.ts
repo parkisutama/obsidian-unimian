@@ -12,36 +12,38 @@
  * priority, or task schemas").
  */
 
-import type { BasesPropertyId, BasesViewConfig } from 'obsidian';
+import type { BasesPropertyId, BasesViewConfig } from "obsidian";
 
 export class ViewConfigReader {
 	constructor(private readonly config: BasesViewConfig) {}
 
 	getString(key: string, fallback: string): string {
 		const value = this.config.get(key);
-		return typeof value === 'string' && value.length > 0 ? value : fallback;
+		return typeof value === "string" && value.length > 0 ? value : fallback;
 	}
 
 	/** Like `getString`, but an empty string is a valid result (not replaced by the fallback). */
 	getOptionalString(key: string): string | null {
 		const value = this.config.get(key);
-		return typeof value === 'string' ? value : null;
+		return typeof value === "string" ? value : null;
 	}
 
 	getNumber(key: string, fallback: number): number {
 		const value = this.config.get(key);
-		return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+		return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 	}
 
 	getBoolean(key: string, fallback: boolean): boolean {
 		const value = this.config.get(key);
-		return typeof value === 'boolean' ? value : fallback;
+		return typeof value === "boolean" ? value : fallback;
 	}
 
 	/** Resolves to `fallback` unless the stored value is exactly one of `values`. */
 	getEnum<T extends string>(key: string, values: readonly T[], fallback: T): T {
 		const value = this.config.get(key);
-		return typeof value === 'string' && (values as readonly string[]).includes(value) ? (value as T) : fallback;
+		return typeof value === "string" && (values as readonly string[]).includes(value)
+			? (value as T)
+			: fallback;
 	}
 
 	/** `null` when unset or invalid — Bases' own `getAsPropertyId` already never guesses. */

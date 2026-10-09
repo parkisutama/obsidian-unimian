@@ -84,9 +84,15 @@ describe("collectBundledPackages / findUnlistedPackages", () => {
 			"main.js": {
 				inputs: {
 					"src/main.ts": { bytesInOutput: 10 },
-					"node_modules/.pnpm/fullcalendar@7.1.0_x/node_modules/fullcalendar/index.js": { bytesInOutput: 5 },
-					"node_modules/.pnpm/@scope+pkg@1.0.0/node_modules/@scope/pkg/index.js": { bytesInOutput: 5 },
-					"node_modules/.pnpm/types-only@1.0.0/node_modules/types-only/index.js": { bytesInOutput: 0 },
+					"node_modules/.pnpm/fullcalendar@7.1.0_x/node_modules/fullcalendar/index.js": {
+						bytesInOutput: 5,
+					},
+					"node_modules/.pnpm/@scope+pkg@1.0.0/node_modules/@scope/pkg/index.js": {
+						bytesInOutput: 5,
+					},
+					"node_modules/.pnpm/types-only@1.0.0/node_modules/types-only/index.js": {
+						bytesInOutput: 0,
+					},
 				},
 			},
 		},
@@ -106,7 +112,9 @@ describe("collectBundledPackages / findUnlistedPackages", () => {
 		expect(findUnlistedPackages(bundled, "`fullcalendar@7.1.0`")).toEqual([
 			"@scope/pkg@1.0.0 is bundled but not listed in scripts/license-banner.mjs",
 		]);
-		expect(findUnlistedPackages(new Map([["fullcalendar", "7.2.0"]]), "`fullcalendar@7.1.0`")).toEqual([
+		expect(
+			findUnlistedPackages(new Map([["fullcalendar", "7.2.0"]]), "`fullcalendar@7.1.0`"),
+		).toEqual([
 			"fullcalendar@7.2.0 is bundled but THIRD_PARTY_NOTICES.md does not list that version",
 		]);
 	});

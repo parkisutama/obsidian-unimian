@@ -11,7 +11,7 @@
  * pure lookup — it never constructs an `EntrySnapshot` or any other data model.
  */
 
-export type OptionKind = 'data' | 'css';
+export type OptionKind = "data" | "css";
 
 export interface ViewOptionSchema {
 	readonly cssOnlyKeys: ReadonlySet<string>;
@@ -23,10 +23,10 @@ export function createViewOptionSchema(cssOnlyKeys: readonly string[]): ViewOpti
 }
 
 export function classifyOption(schema: ViewOptionSchema, key: string): OptionKind {
-	return schema.cssOnlyKeys.has(key) ? 'css' : 'data';
+	return schema.cssOnlyKeys.has(key) ? "css" : "data";
 }
 
 /** True if every key in `keys` is CSS-only under `schema` — e.g. "did only CSS-only options change?" */
 export function areAllCssOnly(schema: ViewOptionSchema, keys: readonly string[]): boolean {
-	return keys.length > 0 && keys.every((key) => classifyOption(schema, key) === 'css');
+	return keys.length > 0 && keys.every((key) => classifyOption(schema, key) === "css");
 }

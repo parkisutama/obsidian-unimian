@@ -17,7 +17,9 @@ describe("UnimianPlugin.loadSettings", () => {
 
 	it("drops the legacy kanbanDefaults instead of reviving its forced column property", async () => {
 		// Older versions saved every default, including plannerGroupBy: "note.status".
-		const settings = await loadWith({ kanbanDefaults: { plannerGroupBy: "note.status", columnWidth: 300 } });
+		const settings = await loadWith({
+			kanbanDefaults: { plannerGroupBy: "note.status", columnWidth: 300 },
+		});
 		expect(settings).not.toHaveProperty("kanbanDefaults");
 		expect(settings.swimlaneDefaults.plannerGroupBy).toBe("");
 	});
@@ -25,6 +27,8 @@ describe("UnimianPlugin.loadSettings", () => {
 	it("keeps saved swimlane defaults and fills in missing keys", async () => {
 		const settings = await loadWith({ swimlaneDefaults: { columnWidth: 320 } });
 		expect(settings.swimlaneDefaults.columnWidth).toBe(320);
-		expect(settings.swimlaneDefaults.borderStyle).toBe(DEFAULT_SETTINGS.swimlaneDefaults.borderStyle);
+		expect(settings.swimlaneDefaults.borderStyle).toBe(
+			DEFAULT_SETTINGS.swimlaneDefaults.borderStyle,
+		);
 	});
 });

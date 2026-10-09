@@ -1,10 +1,15 @@
+import esbuild from "esbuild";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import path from "path";
 import { fileURLToPath } from "url";
-import esbuild from "esbuild";
 import { afterEach, describe, expect, it } from "vitest";
-import { BUNDLE_MARKER, composeStyles, createCssMergePlugin, packageLicenseNotice } from "../scripts/css-merge.mjs";
+import {
+	BUNDLE_MARKER,
+	composeStyles,
+	createCssMergePlugin,
+	packageLicenseNotice,
+} from "../scripts/css-merge.mjs";
 
 const fixtures = fileURLToPath(new URL("./fixtures/css-merge/", import.meta.url));
 const tempDirs = [];
@@ -23,7 +28,12 @@ afterEach(() => {
 const BANNER = "/*! Test banner */\n";
 
 /** Build the fixture entry with the css-merge plugin, writing into a temp styles.css. */
-async function buildFixture({ existingStyles = "", extraCss = [], firstPartyCss, rebuilds = 1 } = {}) {
+async function buildFixture({
+	existingStyles = "",
+	extraCss = [],
+	firstPartyCss,
+	rebuilds = 1,
+} = {}) {
 	const dir = makeTempDir();
 	const stylesPath = path.join(dir, "styles.css");
 	writeFileSync(stylesPath, existingStyles);
@@ -77,7 +87,12 @@ describe("packageLicenseNotice", () => {
 });
 
 describe("composeStyles", () => {
-	const base = { banner: BANNER, bannerStart: "/*! Test banner", extras: [], extraPaths: new Set() };
+	const base = {
+		banner: BANNER,
+		bannerStart: "/*! Test banner",
+		extras: [],
+		extraPaths: new Set(),
+	};
 
 	it("sorts imports by path whatever order they finished loading in", () => {
 		const styles = composeStyles({
@@ -125,7 +140,12 @@ describe("composeStyles", () => {
 	});
 
 	it("preserves firstParty's given order even though it isn't path-sorted", () => {
-		const styles = composeStyles({ ...base, existing: "", firstParty: ".z-module {}\n\n.a-module {}\n", imported: [] });
+		const styles = composeStyles({
+			...base,
+			existing: "",
+			firstParty: ".z-module {}\n\n.a-module {}\n",
+			imported: [],
+		});
 		expect(styles.indexOf(".z-module {}")).toBeLessThan(styles.indexOf(".a-module {}"));
 	});
 });
@@ -143,7 +163,9 @@ describe("createCssMergePlugin", () => {
 
 	it("orders merged CSS by path, not by import order", async () => {
 		const styles = await buildFixture();
-		expect(styles.indexOf(".a { color: red; }")).toBeLessThan(styles.indexOf(".b { color: blue; }"));
+		expect(styles.indexOf(".a { color: red; }")).toBeLessThan(
+			styles.indexOf(".b { color: blue; }"),
+		);
 	});
 
 	it("produces identical output across builds", async () => {
@@ -168,7 +190,14 @@ describe("createCssMergePlugin", () => {
 			bundle: true,
 			write: false,
 			logLevel: "silent",
-			plugins: [createCssMergePlugin({ stylesPath, banner: BANNER, bannerStart: "/*! Test banner", log: () => {} })],
+			plugins: [
+				createCssMergePlugin({
+					stylesPath,
+					banner: BANNER,
+					bannerStart: "/*! Test banner",
+					log: () => {},
+				}),
+			],
 		});
 		await context.rebuild();
 		await context.dispose();
@@ -196,7 +225,10 @@ describe("createCssMergePlugin", () => {
 			path.join(fixtures, "first-party", "foundations.css"),
 			path.join(fixtures, "first-party", "views.css"),
 		];
-		const outputs = await Promise.all([buildFixture({ firstPartyCss }), buildFixture({ firstPartyCss })]);
+		const outputs = await Promise.all([
+			buildFixture({ firstPartyCss }),
+			buildFixture({ firstPartyCss }),
+		]);
 		expect(new Set(outputs).size).toBe(1);
 	});
 
@@ -211,7 +243,13 @@ describe("createCssMergePlugin", () => {
 			],
 		});
 		const bundled = styles.split(BUNDLE_MARKER)[1];
-		expect(bundled.trimStart().startsWith("/*! @scope/pkg-b v4.5.6 | Apache-2.0 License | Copyright 2021 Bob Example | Modified: themed")).toBe(true);
+		expect(
+			bundled
+				.trimStart()
+				.startsWith(
+					"/*! @scope/pkg-b v4.5.6 | Apache-2.0 License | Copyright 2021 Bob Example | Modified: themed",
+				),
+		).toBe(true);
 		expect(bundled).toContain(".b { color: var(--accent); }");
 		// The same file imported by the entry is not merged a second time.
 		expect(count(bundled, "From: b.css")).toBe(1);

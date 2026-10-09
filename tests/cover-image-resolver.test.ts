@@ -1,8 +1,9 @@
 // @vitest-environment happy-dom
-import { describe, expect, it } from "vitest";
-import { TFile } from "./fixtures/obsidian";
-import { resolveCoverImageSrc } from "../src/platform/dom/CoverImageResolver";
+
 import type { App } from "obsidian";
+import { describe, expect, it } from "vitest";
+import { resolveCoverImageSrc } from "../src/platform/dom/CoverImageResolver";
+import { TFile } from "./fixtures/obsidian";
 
 function makeApp(options: { existingFiles?: string[] } = {}) {
 	const files = new Set(options.existingFiles ?? []);
@@ -19,7 +20,9 @@ function makeApp(options: { existingFiles?: string[] } = {}) {
 describe("resolveCoverImageSrc", () => {
 	it("returns an external/app:// URL as-is", () => {
 		const { app } = makeApp();
-		expect(resolveCoverImageSrc(app, "https://example.com/a.png")).toBe("https://example.com/a.png");
+		expect(resolveCoverImageSrc(app, "https://example.com/a.png")).toBe(
+			"https://example.com/a.png",
+		);
 		expect(resolveCoverImageSrc(app, "app://local/a.png")).toBe("app://local/a.png");
 	});
 

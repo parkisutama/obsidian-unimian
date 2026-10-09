@@ -1,12 +1,16 @@
 // @vitest-environment happy-dom
-import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { BASES_SWIMLANE_VIEW_ID, createSwimlaneViewRegistration } from "../src/views/BasesSwimlaneView";
-import { DEFAULT_SETTINGS } from "../src/types/settings";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type UnimianPlugin from "../src/main";
-import { createSwimlaneHarness, waitForRender, type SwimlaneHarness } from "./fixtures/swimlane";
+import { DEFAULT_SETTINGS } from "../src/types/settings";
+import {
+	BASES_SWIMLANE_VIEW_ID,
+	createSwimlaneViewRegistration,
+} from "../src/views/BasesSwimlaneView";
+import { createSwimlaneHarness, type SwimlaneHarness, waitForRender } from "./fixtures/swimlane";
 
 const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as UnimianPlugin;
 const repoRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -38,7 +42,9 @@ describe("Swimlane view registration", () => {
 		const options = createSwimlaneViewRegistration(plugin).options?.({} as never) ?? [];
 		const propertyOptions = options.filter((option) => option.type === "property");
 		expect(propertyOptions.length).toBeGreaterThan(0);
-		const preselected = propertyOptions.filter((option) => "default" in option && option.default).map((option) => option.key);
+		const preselected = propertyOptions
+			.filter((option) => "default" in option && option.default)
+			.map((option) => option.key);
 		expect(preselected).toEqual([]);
 	});
 
@@ -90,7 +96,12 @@ describe("Swimlane view with configured properties", () => {
 
 	it("uses the configured title, cover, and summary properties", async () => {
 		const h = await mount({
-			config: { plannerGroupBy: "note.status", titleBy: "note.title", coverField: "note.cover", summaryField: "note.summary" },
+			config: {
+				plannerGroupBy: "note.status",
+				titleBy: "note.title",
+				coverField: "note.cover",
+				summaryField: "note.summary",
+			},
 			order: ["note.summary"],
 		});
 		expect(texts(h, ".planner-kanban-card-title")).toContain("Spec title");
@@ -111,17 +122,24 @@ describe("Swimlane view lifecycle", () => {
 	it("disconnects the previous render's virtual-scroll observers before mounting new ones", async () => {
 		const notes = Array.from({ length: 20 }, (_, i) => ({ path: `Tasks/${i}.md`, status: "Todo" }));
 		const h = await mount({ notes, config: { plannerGroupBy: "note.status" } });
-		const observers = (h.view as unknown as { virtualScrollObservers: Map<unknown, { disconnect: () => void }> })
-			.virtualScrollObservers;
+		const observers = (
+			h.view as unknown as { virtualScrollObservers: Map<unknown, { disconnect: () => void }> }
+		).virtualScrollObservers;
 		expect(observers.size).toBeGreaterThan(0);
 		const firstRenderObservers = [...observers.values()];
-		const disconnectSpies = firstRenderObservers.map((observer) => vi.spyOn(observer, "disconnect"));
+		const disconnectSpies = firstRenderObservers.map((observer) =>
+			vi.spyOn(observer, "disconnect"),
+		);
 
 		// PERF-002: onDataUpdated() now takes a fast path and skips rebuilding entirely when the
 		// update is identical to the last one, so this must simulate a genuine data change (a
 		// bumped mtime, exactly as a real edited note would report) to still exercise a real
 		// re-render here.
-		const data = (h.view as unknown as { data: { groupedData: Array<{ entries: Array<{ file: { stat: { mtime: number } } }> }> } }).data;
+		const data = (
+			h.view as unknown as {
+				data: { groupedData: Array<{ entries: Array<{ file: { stat: { mtime: number } } }> }> };
+			}
+		).data;
 		const firstEntryFile = data.groupedData[0]?.entries[0]?.file;
 		if (firstEntryFile) firstEntryFile.stat.mtime += 1;
 
@@ -152,7 +170,9 @@ describe("Swimlane view lifecycle", () => {
 		expect(row).not.toBeNull();
 		internals(h).startSwimlaneTouchDrag(row!, "High", { touches: [{ clientX: 0, clientY: 0 }] });
 
-		expect(h.host.ownerDocument.querySelector(".planner-kanban-swimlane-drag-clone")).not.toBeNull();
+		expect(
+			h.host.ownerDocument.querySelector(".planner-kanban-swimlane-drag-clone"),
+		).not.toBeNull();
 		h.view.onunload();
 		expect(h.host.ownerDocument.querySelector(".planner-kanban-swimlane-drag-clone")).toBeNull();
 	});
@@ -168,7 +188,10 @@ describe("Swimlane view lifecycle", () => {
 
 describe("Swimlane shared platform boundaries (T026)", () => {
 	it("does not retain BasesEntry or call Obsidian mutation APIs directly", () => {
-		const source = readFileSync(path.join(repoRoot, "src", "views", "BasesSwimlaneView.ts"), "utf8");
+		const source = readFileSync(
+			path.join(repoRoot, "src", "views", "BasesSwimlaneView.ts"),
+			"utf8",
+		);
 		expect(source).not.toContain("BasesEntry");
 		expect(source).not.toContain(".processFrontMatter(");
 		expect(source).not.toContain(".renameFile(");
@@ -178,19 +201,24 @@ describe("Swimlane shared platform boundaries (T026)", () => {
 	});
 
 	it("uses shared color and hover adapters", () => {
-		const source = readFileSync(path.join(repoRoot, "src", "views", "BasesSwimlaneView.ts"), "utf8");
+		const source = readFileSync(
+			path.join(repoRoot, "src", "views", "BasesSwimlaneView.ts"),
+			"utf8",
+		);
 		expect(source).toContain("resolveColor({");
 		expect(source).toContain("resolvePrettyPropertiesColor(");
 		expect(source).toContain("dispatchHoverPreview({");
 		expect(source).not.toContain("PrettyPropertiesApi");
-		expect(source).not.toContain("workspace.trigger('hover-link'");
+		expect(source).not.toMatch(/workspace\.trigger\(\s*["']hover-link["']/);
 	});
 });
 
 describe("Swimlane card rendering (characterization)", () => {
 	const base = { plannerGroupBy: "note.status", coverField: "note.cover" };
 	const specCard = (h: SwimlaneHarness) =>
-		[...h.host.querySelectorAll<HTMLElement>(".planner-kanban-card")].find((c) => c.dataset.path === "Tasks/Write spec.md")!;
+		[...h.host.querySelectorAll<HTMLElement>(".planner-kanban-card")].find(
+			(c) => c.dataset.path === "Tasks/Write spec.md",
+		)!;
 
 	it("renders a banner cover with the configured height", async () => {
 		const h = await mount({ config: { ...base, coverDisplay: "banner", coverHeight: "150" } });
@@ -219,10 +247,14 @@ describe("Swimlane card rendering (characterization)", () => {
 	});
 
 	it("applies the configured border style class", async () => {
-		const accent = await mount({ config: { plannerGroupBy: "note.status", borderStyle: "left-accent" } });
+		const accent = await mount({
+			config: { plannerGroupBy: "note.status", borderStyle: "left-accent" },
+		});
 		expect(specCard(accent).classList).toContain("planner-kanban-card-base--left-accent");
 		accent.destroy();
-		const full = await mount({ config: { plannerGroupBy: "note.status", borderStyle: "full-border" } });
+		const full = await mount({
+			config: { plannerGroupBy: "note.status", borderStyle: "full-border" },
+		});
 		expect(specCard(full).classList).toContain("planner-kanban-card-base--full-border");
 		full.destroy();
 		const none = await mount({ config: { plannerGroupBy: "note.status", borderStyle: "none" } });
@@ -231,13 +263,26 @@ describe("Swimlane card rendering (characterization)", () => {
 
 	it("places badges inline in the title row or in a properties section below", async () => {
 		const opts = { order: ["note.priority"] };
-		const inline = await mount({ ...opts, config: { plannerGroupBy: "note.status", badgePlacement: "inline" } });
-		expect(specCard(inline).querySelector(".planner-kanban-card-title-row--inline .planner-kanban-badges--inline")).not.toBeNull();
+		const inline = await mount({
+			...opts,
+			config: { plannerGroupBy: "note.status", badgePlacement: "inline" },
+		});
+		expect(
+			specCard(inline).querySelector(
+				".planner-kanban-card-title-row--inline .planner-kanban-badges--inline",
+			),
+		).not.toBeNull();
 		inline.destroy();
-		const section = await mount({ ...opts, config: { plannerGroupBy: "note.status", badgePlacement: "properties-section" } });
+		const section = await mount({
+			...opts,
+			config: { plannerGroupBy: "note.status", badgePlacement: "properties-section" },
+		});
 		const card = specCard(section);
 		expect(card.querySelector(".planner-kanban-card-title-row--inline")).toBeNull();
-		expect(card.querySelector(".planner-kanban-card-content > .planner-kanban-badges--bottom")?.textContent).toContain("High");
+		expect(
+			card.querySelector(".planner-kanban-card-content > .planner-kanban-badges--bottom")
+				?.textContent,
+		).toContain("High");
 	});
 });
 
@@ -246,7 +291,9 @@ describe("Swimlane column ordering (characterization)", () => {
 		const h = await mount({ config: { plannerGroupBy: "note.status" } });
 		expect(texts(h, ".planner-kanban-column-title")).toEqual(["Doing", "Done", "Todo"]);
 		h.destroy();
-		const saved = await mount({ config: { plannerGroupBy: "note.status", columnOrder: JSON.stringify(["Todo", "Doing"]) } });
+		const saved = await mount({
+			config: { plannerGroupBy: "note.status", columnOrder: JSON.stringify(["Todo", "Doing"]) },
+		});
 		expect(texts(saved, ".planner-kanban-column-title")).toEqual(["Todo", "Doing", "Done"]);
 	});
 });
@@ -258,7 +305,11 @@ describe("Swimlane lifecycle leaks (characterization)", () => {
 			h.view.onDataUpdated();
 			await waitForRender();
 			const card = h.host.querySelector<HTMLElement>(".planner-kanban-card")!;
-			internals(h).startTouchDrag(card, { path: "Tasks/Build.md" }, { touches: [{ clientX: 0, clientY: 0 }] });
+			internals(h).startTouchDrag(
+				card,
+				{ path: "Tasks/Build.md" },
+				{ touches: [{ clientX: 0, clientY: 0 }] },
+			);
 			h.destroy();
 			harness = null;
 			expect(document.querySelector(".planner-kanban-drag-clone")).toBeNull();
@@ -283,7 +334,9 @@ describe("Swimlane keyboard navigation (characterization)", () => {
 
 describe("Swimlane grid layout (characterization)", () => {
 	it("renders one row per swimlane value, alphabetically, each with a cell per column", async () => {
-		const h = await mount({ config: { plannerGroupBy: "note.status", swimlaneBy: "note.priority" } });
+		const h = await mount({
+			config: { plannerGroupBy: "note.status", swimlaneBy: "note.priority" },
+		});
 		const rows = [...h.host.querySelectorAll<HTMLElement>(".planner-kanban-swimlane-row")];
 		expect(rows.length).toBeGreaterThanOrEqual(3);
 		expect(h.host.textContent).toContain("High");
@@ -293,7 +346,10 @@ describe("Swimlane grid layout (characterization)", () => {
 
 	it("renders a single column from a saved order with one value", async () => {
 		const notes = [{ path: "a.md", status: "Todo" }];
-		const shown = await mount({ notes, config: { plannerGroupBy: "note.status", columnOrder: JSON.stringify(["Todo"]) } });
+		const shown = await mount({
+			notes,
+			config: { plannerGroupBy: "note.status", columnOrder: JSON.stringify(["Todo"]) },
+		});
 		expect(texts(shown, ".planner-kanban-column-title")).toEqual(["Todo"]);
 	});
 });
@@ -304,7 +360,13 @@ describe("Swimlane frozen column headers without swimlanes", () => {
 		const row = h.host.querySelector(".planner-kanban-header-row--frozen");
 		expect(row?.classList).toContain("planner-kanban-header-row--plain");
 		h.destroy();
-		const withLanes = await mount({ config: { plannerGroupBy: "note.status", swimlaneBy: "note.priority", freezeHeaders: "columns" } });
+		const withLanes = await mount({
+			config: {
+				plannerGroupBy: "note.status",
+				swimlaneBy: "note.priority",
+				freezeHeaders: "columns",
+			},
+		});
 		expect(withLanes.host.querySelector(".planner-kanban-header-row--plain")).toBeNull();
 	});
 });

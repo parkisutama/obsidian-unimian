@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { TFile } from "obsidian";
-import { notices, TFile as FakeFile } from "./fixtures/obsidian";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { LegacyMutationGateway } from "../src/platform/mutations/LegacyMutationGateway";
 import { NoteTemplateService } from "../src/services/NoteTemplateService";
 import { detectTemplateEngine, PLAIN_TEMPLATE_NOTICE } from "../src/services/templateEngine";
-import { LegacyMutationGateway } from "../src/platform/mutations/LegacyMutationGateway";
+import { TFile as FakeFile, notices } from "./fixtures/obsidian";
 
 vi.mock("../src/utils/openFile", () => ({ openFileInNewTab: vi.fn() }));
 
@@ -34,7 +34,9 @@ function createApp(engines: { templater?: boolean; core?: boolean } = {}): Fixtu
 		return file;
 	});
 	const insertTemplate = vi.fn();
-	const processFrontMatter = vi.fn(async (_file: TFile, fn: (fm: Record<string, unknown>) => void) => fn({}));
+	const processFrontMatter = vi.fn(
+		async (_file: TFile, fn: (fm: Record<string, unknown>) => void) => fn({}),
+	);
 	const open = vi.fn();
 	const folders = new Set<string>(["Events"]);
 
@@ -59,10 +61,15 @@ function createApp(engines: { templater?: boolean; core?: boolean } = {}): Fixtu
 			getActiveFile: () => null,
 			getLeaf: () => ({ openFile: open }),
 		},
-		plugins: { plugins: engines.templater ? { "templater-obsidian": { templater: { create_new_note_from_template: templater } } } : {} },
+		plugins: {
+			plugins: engines.templater
+				? { "templater-obsidian": { templater: { create_new_note_from_template: templater } } }
+				: {},
+		},
 		internalPlugins: {
 			getPluginById: (id: string) => {
-				if (id === "templates") return { enabled: Boolean(engines.core), instance: { insertTemplate } };
+				if (id === "templates")
+					return { enabled: Boolean(engines.core), instance: { insertTemplate } };
 				return undefined;
 			},
 		},
@@ -97,7 +104,12 @@ describe("NoteTemplateService", () => {
 		await new NoteTemplateService(f.app, settings).createNote({} as never, context);
 
 		expect(f.templater).toHaveBeenCalledTimes(1);
-		const [template, folder, name, openNew] = f.templater.mock.calls[0] as [TFile, { path: string }, string, boolean];
+		const [template, folder, name, openNew] = f.templater.mock.calls[0] as [
+			TFile,
+			{ path: string },
+			string,
+			boolean,
+		];
 		expect(template.path).toBe("Templates/Event.md");
 		expect(folder.path).toBe("Events");
 		expect(name).toBe("Event 2026-09-19 10.30");
@@ -136,13 +148,22 @@ describe("NoteTemplateService", () => {
 
 	it("applies Unimian's own tokens to the title format only", async () => {
 		const f = createApp({ templater: true });
-		await new NoteTemplateService(f.app, { ...settings, titleFormat: "Meeting {{date}} {{time}}" }).createNote({} as never, context);
+		await new NoteTemplateService(f.app, {
+			...settings,
+			titleFormat: "Meeting {{date}} {{time}}",
+		}).createNote({} as never, context);
 		expect(f.templater.mock.calls[0]?.[2]).toBe("Meeting 2026-09-19 10-30");
 	});
 
 	it("hands scoped-write views a template path when an engine is available, a body when not", async () => {
-		const withEngine = await new NoteTemplateService(createApp({ templater: true }).app, settings).prepareNote(context);
-		expect(withEngine).toMatchObject({ path: "Events/Event 2026-09-19 10.30.md", templatePath: "Templates/Event.md" });
+		const withEngine = await new NoteTemplateService(
+			createApp({ templater: true }).app,
+			settings,
+		).prepareNote(context);
+		expect(withEngine).toMatchObject({
+			path: "Events/Event 2026-09-19 10.30.md",
+			templatePath: "Templates/Event.md",
+		});
 		expect(withEngine.body).toBeUndefined();
 
 		notices.length = 0;
@@ -155,7 +176,11 @@ describe("NoteTemplateService", () => {
 	it("creates through the view when no template is configured", async () => {
 		const f = createApp({ templater: true });
 		const createFileForView = vi.fn();
-		await new NoteTemplateService(f.app, { templatePath: "", targetFolder: "", titleFormat: "" }).createNote({ createFileForView } as never, context);
+		await new NoteTemplateService(f.app, {
+			templatePath: "",
+			targetFolder: "",
+			titleFormat: "",
+		}).createNote({ createFileForView } as never, context);
 		expect(createFileForView).toHaveBeenCalledWith("Event 2026-09-19 10.30", expect.any(Function));
 		expect(f.templater).not.toHaveBeenCalled();
 	});

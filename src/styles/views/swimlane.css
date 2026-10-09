@@ -243,16 +243,14 @@
 }
 
 .planner-kanban-card-base--left-accent {
-	border-left: 4px solid
-		var(--card-accent-color, var(--background-modifier-border));
+	border-left: 4px solid var(--card-accent-color, var(--background-modifier-border));
 	border-top: none;
 	border-right: none;
 	border-bottom: none;
 }
 
 .planner-kanban-card-base--full-border {
-	border: 2px solid
-		var(--card-accent-color, var(--background-modifier-border));
+	border: 2px solid var(--card-accent-color, var(--background-modifier-border));
 }
 
 .planner-kanban-card-base--default-border {
@@ -829,4 +827,3 @@
 		padding: 10px;
 	}
 }
-

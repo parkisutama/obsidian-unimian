@@ -11,9 +11,9 @@
  * lookup rather than this module touching `window`/plugin settings itself (spec §7.9).
  */
 
-import { getContrastColor, stringToColor } from '../../utils/colorUtils';
+import { getContrastColor, stringToColor } from "../../utils/colorUtils";
 
-export type ColorSource = 'explicit' | 'pretty-properties' | 'value-style' | 'fallback';
+export type ColorSource = "explicit" | "pretty-properties" | "value-style" | "fallback";
 
 export interface ResolvedColor {
 	/** Always a value safe to place directly in an inline style or CSS variable. */
@@ -66,28 +66,28 @@ function finish(background: string, source: ColorSource): ResolvedColor {
 export function resolveColor(inputs: ColorResolverInputs): ResolvedColor {
 	if (inputs.explicitColor) {
 		const explicit = normalizeExplicitColor(inputs.explicitColor);
-		if (explicit) return finish(explicit, 'explicit');
+		if (explicit) return finish(explicit, "explicit");
 	}
 
 	const category = inputs.categoryValue;
 	if (category) {
 		const pretty = inputs.resolvePrettyPropertiesColor?.(category) ?? null;
-		if (pretty && isSafeColor(pretty)) return finish(pretty, 'pretty-properties');
+		if (pretty && isSafeColor(pretty)) return finish(pretty, "pretty-properties");
 
 		if (inputs.valueStyleColor && isSafeColor(inputs.valueStyleColor)) {
-			return finish(inputs.valueStyleColor, 'value-style');
+			return finish(inputs.valueStyleColor, "value-style");
 		}
 
-		return finish(stringToColor(category), 'fallback');
+		return finish(stringToColor(category), "fallback");
 	}
 
-	return finish(stringToColor(''), 'fallback');
+	return finish(stringToColor(""), "fallback");
 }
 
 /** Semantic CSS variables a renderer can set on an element's `style`, instead of hardcoding properties. */
 export function toCssVariables(resolved: ResolvedColor): Record<string, string> {
 	return {
-		'--unimian-color-bg': resolved.background,
-		'--unimian-color-fg': resolved.foreground,
+		"--unimian-color-bg": resolved.background,
+		"--unimian-color-fg": resolved.foreground,
 	};
 }

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Parkis Utama
 
+import type UnimianPlugin from "../../src/main";
+import { DEFAULT_SETTINGS } from "../../src/types/settings";
+import { BasesCalendarView } from "../../src/views/BasesCalendarView";
 // Import the test double directly so this file type-checks against it; at runtime "obsidian"
 // resolves to the same module through the vitest alias.
 import { TFile } from "./obsidian";
-import { BasesCalendarView } from "../../src/views/BasesCalendarView";
-import { DEFAULT_SETTINGS } from "../../src/types/settings";
-import type UnimianPlugin from "../../src/main";
 
 /** A note as Bases exposes it: frontmatter keyed by property name. */
 export interface NoteFixture {
@@ -25,9 +25,27 @@ export function dayOffset(offsetDays: number, hour?: number): string {
 }
 
 export const sampleNotes = (): NoteFixture[] => [
-	{ path: "Projects/Launch.md", title: "Launch review", date_start: dayOffset(0, 10), date_end: dayOffset(0, 12), status: "active" },
-	{ path: "Projects/Offsite.md", title: "Team offsite", date_start: dayOffset(-2), date_end: dayOffset(1), status: "planned" },
-	{ path: "Projects/Report.md", title: "Quarterly report", date_start: dayOffset(3, 14), date_end: dayOffset(3, 15), status: "done" },
+	{
+		path: "Projects/Launch.md",
+		title: "Launch review",
+		date_start: dayOffset(0, 10),
+		date_end: dayOffset(0, 12),
+		status: "active",
+	},
+	{
+		path: "Projects/Offsite.md",
+		title: "Team offsite",
+		date_start: dayOffset(-2),
+		date_end: dayOffset(1),
+		status: "planned",
+	},
+	{
+		path: "Projects/Report.md",
+		title: "Quarterly report",
+		date_start: dayOffset(3, 14),
+		date_end: dayOffset(3, 15),
+		status: "done",
+	},
 ];
 
 export interface CalendarHarnessOptions {

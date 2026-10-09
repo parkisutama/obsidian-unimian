@@ -3,12 +3,12 @@
 
 import {
 	compareTemporalValues,
-	dateOnlyFromDayIndex,
 	type DateOnlyValue,
 	type DateTimeValue,
+	dateOnlyFromDayIndex,
 	type OngoingValue,
 	type TemporalValue,
-} from './TemporalValue';
+} from "./TemporalValue";
 
 type ConcreteTemporalValue = Exclude<TemporalValue, OngoingValue>;
 
@@ -29,7 +29,9 @@ export interface NormalizeDateRangeOptions {
 
 function localToday(): DateOnlyValue {
 	const now = new Date();
-	return dateOnlyFromDayIndex(Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86_400_000));
+	return dateOnlyFromDayIndex(
+		Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86_400_000),
+	);
 }
 
 /**
@@ -45,10 +47,10 @@ export function normalizeDateRange(
 	end?: TemporalValue | null,
 	options: NormalizeDateRangeOptions = {},
 ): NormalizedDateRange | null {
-	if (!start || start.kind === 'ongoing') return null;
+	if (!start || start.kind === "ongoing") return null;
 	let concreteEnd: ConcreteTemporalValue = start;
 	let openEnded = false;
-	if (end?.kind === 'ongoing') {
+	if (end?.kind === "ongoing") {
 		concreteEnd = options.today ?? localToday();
 		openEnded = true;
 	} else if (end) {
@@ -62,16 +64,21 @@ export function normalizeDateRange(
 		[normalizedStart, normalizedEnd] = [normalizedEnd, normalizedStart];
 		reversed = true;
 	}
-	const endExclusive = normalizedStart.kind === 'date' && normalizedEnd.kind === 'date'
-		? dateOnlyFromDayIndex(normalizedEnd.dayIndex + 1)
-		: null;
+	const endExclusive =
+		normalizedStart.kind === "date" && normalizedEnd.kind === "date"
+			? dateOnlyFromDayIndex(normalizedEnd.dayIndex + 1)
+			: null;
 	return { start: normalizedStart, endInclusive: normalizedEnd, endExclusive, openEnded, reversed };
 }
 
 export function rangeDurationMs(range: NormalizedDateRange): number {
-	const start = range.start.kind === 'date' ? range.start.dayIndex * 86_400_000 : (range.start as DateTimeValue).epochMs;
-	const end = range.endInclusive.kind === 'date'
-		? (range.endExclusive?.dayIndex ?? range.endInclusive.dayIndex) * 86_400_000
-		: (range.endInclusive as DateTimeValue).epochMs;
+	const start =
+		range.start.kind === "date"
+			? range.start.dayIndex * 86_400_000
+			: (range.start as DateTimeValue).epochMs;
+	const end =
+		range.endInclusive.kind === "date"
+			? (range.endExclusive?.dayIndex ?? range.endInclusive.dayIndex) * 86_400_000
+			: (range.endInclusive as DateTimeValue).epochMs;
 	return Math.max(0, end - start);
 }

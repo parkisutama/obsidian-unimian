@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Parkis Utama
 
-import type { NormalizedDateRange } from './DateRange';
-import type { DateOnlyValue } from './TemporalValue';
+import type { NormalizedDateRange } from "./DateRange";
+import type { DateOnlyValue } from "./TemporalValue";
 
 export interface TimeDomain {
 	/** Inclusive first visible UTC calendar-day index. */
@@ -26,12 +26,14 @@ export interface TimeDomainOptions {
 
 /** Converts a normalized date/datetime range into UTC day bounds for timeline layout. */
 export function rangeToDayBounds(range: NormalizedDateRange): DayBounds {
-	const startDay = range.start.kind === 'date'
-		? range.start.dayIndex
-		: Math.floor(range.start.epochMs / 86_400_000);
-	const endDay = range.endInclusive.kind === 'date'
-		? range.endExclusive?.dayIndex ?? range.endInclusive.dayIndex + 1
-		: Math.max(startDay + 1, Math.ceil(range.endInclusive.epochMs / 86_400_000));
+	const startDay =
+		range.start.kind === "date"
+			? range.start.dayIndex
+			: Math.floor(range.start.epochMs / 86_400_000);
+	const endDay =
+		range.endInclusive.kind === "date"
+			? (range.endExclusive?.dayIndex ?? range.endInclusive.dayIndex + 1)
+			: Math.max(startDay + 1, Math.ceil(range.endInclusive.epochMs / 86_400_000));
 	return { startDay: Math.min(startDay, endDay - 1), endDay: Math.max(startDay + 1, endDay) };
 }
 
@@ -53,8 +55,11 @@ export function calculateTimeDomain(
 	let minimum = options.today.dayIndex;
 	let maximum = options.today.dayIndex + 1;
 
-	const valid = ranges.filter(range =>
-		Number.isFinite(range.startDay) && Number.isFinite(range.endDay) && range.endDay > range.startDay
+	const valid = ranges.filter(
+		(range) =>
+			Number.isFinite(range.startDay) &&
+			Number.isFinite(range.endDay) &&
+			range.endDay > range.startDay,
 	);
 	if (valid.length > 0) {
 		minimum = Math.trunc(valid[0]!.startDay);
@@ -79,8 +84,11 @@ export function calculateTimeDomain(
 	return { startDay, endDay, spanDays: endDay - startDay };
 }
 
-export function todayPosition(domain: TimeDomain, today: DateOnlyValue): 'before' | 'inside' | 'after' {
-	if (today.dayIndex < domain.startDay) return 'before';
-	if (today.dayIndex >= domain.endDay) return 'after';
-	return 'inside';
+export function todayPosition(
+	domain: TimeDomain,
+	today: DateOnlyValue,
+): "before" | "inside" | "after" {
+	if (today.dayIndex < domain.startDay) return "before";
+	if (today.dayIndex >= domain.endDay) return "after";
+	return "inside";
 }

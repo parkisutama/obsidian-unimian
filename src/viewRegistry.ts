@@ -10,11 +10,22 @@
  * is stored, not called, until Obsidian itself mounts the view.
  */
 
-import type { App, BasesViewFactory, BasesAllOptions, BasesViewConfig, Command, HoverLinkSource } from 'obsidian';
-import { createGrantedMutations, type GrantedMutations, type MutationGrant } from './platform/mutations/grants';
+import type {
+	App,
+	BasesAllOptions,
+	BasesViewConfig,
+	BasesViewFactory,
+	Command,
+	HoverLinkSource,
+} from "obsidian";
+import {
+	createGrantedMutations,
+	type GrantedMutations,
+	type MutationGrant,
+} from "./platform/mutations/grants";
 
 /** Every Unimian type ID must use this prefix; enforced by validateViewDescriptor. */
-export const VIEW_ID_PREFIX = 'unimian-';
+export const VIEW_ID_PREFIX = "unimian-";
 
 /**
  * Capabilities a descriptor may declare. `legacyMutation` marks a view that keeps existing
@@ -34,7 +45,7 @@ export interface ViewCapabilities {
  * View ids approved to declare `capabilities.mutations`. Each entry must have a matching section
  * in docs/architecture/view-write-access.md; adding one is a compatibility decision, not a refactor.
  */
-export const APPROVED_MUTATION_GRANT_VIEW_IDS: readonly string[] = ['unimian-gantt'];
+export const APPROVED_MUTATION_GRANT_VIEW_IDS: readonly string[] = ["unimian-gantt"];
 
 /**
  * Everything needed to register one Bases view with Obsidian: the view registration itself,
@@ -70,7 +81,9 @@ export class InvalidViewIdError extends Error {
 
 export class UnapprovedMutationGrantError extends Error {
 	constructor(public readonly id: string) {
-		super(`View "${id}" declares scoped mutations but is not listed in APPROVED_MUTATION_GRANT_VIEW_IDS.`);
+		super(
+			`View "${id}" declares scoped mutations but is not listed in APPROVED_MUTATION_GRANT_VIEW_IDS.`,
+		);
 	}
 }
 

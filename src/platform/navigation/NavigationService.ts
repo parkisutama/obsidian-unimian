@@ -12,11 +12,11 @@
  * previously duplicated per view.
  */
 
-import { Keymap, type App, type Component, type PaneType, type UserEvent } from 'obsidian';
-import { QuickPreviewModal, type OpenFull } from '../preview/QuickPreviewModal';
-import type { UnimianSettings } from '../../types/settings';
+import { type App, type Component, Keymap, type PaneType, type UserEvent } from "obsidian";
+import type { UnimianSettings } from "../../types/settings";
+import { type OpenFull, QuickPreviewModal } from "../preview/QuickPreviewModal";
 
-export type OpenDestination = 'active' | PaneType;
+export type OpenDestination = "active" | PaneType;
 
 /**
  * Resolves the same destination for a mouse or keyboard activation, since `UserEvent` already
@@ -26,13 +26,13 @@ export type OpenDestination = 'active' | PaneType;
  */
 export function resolveOpenDestination(event?: UserEvent | null): OpenDestination {
 	const result = Keymap.isModEvent(event);
-	return result === 'tab' || result === 'split' || result === 'window' ? result : 'active';
+	return result === "tab" || result === "split" || result === "window" ? result : "active";
 }
 
 /** Opens `path`, choosing the pane from `event`'s modifiers (or the active pane with no event). */
 export function openPath(app: App, path: string, event?: UserEvent | null): void {
 	const destination = resolveOpenDestination(event);
-	void app.workspace.openLinkText(path, '', destination === 'active' ? false : destination);
+	void app.workspace.openLinkText(path, "", destination === "active" ? false : destination);
 }
 
 export interface HoverPreviewOptions {
@@ -49,19 +49,19 @@ export interface HoverPreviewOptions {
 
 /** Dispatches a `hover-link` event carrying the correct registered source id and target. */
 export function triggerHoverPreview(options: HoverPreviewOptions): void {
-	options.app.workspace.trigger('hover-link', {
+	options.app.workspace.trigger("hover-link", {
 		event: options.event,
 		source: options.sourceId,
 		hoverParent: options.hoverParent,
 		targetEl: options.targetEl,
 		linktext: options.filePath,
-		sourcePath: options.sourcePath ?? '/',
+		sourcePath: options.sourcePath ?? "/",
 	});
 }
 
 /** True for the keys that should activate a focused, keyboard-reachable card/row: Enter or Space. */
 export function isActivationKey(event: KeyboardEvent): boolean {
-	return event.key === 'Enter' || event.key === ' ';
+	return event.key === "Enter" || event.key === " ";
 }
 
 export interface ActivateEntryOptions {
@@ -82,7 +82,7 @@ export interface ActivateEntryOptions {
 export function activateEntry(options: ActivateEntryOptions): void {
 	const { app, settings, path, event, openFull } = options;
 
-	if (resolveOpenDestination(event) !== 'active') {
+	if (resolveOpenDestination(event) !== "active") {
 		openFull(path, event);
 		return;
 	}
