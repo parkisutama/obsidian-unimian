@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-unimian",
-	"version": "1.0.3",
+	"version": "0.0.1",
 	"description": "Add Calendar, Swimlane, Gantt, and Timeline views to Bases without prescribing a task management workflow.",
 	"packageManager": "pnpm@12.10.1",
 	"engines": {

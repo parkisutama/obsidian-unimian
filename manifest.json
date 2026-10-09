@@ -1,7 +1,7 @@
 {
 	"id": "unimian",
 	"name": "Unimian",
-	"version": "1.0.3",
+	"version": "0.0.1",
 	"minAppVersion": "1.14.4",
 	"description": "Add Calendar, Swimlane, Gantt, and Timeline views to Bases without prescribing a task management workflow.",
 	"author": "Parkis Utama",
