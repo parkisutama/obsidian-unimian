@@ -41,7 +41,7 @@ import { migratePath, pruneMissing } from './views/sticky-note/pinStore';
 // entry for the history if this is revisited.
 
 export default class UnimianPlugin extends Plugin {
-  settings!: UnimianSettings;
+  declare settings: UnimianSettings;
   private readonly viewRegistry = new ViewRegistry();
 
   async onload() {
