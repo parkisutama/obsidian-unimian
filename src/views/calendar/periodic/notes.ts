@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Parkis Utama
 
 import { type App, Notice } from "obsidian";
+import { assertInsideVault } from "../../../core/paths/vaultPath";
 import {
 	createNoteFromTemplate,
 	detectTemplateEngine,
@@ -91,7 +92,7 @@ export async function openPeriodicNote(
 				noticePlainTemplate();
 			}
 			await ensureFolder(app, target.folder);
-			await app.vault.create(target.path, content);
+			await app.vault.create(assertInsideVault(target.path), content);
 		}
 	}
 	openFileInNewTab(app, openPath);

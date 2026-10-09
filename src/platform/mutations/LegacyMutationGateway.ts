@@ -10,7 +10,8 @@
  * property has no frontmatter field to write to.
  */
 
-import { type App, TFile } from "obsidian";
+import { type App, stringifyYaml, TFile } from "obsidian";
+import { assertInsideVault } from "../../core/paths/vaultPath";
 import { createNoteFromTemplate, detectTemplateEngine } from "../../services/templateEngine";
 import type {
 	DateMutationCapability,
@@ -160,6 +161,7 @@ export class LegacyMutationGateway
 		const file = this.resolveFile(path);
 		if (!file) return { ok: false, reason: "file-not-found", message: `No file at "${path}".` };
 		try {
+			assertInsideVault(targetFolder);
 			if (targetFolder && !this.app.vault.getAbstractFileByPath(targetFolder)) {
 				await this.app.vault.createFolder(targetFolder);
 			}
@@ -196,6 +198,7 @@ export class LegacyMutationGateway
 
 	async createNote(request: NoteCreationRequest): Promise<MutationResult> {
 		try {
+			assertInsideVault(request.path);
 			const template = request.templatePath ? this.resolveFile(request.templatePath) : null;
 			const engine = detectTemplateEngine(this.app);
 			if (template && engine !== "plain") {
@@ -212,12 +215,13 @@ export class LegacyMutationGateway
 			if (folder && !this.app.vault.getAbstractFileByPath(folder)) {
 				await this.app.vault.createFolder(folder);
 			}
-			const frontmatterBlock =
+			// Obsidian's own serializer quotes and escapes property names and values; building the
+			// YAML by hand let a name containing `:` or a line break corrupt the block.
+			const yaml =
 				request.frontmatter && Object.keys(request.frontmatter).length > 0
-					? `---\n${Object.entries(request.frontmatter)
-							.map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
-							.join("\n")}\n---\n`
+					? stringifyYaml(request.frontmatter).trimEnd()
 					: "";
+			const frontmatterBlock = yaml ? `---\n${yaml}\n---\n` : "";
 			await this.app.vault.create(request.path, `${frontmatterBlock}${request.body ?? ""}`);
 			return { ok: true };
 		} catch (error) {
