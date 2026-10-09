@@ -1,5 +1,11 @@
-import { describe, expect, it } from "vitest";
 import type { BasesEntry, BasesEntryGroup } from "obsidian";
+import { describe, expect, it } from "vitest";
+import { MISSING_VALUE } from "../src/core/entries/NormalizedValue";
+import {
+	createEntrySnapshot,
+	createEntrySnapshotGroups,
+	normalizeValue,
+} from "../src/platform/bases/entrySnapshotAdapter";
 import {
 	BooleanValue,
 	DateValue,
@@ -11,12 +17,6 @@ import {
 	StringValue,
 	TFile,
 } from "./fixtures/obsidian";
-import {
-	createEntrySnapshot,
-	createEntrySnapshotGroups,
-	normalizeValue,
-} from "../src/platform/bases/entrySnapshotAdapter";
-import { MISSING_VALUE } from "../src/core/entries/NormalizedValue";
 
 function makeEntry(path: string, values: Record<string, unknown>): BasesEntry {
 	const file = new TFile(path);
@@ -39,12 +39,21 @@ describe("normalizeValue", () => {
 	});
 
 	it("normalizes a note/text value", () => {
-		expect(normalizeValue(new StringValue("hello") as never)).toEqual({ kind: "text", value: "hello" });
+		expect(normalizeValue(new StringValue("hello") as never)).toEqual({
+			kind: "text",
+			value: "hello",
+		});
 	});
 
 	it("normalizes a checkbox (boolean) value via isTruthy", () => {
-		expect(normalizeValue(new BooleanValue(true) as never)).toEqual({ kind: "boolean", value: true });
-		expect(normalizeValue(new BooleanValue(false) as never)).toEqual({ kind: "boolean", value: false });
+		expect(normalizeValue(new BooleanValue(true) as never)).toEqual({
+			kind: "boolean",
+			value: true,
+		});
+		expect(normalizeValue(new BooleanValue(false) as never)).toEqual({
+			kind: "boolean",
+			value: false,
+		});
 	});
 
 	it("normalizes a date-only value without a time component", () => {
@@ -99,7 +108,10 @@ describe("normalizeValue", () => {
 	});
 
 	it("normalizes a file value to its path", () => {
-		expect(normalizeValue(new FileValue("Folder/Note.md") as never)).toEqual({ kind: "file", path: "Folder/Note.md" });
+		expect(normalizeValue(new FileValue("Folder/Note.md") as never)).toEqual({
+			kind: "file",
+			path: "Folder/Note.md",
+		});
 	});
 
 	it("normalizes a list value, recursing into each item", () => {

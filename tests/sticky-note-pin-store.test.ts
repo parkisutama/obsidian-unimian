@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { isPinned, migratePath, pruneMissing, togglePin } from "../src/views/sticky-note/pinStore";
 import type { StickyNoteData } from "../src/types/settings";
+import { isPinned, migratePath, pruneMissing, togglePin } from "../src/views/sticky-note/pinStore";
 
 function data(pinnedByBase: Record<string, string[]> = {}): StickyNoteData {
 	return { pinnedByBase };

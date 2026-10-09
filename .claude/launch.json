@@ -1,11 +1,11 @@
 {
-  "version": "0.0.1",
-  "configurations": [
-    {
-      "name": "dev",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["esbuild.config.mjs"],
-      "port": 0
-    }
-  ]
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "dev",
+			"runtimeExecutable": "node",
+			"runtimeArgs": ["esbuild.config.mjs"],
+			"port": 0
+		}
+	]
 }

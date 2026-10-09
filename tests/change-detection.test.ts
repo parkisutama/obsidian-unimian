@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { computeRenderSignature, diffRenderSignatures } from "../src/platform/bases/changeDetection";
+import {
+	computeRenderSignature,
+	diffRenderSignatures,
+} from "../src/platform/bases/changeDetection";
 
 const baseInput = {
-	entries: [{ path: "A.md", mtime: 1 }, { path: "B.md", mtime: 2 }],
+	entries: [
+		{ path: "A.md", mtime: 1 },
+		{ path: "B.md", mtime: 2 },
+	],
 	order: ["note.title"],
 	groupKeys: ["Todo", "Done"],
 	config: { titleField: "note.title" },
@@ -17,7 +23,13 @@ describe("computeRenderSignature", () => {
 
 	it("changes when an entry's mtime changes", () => {
 		const a = computeRenderSignature(baseInput);
-		const b = computeRenderSignature({ ...baseInput, entries: [{ path: "A.md", mtime: 999 }, { path: "B.md", mtime: 2 }] });
+		const b = computeRenderSignature({
+			...baseInput,
+			entries: [
+				{ path: "A.md", mtime: 999 },
+				{ path: "B.md", mtime: 2 },
+			],
+		});
 		expect(a.entries).not.toBe(b.entries);
 		expect(a.order).toBe(b.order);
 	});
@@ -32,7 +44,13 @@ describe("computeRenderSignature", () => {
 describe("diffRenderSignatures", () => {
 	it("reports every layer changed on the first render (prev === null)", () => {
 		const diff = diffRenderSignatures(null, computeRenderSignature(baseInput));
-		expect(diff).toEqual({ entriesChanged: true, orderChanged: true, groupsChanged: true, configChanged: true, identical: false });
+		expect(diff).toEqual({
+			entriesChanged: true,
+			orderChanged: true,
+			groupsChanged: true,
+			configChanged: true,
+			identical: false,
+		});
 	});
 
 	it("reports identical for two computations of the same input", () => {
@@ -55,6 +73,10 @@ describe("diffRenderSignatures", () => {
 	it("isolates a group-key change from everything else", () => {
 		const prev = computeRenderSignature(baseInput);
 		const next = computeRenderSignature({ ...baseInput, groupKeys: ["Doing"] });
-		expect(diffRenderSignatures(prev, next)).toMatchObject({ entriesChanged: false, orderChanged: false, groupsChanged: true });
+		expect(diffRenderSignatures(prev, next)).toMatchObject({
+			entriesChanged: false,
+			orderChanged: false,
+			groupsChanged: true,
+		});
 	});
 });

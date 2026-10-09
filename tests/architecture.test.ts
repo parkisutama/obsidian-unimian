@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -62,7 +62,15 @@ const GATEWAY_IMPORT_PATTERN = /LegacyMutationGateway/;
 
 /** Build/runtime dependencies the specification forbids adding (spec §3.5, §6.2, §7.17). */
 // "frappe-gantt" was removed with the Frappe Gantt view on 2026-09-20 (docs/specs/gantt-frappe-removal.md).
-const FORBIDDEN_DEPENDENCIES = ["react", "react-dom", "sass", "node-sass", "tailwindcss", "@tanstack/react-virtual", "frappe-gantt"];
+const FORBIDDEN_DEPENDENCIES = [
+	"react",
+	"react-dom",
+	"sass",
+	"node-sass",
+	"tailwindcss",
+	"@tanstack/react-virtual",
+	"frappe-gantt",
+];
 
 function toPosix(p: string): string {
 	return p.split(path.sep).join("/");
@@ -86,10 +94,14 @@ interface Violation {
 }
 
 /** Scan a set of (relativePath, content) pairs for forbidden mutation calls outside the allowlist. */
-function findMutationViolations(files: Array<{ relativePath: string; content: string }>): Violation[] {
+function findMutationViolations(
+	files: Array<{ relativePath: string; content: string }>,
+): Violation[] {
 	const violations: Violation[] = [];
 	for (const { relativePath, content } of files) {
-		const isAllowed = ALLOWED_MUTATION_PATHS.some((allowed) => relativePath === allowed || relativePath.startsWith(allowed));
+		const isAllowed = ALLOWED_MUTATION_PATHS.some(
+			(allowed) => relativePath === allowed || relativePath.startsWith(allowed),
+		);
 		if (isAllowed) continue;
 		for (const { name, pattern } of FORBIDDEN_MUTATION_PATTERNS) {
 			if (pattern.test(content)) violations.push({ relativePath, name });
@@ -102,7 +114,10 @@ function readRepoFiles(dirs: string[]): Array<{ relativePath: string; content: s
 	const files: Array<{ relativePath: string; content: string }> = [];
 	for (const dir of dirs) {
 		for (const file of walk(path.join(repoRoot, dir))) {
-			files.push({ relativePath: toPosix(path.relative(repoRoot, file)), content: readFileSync(file, "utf8") });
+			files.push({
+				relativePath: toPosix(path.relative(repoRoot, file)),
+				content: readFileSync(file, "utf8"),
+			});
 		}
 	}
 	return files;
@@ -111,22 +126,33 @@ function readRepoFiles(dirs: string[]): Array<{ relativePath: string; content: s
 describe("architecture guard: direct mutation ban", () => {
 	it("fails on a fixture that reproduces every forbidden mutation call", () => {
 		const content = readFileSync(path.join(fixturesDir, "forbidden.ts"), "utf8");
-		const violations = findMutationViolations([{ relativePath: "src/views/keep/forbidden.ts", content }]);
+		const violations = findMutationViolations([
+			{ relativePath: "src/views/keep/forbidden.ts", content },
+		]);
 		const names = violations.map((v) => v.name);
 		expect(names).toEqual(
-			expect.arrayContaining(["processFrontMatter", "vault.modify", "trashFile", "editor.setValue"]),
+			expect.arrayContaining([
+				"processFrontMatter",
+				"vault.modify",
+				"trashFile",
+				"editor.setValue",
+			]),
 		);
 	});
 
 	it("passes on a fixture that only reads and navigates", () => {
 		const content = readFileSync(path.join(fixturesDir, "allowed.ts"), "utf8");
-		const violations = findMutationViolations([{ relativePath: "src/views/keep/allowed.ts", content }]);
+		const violations = findMutationViolations([
+			{ relativePath: "src/views/keep/allowed.ts", content },
+		]);
 		expect(violations).toEqual([]);
 	});
 
 	it("permits the explicitly listed legacy views to keep writing", () => {
 		const content = readFileSync(path.join(fixturesDir, "forbidden.ts"), "utf8");
-		const violations = findMutationViolations([{ relativePath: "src/views/BasesCalendarView.ts", content }]);
+		const violations = findMutationViolations([
+			{ relativePath: "src/views/BasesCalendarView.ts", content },
+		]);
 		expect(violations).toEqual([]);
 	});
 
@@ -138,20 +164,30 @@ describe("architecture guard: direct mutation ban", () => {
 
 describe("architecture guard: scoped mutation grants", () => {
 	it("fails when a scoped-grant view reaches for the full gateway", () => {
-		const content = "import { LegacyMutationGateway } from '../../platform/mutations/LegacyMutationGateway';";
+		const content =
+			"import { LegacyMutationGateway } from '../../platform/mutations/LegacyMutationGateway';";
 		expect(GATEWAY_IMPORT_PATTERN.test(content)).toBe(true);
 	});
 
 	it("treats a direct mutation call in a scoped-grant view as a violation", () => {
 		const content = readFileSync(path.join(fixturesDir, "forbidden.ts"), "utf8");
-		const violations = findMutationViolations([{ relativePath: "src/views/gantt/forbidden.ts", content }]);
+		const violations = findMutationViolations([
+			{ relativePath: "src/views/gantt/forbidden.ts", content },
+		]);
 		expect(violations.map((v) => v.name)).toEqual(
-			expect.arrayContaining(["processFrontMatter", "vault.modify", "trashFile", "editor.setValue"]),
+			expect.arrayContaining([
+				"processFrontMatter",
+				"vault.modify",
+				"trashFile",
+				"editor.setValue",
+			]),
 		);
 	});
 
 	it("finds no gateway construction or import in scoped-grant views today", () => {
-		const offenders = readRepoFiles(SCOPED_GRANT_DIRS).filter(({ content }) => GATEWAY_IMPORT_PATTERN.test(content));
+		const offenders = readRepoFiles(SCOPED_GRANT_DIRS).filter(({ content }) =>
+			GATEWAY_IMPORT_PATTERN.test(content),
+		);
 		expect(offenders.map((f) => f.relativePath)).toEqual([]);
 	});
 });
@@ -163,7 +199,9 @@ describe("architecture guard: core import direction", () => {
 	});
 
 	it("finds no obsidian import in src/core today", () => {
-		const offenders = readRepoFiles(["src/core/"]).filter(({ content }) => /from\s+['"]obsidian['"]/.test(content));
+		const offenders = readRepoFiles(["src/core/"]).filter(({ content }) =>
+			/from\s+['"]obsidian['"]/.test(content),
+		);
 		expect(offenders).toEqual([]);
 	});
 });
@@ -186,7 +224,7 @@ describe("architecture guard: forbidden dependencies", () => {
 });
 
 describe("architecture guard: stable view IDs", () => {
-	const idPattern = /export const [A-Z_]+_VIEW_ID\s*=\s*'([^']+)'/g;
+	const idPattern = /export const [A-Z_]+_VIEW_ID\s*=\s*["']([^"']+)["']/g;
 
 	function collectViewIds(): string[] {
 		const ids: string[] = [];

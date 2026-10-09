@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildCardExcerpt, isTextExcerptExtension, stripInlineImages, truncateExcerpt } from "../src/views/sticky-note/content";
+import {
+	buildCardExcerpt,
+	isTextExcerptExtension,
+	stripInlineImages,
+	truncateExcerpt,
+} from "../src/views/sticky-note/content";
 
 describe("sticky-note content: isTextExcerptExtension", () => {
 	it("treats markdown/text extensions as excerpt-safe", () => {
@@ -24,7 +29,9 @@ describe("sticky-note content: stripInlineImages", () => {
 	});
 
 	it("removes standard Markdown image syntax regardless of extension knowledge", () => {
-		expect(stripInlineImages("before\n![alt](Pasted%20image%20123.png)\nafter")).toBe("before\nafter");
+		expect(stripInlineImages("before\n![alt](Pasted%20image%20123.png)\nafter")).toBe(
+			"before\nafter",
+		);
 	});
 
 	it("leaves a non-image wikilink embed (e.g. a note transclusion) untouched", () => {

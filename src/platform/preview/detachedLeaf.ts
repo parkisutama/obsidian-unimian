@@ -23,8 +23,8 @@
  * technique Hover Editor uses for the same reason.
  */
 
-import type { App, TFile, WorkspaceLeaf } from 'obsidian';
-import { WorkspaceLeaf as WorkspaceLeafClass } from 'obsidian';
+import type { App, TFile, WorkspaceLeaf } from "obsidian";
+import { WorkspaceLeaf as WorkspaceLeafClass } from "obsidian";
 
 export interface DetachedLeaf {
 	leaf: WorkspaceLeaf;
@@ -35,7 +35,10 @@ type UndocumentedLeafCtor = new (app: App) => WorkspaceLeaf;
 type UndocumentedLeaf = WorkspaceLeaf & { containerEl?: unknown; parent?: unknown };
 
 /** Opens `file` in a `WorkspaceLeaf` that is never attached to the visible layout. */
-export async function openDetachedMarkdownLeaf(app: App, file: TFile): Promise<DetachedLeaf | null> {
+export async function openDetachedMarkdownLeaf(
+	app: App,
+	file: TFile,
+): Promise<DetachedLeaf | null> {
 	try {
 		const LeafCtor = WorkspaceLeafClass as unknown as UndocumentedLeafCtor;
 		const leaf = new LeafCtor(app);
@@ -44,7 +47,7 @@ export async function openDetachedMarkdownLeaf(app: App, file: TFile): Promise<D
 
 		const el = (leaf as UndocumentedLeaf).containerEl;
 		if (!(el instanceof HTMLElement)) {
-			closeDetachedLeaf({ leaf, el: document.createElement('div') });
+			closeDetachedLeaf({ leaf, el: document.createElement("div") });
 			return null;
 		}
 

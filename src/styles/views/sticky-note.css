@@ -57,7 +57,10 @@
 	border-radius: var(--radius-m);
 	background: var(--unimian-color-bg, var(--background-secondary));
 	border: 1px solid var(--background-modifier-border);
-	transition: top 0.12s ease, left 0.12s ease, box-shadow 0.12s ease;
+	transition:
+		top 0.12s ease,
+		left 0.12s ease,
+		box-shadow 0.12s ease;
 	cursor: pointer;
 	position: relative;
 	overflow: hidden;
@@ -94,8 +97,12 @@
 }
 
 @keyframes unimian-sticky-note-shimmer {
-	from { background-position: 150% 0; }
-	to { background-position: -50% 0; }
+	from {
+		background-position: 150% 0;
+	}
+	to {
+		background-position: -50% 0;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -110,11 +117,15 @@
 }
 
 .unimian-sticky-note-card::after {
-	content: '';
+	content: "";
 	position: absolute;
 	inset: auto 0 0 0;
 	height: 48px;
-	background: linear-gradient(to bottom, transparent, var(--unimian-color-bg, var(--background-secondary)));
+	background: linear-gradient(
+		to bottom,
+		transparent,
+		var(--unimian-color-bg, var(--background-secondary))
+	);
 	pointer-events: none;
 }
 

@@ -1,7 +1,11 @@
-import { describe, expect, it } from "vitest";
 import type { BasesViewConfig } from "obsidian";
+import { describe, expect, it } from "vitest";
 import { ViewConfigReader } from "../src/platform/bases/ViewConfigReader";
-import { areAllCssOnly, classifyOption, createViewOptionSchema } from "../src/platform/bases/viewOptionTypes";
+import {
+	areAllCssOnly,
+	classifyOption,
+	createViewOptionSchema,
+} from "../src/platform/bases/viewOptionTypes";
 import { readTimelineOptions } from "../src/views/timeline/timelineOptions";
 
 function makeConfig(values: Record<string, unknown>): BasesViewConfig {
@@ -9,7 +13,9 @@ function makeConfig(values: Record<string, unknown>): BasesViewConfig {
 		get: (key: string) => values[key],
 		getAsPropertyId: (key: string) => {
 			const value = values[key];
-			return typeof value === "string" && /^(note|file|formula)\./.test(value) ? (value as never) : null;
+			return typeof value === "string" && /^(note|file|formula)\./.test(value)
+				? (value as never)
+				: null;
 		},
 		getOrder: () => (values.__order__ as never) ?? [],
 		getDisplayName: (id: string) => id.replace(/^(note|file|formula)\./, ""),
@@ -31,7 +37,9 @@ describe("ViewConfigReader", () => {
 	});
 
 	it("resolves an invalid number to the fallback, including NaN/Infinity", () => {
-		const reader = new ViewConfigReader(makeConfig({ barHeight: "not-a-number", zoom: Number.NaN }));
+		const reader = new ViewConfigReader(
+			makeConfig({ barHeight: "not-a-number", zoom: Number.NaN }),
+		);
 		expect(reader.getNumber("barHeight", 30)).toBe(30);
 		expect(reader.getNumber("zoom", 1)).toBe(1);
 		expect(new ViewConfigReader(makeConfig({ barHeight: 42 })).getNumber("barHeight", 30)).toBe(42);
@@ -40,22 +48,30 @@ describe("ViewConfigReader", () => {
 	it("resolves a non-boolean to the fallback", () => {
 		const reader = new ViewConfigReader(makeConfig({ showProgress: "yes" }));
 		expect(reader.getBoolean("showProgress", false)).toBe(false);
-		expect(new ViewConfigReader(makeConfig({ showProgress: true })).getBoolean("showProgress", false)).toBe(true);
+		expect(
+			new ViewConfigReader(makeConfig({ showProgress: true })).getBoolean("showProgress", false),
+		).toBe(true);
 	});
 
 	it("resolves a value outside the enum to the fallback rather than guessing", () => {
 		const views = ["dayGridMonth", "timeGridWeek"] as const;
 		const reader = new ViewConfigReader(makeConfig({ defaultView: "not-a-real-view" }));
 		expect(reader.getEnum("defaultView", views, "dayGridMonth")).toBe("dayGridMonth");
-		expect(new ViewConfigReader(makeConfig({ defaultView: "timeGridWeek" })).getEnum("defaultView", views, "dayGridMonth")).toBe(
-			"timeGridWeek",
-		);
+		expect(
+			new ViewConfigReader(makeConfig({ defaultView: "timeGridWeek" })).getEnum(
+				"defaultView",
+				views,
+				"dayGridMonth",
+			),
+		).toBe("timeGridWeek");
 	});
 
 	it("resolves an invalid property id to null instead of guessing one", () => {
 		const reader = new ViewConfigReader(makeConfig({ startDate: "not.a.property" }));
 		expect(reader.getPropertyId("startDate")).toBeNull();
-		expect(new ViewConfigReader(makeConfig({ startDate: "note.start" })).getPropertyId("startDate")).toBe("note.start");
+		expect(
+			new ViewConfigReader(makeConfig({ startDate: "note.start" })).getPropertyId("startDate"),
+		).toBe("note.start");
 	});
 
 	it("has no built-in default of its own for any accessor", () => {
@@ -67,21 +83,29 @@ describe("ViewConfigReader", () => {
 
 describe("Timeline option compatibility", () => {
 	it("prefers upstream start/end keys", () => {
-		const options = readTimelineOptions(new ViewConfigReader(makeConfig({
-			start: "note.upstreamStart",
-			end: "note.upstreamEnd",
-			startDate: "note.legacyStart",
-			endDate: "note.legacyEnd",
-		})));
+		const options = readTimelineOptions(
+			new ViewConfigReader(
+				makeConfig({
+					start: "note.upstreamStart",
+					end: "note.upstreamEnd",
+					startDate: "note.legacyStart",
+					endDate: "note.legacyEnd",
+				}),
+			),
+		);
 		expect(options.startProperty).toBe("note.upstreamStart");
 		expect(options.endProperty).toBe("note.upstreamEnd");
 	});
 
 	it("keeps early Unimian startDate/endDate configurations readable", () => {
-		const options = readTimelineOptions(new ViewConfigReader(makeConfig({
-			startDate: "note.start",
-			endDate: "note.end",
-		})));
+		const options = readTimelineOptions(
+			new ViewConfigReader(
+				makeConfig({
+					startDate: "note.start",
+					endDate: "note.end",
+				}),
+			),
+		);
 		expect(options.startProperty).toBe("note.start");
 		expect(options.endProperty).toBe("note.end");
 	});

@@ -1,13 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Parkis Utama
 
-import { ReactGanttChart, type GanttHandle, type GanttProps, type GanttScaleKey, type Task } from '@jaeungkim/gantt-chart';
-import { h, type ComponentChild } from 'preact';
-import { render } from 'preact/compat';
-import type { ViewRuntime } from '../../platform/dom/ViewRuntime';
-import { TooltipGuard } from './tooltipGuard';
+import {
+	type GanttHandle,
+	type GanttProps,
+	type GanttScaleKey,
+	ReactGanttChart,
+	type Task,
+} from "@jaeungkim/gantt-chart";
+import { type ComponentChild, h } from "preact";
+import { render } from "preact/compat";
+import type { ViewRuntime } from "../../platform/dom/ViewRuntime";
+import { TooltipGuard } from "./tooltipGuard";
 
-export type GanttTheme = 'light' | 'dark';
+export type GanttTheme = "light" | "dark";
 export type ChartRender = (node: ComponentChild, container: Element) => void;
 
 export interface GanttChartModel {
@@ -18,7 +24,7 @@ export interface GanttChartModel {
 }
 
 function bodyTheme(body: HTMLElement): GanttTheme {
-	return body.classList.contains('theme-dark') ? 'dark' : 'light';
+	return body.classList.contains("theme-dark") ? "dark" : "light";
 }
 
 /** Owns the Preact tree and the owning-window theme observer for one Gantt view. */
@@ -37,9 +43,11 @@ export class GanttChartHost {
 		private readonly renderChart: ChartRender = render,
 	) {
 		this.theme = bodyTheme(runtime.doc.body);
-		const MutationObserverCtor = (runtime.win as Window & { MutationObserver: typeof MutationObserver }).MutationObserver;
+		const MutationObserverCtor = (
+			runtime.win as Window & { MutationObserver: typeof MutationObserver }
+		).MutationObserver;
 		this.observer = new MutationObserverCtor(() => this.refreshTheme());
-		this.observer.observe(runtime.doc.body, { attributes: true, attributeFilter: ['class'] });
+		this.observer.observe(runtime.doc.body, { attributes: true, attributeFilter: ["class"] });
 		this.tooltipGuard = new TooltipGuard(containerEl, runtime.win);
 	}
 
@@ -57,19 +65,32 @@ export class GanttChartHost {
 	private paint(): void {
 		if (!this.model) return;
 		if (this.model.tasks.length === 0) {
-			this.renderChart(h('div', { class: 'unimian-gantt-empty' },
-				this.model.unscheduledCount > 0 ? `${this.model.unscheduledCount} note(s) need a configured start date.` : 'No scheduled notes.'), this.containerEl);
+			this.renderChart(
+				h(
+					"div",
+					{ class: "unimian-gantt-empty" },
+					this.model.unscheduledCount > 0
+						? `${this.model.unscheduledCount} note(s) need a configured start date.`
+						: "No scheduled notes.",
+				),
+				this.containerEl,
+			);
 			return;
 		}
-		this.renderChart(h(ReactGanttChart, {
-			key: this.remountKey,
-			ref: (handle: GanttHandle | null) => { this.handle = handle; },
-			tasks: this.model.tasks,
-			height: '100%',
-			width: '100%',
-			theme: this.theme,
-			...this.model.props,
-		}), this.containerEl);
+		this.renderChart(
+			h(ReactGanttChart, {
+				key: this.remountKey,
+				ref: (handle: GanttHandle | null) => {
+					this.handle = handle;
+				},
+				tasks: this.model.tasks,
+				height: "100%",
+				width: "100%",
+				theme: this.theme,
+				...this.model.props,
+			}),
+			this.containerEl,
+		);
 		this.tooltipGuard.sweep();
 	}
 
@@ -91,9 +112,12 @@ export class GanttChartHost {
 
 	/** Row height is a CSS-only update; unchanged task/prop references do not repaint Preact. */
 	update(model: GanttChartModel): void {
-		this.containerEl.style.setProperty('--gantt-row-height', `${model.rowHeight}px`);
-		const repaint = !this.model || this.model.tasks !== model.tasks || this.model.props !== model.props
-			|| this.model.unscheduledCount !== model.unscheduledCount;
+		this.containerEl.style.setProperty("--gantt-row-height", `${model.rowHeight}px`);
+		const repaint =
+			!this.model ||
+			this.model.tasks !== model.tasks ||
+			this.model.props !== model.props ||
+			this.model.unscheduledCount !== model.unscheduledCount;
 		this.model = model;
 		if (repaint) this.paint();
 	}

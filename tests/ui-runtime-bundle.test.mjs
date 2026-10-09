@@ -1,6 +1,6 @@
+import esbuild from "esbuild";
 import path from "path";
 import { fileURLToPath } from "url";
-import esbuild from "esbuild";
 import { describe, expect, it } from "vitest";
 import { UI_RUNTIME_ALIASES } from "../scripts/ui-runtime-aliases.mjs";
 

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Parkis Utama
 
+import type UnimianPlugin from "../../src/main";
+import { DEFAULT_SETTINGS } from "../../src/types/settings";
+import { BasesSwimlaneView } from "../../src/views/BasesSwimlaneView";
 // Import the test double directly so this file type-checks against it; at runtime "obsidian"
 // resolves to the same module through the vitest alias.
 import { TFile } from "./obsidian";
-import { BasesSwimlaneView } from "../../src/views/BasesSwimlaneView";
-import { DEFAULT_SETTINGS } from "../../src/types/settings";
-import type UnimianPlugin from "../../src/main";
 
 /** A note as Bases exposes it: frontmatter keyed by property name. */
 export interface NoteFixture {
@@ -15,7 +15,14 @@ export interface NoteFixture {
 }
 
 export const sampleNotes = (): NoteFixture[] => [
-	{ path: "Tasks/Write spec.md", title: "Spec title", status: "Todo", priority: "High", cover: "cover.png", summary: "Spec summary" },
+	{
+		path: "Tasks/Write spec.md",
+		title: "Spec title",
+		status: "Todo",
+		priority: "High",
+		cover: "cover.png",
+		summary: "Spec summary",
+	},
 	{ path: "Tasks/Build.md", title: "Build title", status: "Doing", priority: "Low" },
 	{ path: "Tasks/Ship.md", status: "Done" },
 ];
@@ -40,7 +47,9 @@ export interface SwimlaneHarness {
 export const waitForRender = () => new Promise((resolve) => setTimeout(resolve, 80));
 
 /** Mount the real BasesSwimlaneView against the obsidian test double and wait for it to render. */
-export async function createSwimlaneHarness(options: SwimlaneHarnessOptions = {}): Promise<SwimlaneHarness> {
+export async function createSwimlaneHarness(
+	options: SwimlaneHarnessOptions = {},
+): Promise<SwimlaneHarness> {
 	const notes = options.notes ?? sampleNotes();
 	const config: Record<string, unknown> = { ...options.config };
 	const byPath = new Map(notes.map((note) => [note.path, note]));
@@ -53,11 +62,13 @@ export async function createSwimlaneHarness(options: SwimlaneHarnessOptions = {}
 			stat: { ctime: number; mtime: number };
 		};
 		file.extension = "md";
-		file.parent = { path: note.path.includes("/") ? note.path.slice(0, note.path.lastIndexOf("/")) : "" };
+		file.parent = {
+			path: note.path.includes("/") ? note.path.slice(0, note.path.lastIndexOf("/")) : "",
+		};
 		file.stat = { ctime: 1, mtime: 2 };
 		return {
-		file,
-		getValue: (id: string) => note[id.replace(/^(note|file|formula)\./, "")] ?? null,
+			file,
+			getValue: (id: string) => note[id.replace(/^(note|file|formula)\./, "")] ?? null,
 		};
 	});
 

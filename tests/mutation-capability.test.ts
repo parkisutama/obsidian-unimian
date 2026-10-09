@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { TFile } from "./fixtures/obsidian";
-import { LegacyMutationGateway } from "../src/platform/mutations/LegacyMutationGateway";
-import { createGrantedMutations } from "../src/platform/mutations/grants";
 import type { App } from "obsidian";
+import { describe, expect, it } from "vitest";
+import { createGrantedMutations } from "../src/platform/mutations/grants";
+import { LegacyMutationGateway } from "../src/platform/mutations/LegacyMutationGateway";
+import { TFile } from "./fixtures/obsidian";
 
 interface MockAppOptions {
 	existingFiles?: string[];
@@ -25,7 +25,7 @@ function makeApp(options: MockAppOptions = {}) {
 			parent: { path: string } | null;
 		};
 		file.name = path.split("/").pop() ?? path;
-		file.extension = file.name.includes(".") ? file.name.split(".").pop() ?? "" : "";
+		file.extension = file.name.includes(".") ? (file.name.split(".").pop() ?? "") : "";
 		file.parent = { path: path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : "" };
 		return file;
 	};
@@ -71,27 +71,43 @@ function makeApp(options: MockAppOptions = {}) {
 describe("LegacyMutationGateway.setProperty", () => {
 	it("writes the property's bare name to frontmatter, keyed by path", async () => {
 		const { app, frontmatterWrites } = makeApp({ existingFiles: ["Tasks/A.md"] });
-		const result = await new LegacyMutationGateway(app).setProperty("Tasks/A.md", "note.status", "Done");
+		const result = await new LegacyMutationGateway(app).setProperty(
+			"Tasks/A.md",
+			"note.status",
+			"Done",
+		);
 		expect(result).toEqual({ ok: true });
 		expect(frontmatterWrites).toEqual([{ path: "Tasks/A.md", values: { status: "Done" } }]);
 	});
 
 	it("rejects a formula property before touching the vault", async () => {
 		const { app, frontmatterWrites } = makeApp({ existingFiles: ["Tasks/A.md"] });
-		const result = await new LegacyMutationGateway(app).setProperty("Tasks/A.md", "formula.status", "Done");
+		const result = await new LegacyMutationGateway(app).setProperty(
+			"Tasks/A.md",
+			"formula.status",
+			"Done",
+		);
 		expect(result).toEqual({ ok: false, reason: "formula-property", message: expect.any(String) });
 		expect(frontmatterWrites).toEqual([]);
 	});
 
 	it("fails deterministically for a path with no file", async () => {
 		const { app } = makeApp();
-		const result = await new LegacyMutationGateway(app).setProperty("Missing.md", "note.status", "Done");
+		const result = await new LegacyMutationGateway(app).setProperty(
+			"Missing.md",
+			"note.status",
+			"Done",
+		);
 		expect(result).toEqual({ ok: false, reason: "file-not-found", message: expect.any(String) });
 	});
 
 	it("reports a stable error result instead of throwing when the write itself fails", async () => {
 		const { app } = makeApp({ existingFiles: ["Tasks/A.md"], throwOnProcessFrontMatter: true });
-		const result = await new LegacyMutationGateway(app).setProperty("Tasks/A.md", "note.status", "Done");
+		const result = await new LegacyMutationGateway(app).setProperty(
+			"Tasks/A.md",
+			"note.status",
+			"Done",
+		);
 		expect(result).toEqual({ ok: false, reason: "error", message: "disk error" });
 	});
 });
@@ -99,14 +115,28 @@ describe("LegacyMutationGateway.setProperty", () => {
 describe("LegacyMutationGateway.updateRange", () => {
 	it("writes both start and end properties in one call", async () => {
 		const { app, frontmatterWrites } = makeApp({ existingFiles: ["A.md"] });
-		const result = await new LegacyMutationGateway(app).updateRange("A.md", "note.start", "2026-01-01", "note.end", "2026-01-02");
+		const result = await new LegacyMutationGateway(app).updateRange(
+			"A.md",
+			"note.start",
+			"2026-01-01",
+			"note.end",
+			"2026-01-02",
+		);
 		expect(result).toEqual({ ok: true });
-		expect(frontmatterWrites).toEqual([{ path: "A.md", values: { start: "2026-01-01", end: "2026-01-02" } }]);
+		expect(frontmatterWrites).toEqual([
+			{ path: "A.md", values: { start: "2026-01-01", end: "2026-01-02" } },
+		]);
 	});
 
 	it("rejects the whole write when either date property is a formula", async () => {
 		const { app, frontmatterWrites } = makeApp({ existingFiles: ["A.md"] });
-		const result = await new LegacyMutationGateway(app).updateRange("A.md", "note.start", "2026-01-01", "formula.end", "2026-01-02");
+		const result = await new LegacyMutationGateway(app).updateRange(
+			"A.md",
+			"note.start",
+			"2026-01-01",
+			"formula.end",
+			"2026-01-02",
+		);
 		expect(result.ok).toBe(false);
 		expect(frontmatterWrites).toEqual([]);
 	});
@@ -120,7 +150,9 @@ describe("LegacyMutationGateway Swimlane movement", () => {
 			"note.priority": "High",
 		});
 		expect(result).toEqual({ ok: true });
-		expect(frontmatterWrites).toEqual([{ path: "Tasks/A.md", values: { status: "Done", priority: "High" } }]);
+		expect(frontmatterWrites).toEqual([
+			{ path: "Tasks/A.md", values: { status: "Done", priority: "High" } },
+		]);
 	});
 
 	it("creates the target folder and returns the renamed path", async () => {
@@ -135,7 +167,11 @@ describe("LegacyMutationGateway Swimlane movement", () => {
 describe("LegacyMutationGateway.setDependencies", () => {
 	it("writes the dependency string as a plain property", async () => {
 		const { app, frontmatterWrites } = makeApp({ existingFiles: ["A.md"] });
-		const result = await new LegacyMutationGateway(app).setDependencies("A.md", "note.depends_on", "task-b, task-c");
+		const result = await new LegacyMutationGateway(app).setDependencies(
+			"A.md",
+			"note.depends_on",
+			"task-b, task-c",
+		);
 		expect(result).toEqual({ ok: true });
 		expect(frontmatterWrites).toEqual([{ path: "A.md", values: { depends_on: "task-b, task-c" } }]);
 	});
@@ -198,8 +234,12 @@ describe("createGrantedMutations (GBETA-003)", () => {
 		const { app, frontmatterWrites } = makeApp({ existingFiles: ["Tasks/A.md"] });
 		const granted = createGrantedMutations(app, ["property"]);
 
-		await expect(granted.property?.setProperty("Tasks/A.md", "note.progress", 40)).resolves.toEqual({ ok: true });
-		await expect(granted.property?.setProperty("Tasks/A.md", "formula.x", 1)).resolves.toMatchObject({
+		await expect(granted.property?.setProperty("Tasks/A.md", "note.progress", 40)).resolves.toEqual(
+			{ ok: true },
+		);
+		await expect(
+			granted.property?.setProperty("Tasks/A.md", "formula.x", 1),
+		).resolves.toMatchObject({
 			ok: false,
 			reason: "formula-property",
 		});

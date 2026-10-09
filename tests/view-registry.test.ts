@@ -1,20 +1,30 @@
 import { describe, expect, it } from "vitest";
+import UnimianPlugin from "../src/main";
+import { DEFAULT_SETTINGS } from "../src/types/settings";
 import {
 	ConflictingMutationCapabilitiesError,
 	DuplicateViewIdError,
 	InvalidViewIdError,
 	UnapprovedMutationGrantError,
-	ViewRegistry,
 	type ViewDescriptor,
+	ViewRegistry,
 	validateViewDescriptor,
 } from "../src/viewRegistry";
-import { BASES_CALENDAR_VIEW_ID, createCalendarViewRegistration } from "../src/views/BasesCalendarView";
-import { BASES_SWIMLANE_VIEW_ID, createSwimlaneViewRegistration } from "../src/views/BasesSwimlaneView";
-import { BASES_TIMELINE_VIEW_ID, createTimelineViewRegistration, getTimelineViewOptions } from "../src/views/timeline";
+import {
+	BASES_CALENDAR_VIEW_ID,
+	createCalendarViewRegistration,
+} from "../src/views/BasesCalendarView";
+import {
+	BASES_SWIMLANE_VIEW_ID,
+	createSwimlaneViewRegistration,
+} from "../src/views/BasesSwimlaneView";
 import { BASES_GANTT_VIEW_ID, createGanttViewRegistration } from "../src/views/gantt";
 import { BASES_STICKY_NOTE_VIEW_ID } from "../src/views/sticky-note";
-import { DEFAULT_SETTINGS } from "../src/types/settings";
-import UnimianPlugin from "../src/main";
+import {
+	BASES_TIMELINE_VIEW_ID,
+	createTimelineViewRegistration,
+	getTimelineViewOptions,
+} from "../src/views/timeline";
 
 const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as UnimianPlugin;
 
@@ -29,32 +39,40 @@ function describedView(id: string, name: string, icon: string): ViewDescriptor {
 
 describe("validateViewDescriptor", () => {
 	it("accepts an id under the unimian- prefix", () => {
-		expect(() => validateViewDescriptor(describedView("unimian-timeline", "Timeline", "clock"))).not.toThrow();
+		expect(() =>
+			validateViewDescriptor(describedView("unimian-timeline", "Timeline", "clock")),
+		).not.toThrow();
 	});
 
 	it("rejects an id without the unimian- prefix", () => {
-		expect(() => validateViewDescriptor(describedView("timeline", "Timeline", "clock"))).toThrow(InvalidViewIdError);
+		expect(() => validateViewDescriptor(describedView("timeline", "Timeline", "clock"))).toThrow(
+			InvalidViewIdError,
+		);
 	});
 });
 
 describe("ViewRegistry", () => {
 	it("registers descriptors without calling their factory", () => {
 		const registry = new ViewRegistry();
-		expect(() => registry.register(describedView("unimian-timeline", "Timeline", "clock"))).not.toThrow();
+		expect(() =>
+			registry.register(describedView("unimian-timeline", "Timeline", "clock")),
+		).not.toThrow();
 		expect(registry.has("unimian-timeline")).toBe(true);
 	});
 
 	it("fails deterministically on a duplicate id", () => {
 		const registry = new ViewRegistry();
 		registry.register(describedView("unimian-timeline", "Timeline", "clock"));
-		expect(() => registry.register(describedView("unimian-timeline", "Timeline 2", "clock"))).toThrow(
-			DuplicateViewIdError,
-		);
+		expect(() =>
+			registry.register(describedView("unimian-timeline", "Timeline 2", "clock")),
+		).toThrow(DuplicateViewIdError);
 	});
 
 	it("fails deterministically on an invalid id, before storing it", () => {
 		const registry = new ViewRegistry();
-		expect(() => registry.register(describedView("timeline", "Timeline", "clock"))).toThrow(InvalidViewIdError);
+		expect(() => registry.register(describedView("timeline", "Timeline", "clock"))).toThrow(
+			InvalidViewIdError,
+		);
 		expect(registry.has("timeline")).toBe(false);
 	});
 
@@ -123,9 +141,9 @@ describe("ViewRegistry", () => {
 	it("exposes schema-agnostic Timeline property and zoom options", () => {
 		const serialized = JSON.stringify(getTimelineViewOptions());
 		for (const key of ["start", "end", "titleBy", "colorBy", "zoom", "wrapTitles"]) {
-			expect(serialized).toContain(`\"key\":\"${key}\"`);
+			expect(serialized).toContain(`"key":"${key}"`);
 		}
-		expect(serialized).not.toContain('groupProperty');
+		expect(serialized).not.toContain("groupProperty");
 		expect(serialized).not.toContain("status");
 		expect(serialized).not.toContain("priority");
 	});
@@ -135,7 +153,10 @@ describe("ViewRegistry", () => {
 		// (BasesViewConfigFile). Reusing one for a plugin-defined option makes Obsidian write a
 		// value of the wrong shape into that reserved slot and refuse to parse the whole file.
 		const reserved = new Set(["type", "name", "filters", "groupBy", "order", "summaries"]);
-		const keys = JSON.stringify(getTimelineViewOptions()).match(/"key":"([^"]+)"/g)?.map(m => m.slice(7, -1)) ?? [];
+		const keys =
+			JSON.stringify(getTimelineViewOptions())
+				.match(/"key":"([^"]+)"/g)
+				?.map((m) => m.slice(7, -1)) ?? [];
 		expect(keys.length).toBeGreaterThan(0);
 		for (const key of keys) expect(reserved.has(key)).toBe(false);
 	});
@@ -143,7 +164,10 @@ describe("ViewRegistry", () => {
 
 describe("UnimianPlugin.onload view registration", () => {
 	it("registers each Bases view and hover source exactly once, and no command", async () => {
-		const app = { plugins: { plugins: {} }, vault: { on: () => ({} as never), getAbstractFileByPath: () => null } };
+		const app = {
+			plugins: { plugins: {} },
+			vault: { on: () => ({}) as never, getAbstractFileByPath: () => null },
+		};
 		const realPlugin = new UnimianPlugin(app as never, {} as never);
 		const registeredViews: string[] = [];
 		const registeredHovers: string[] = [];
@@ -197,7 +221,10 @@ describe("scoped mutation grants (GBETA-003)", () => {
 
 	it("gives a legacy-mutation descriptor no scoped capability", () => {
 		const registry = new ViewRegistry();
-		registry.register({ ...describedView("unimian-a", "A", "a"), capabilities: { legacyMutation: true } });
+		registry.register({
+			...describedView("unimian-a", "A", "a"),
+			capabilities: { legacyMutation: true },
+		});
 
 		expect(registry.mutationsFor("unimian-a", app)).toEqual({});
 	});
@@ -215,7 +242,10 @@ describe("scoped mutation grants (GBETA-003)", () => {
 	});
 
 	it("rejects scoped mutations on a view that is not approved", () => {
-		const descriptor = { ...describedView("unimian-other", "Other", "x"), capabilities: { mutations: ["date"] as const } };
+		const descriptor = {
+			...describedView("unimian-other", "Other", "x"),
+			capabilities: { mutations: ["date"] as const },
+		};
 
 		expect(() => validateViewDescriptor(descriptor)).toThrow(UnapprovedMutationGrantError);
 		expect(() => new ViewRegistry().register(descriptor)).toThrow(UnapprovedMutationGrantError);

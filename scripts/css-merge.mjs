@@ -22,7 +22,10 @@ export function packageLicenseNotice(cssPath, note) {
 	const pkg = JSON.parse(fs.readFileSync(path.join(dir, "package.json"), "utf8"));
 	const licenseFile = fs.readdirSync(dir).find((f) => /^licen[cs]e/i.test(f));
 	const copyright = licenseFile
-		? fs.readFileSync(path.join(dir, licenseFile), "utf8").match(/^\s*Copyright.*$/m)?.[0].trim()
+		? fs
+				.readFileSync(path.join(dir, licenseFile), "utf8")
+				.match(/^\s*Copyright.*$/m)?.[0]
+				.trim()
 		: undefined;
 	const parts = [
 		`${pkg.name} v${pkg.version}`,
@@ -54,7 +57,15 @@ export function packageLicenseNotice(cssPath, note) {
  * @param {Array<{ path: string, css: string }>} options.imported Imported stylesheets, any order.
  * @param {string} [options.firstParty] Pre-concatenated first-party CSS source modules, verbatim.
  */
-export function composeStyles({ existing, banner, bannerStart, extras, extraPaths, imported, firstParty }) {
+export function composeStyles({
+	existing,
+	banner,
+	bannerStart,
+	extras,
+	extraPaths,
+	imported,
+	firstParty,
+}) {
 	let handWritten;
 	if (firstParty !== undefined) {
 		handWritten = firstParty;
@@ -132,7 +143,9 @@ export function createCssMergePlugin({
 			});
 
 			build.onEnd(async () => {
-				const existing = fs.existsSync(stylesPath) ? await fs.promises.readFile(stylesPath, "utf8") : "";
+				const existing = fs.existsSync(stylesPath)
+					? await fs.promises.readFile(stylesPath, "utf8")
+					: "";
 
 				let firstParty;
 				if (firstPartyCss !== undefined) {
@@ -152,7 +165,15 @@ export function createCssMergePlugin({
 				}
 				const extraPaths = new Set(extraCss.map((extra) => extra.path));
 
-				const styles = composeStyles({ existing, banner, bannerStart, extras, extraPaths, imported, firstParty });
+				const styles = composeStyles({
+					existing,
+					banner,
+					bannerStart,
+					extras,
+					extraPaths,
+					imported,
+					firstParty,
+				});
 				if (styles !== null) {
 					await fs.promises.writeFile(stylesPath, styles);
 					log("Merged CSS imports into styles.css");

@@ -7,35 +7,55 @@
  * explicitly out of scope for v1.
  */
 
-import { BasesView, Component, MarkdownRenderer, setIcon, type BasesEntry, type BasesPropertyId, type QueryController } from 'obsidian';
-import type UnimianPlugin from '../../main';
-import { computeRenderSignature, type RenderSignatureInput } from '../../platform/bases/changeDetection';
-import { normalizeValue } from '../../platform/bases/entrySnapshotAdapter';
-import { ViewConfigReader } from '../../platform/bases/ViewConfigReader';
-import { resolveColor } from '../../platform/colors/ColorResolver';
-import { resolveCoverImageSrc } from '../../platform/dom/CoverImageResolver';
-import { RenderScheduler } from '../../platform/dom/RenderScheduler';
-import { ViewRuntime } from '../../platform/dom/ViewRuntime';
-import { activateEntry, openPath } from '../../platform/navigation/NavigationService';
-import { resolvePrettyPropertiesColor } from '../../integrations/PrettyPropertiesAdapter';
-import { buildCardExcerpt, isTextExcerptExtension } from './content';
-import { getColumnCount, layoutMasonrySection } from './masonry';
-import { findOwningBaseFile } from './ownerBaseFile';
-import { readStickyNoteOptions, STICKY_NOTE_CSS_ONLY_KEYS, type StickyNoteOptions } from './options';
-import { isPinned, togglePin } from './pinStore';
+import {
+	type BasesEntry,
+	type BasesPropertyId,
+	BasesView,
+	Component,
+	MarkdownRenderer,
+	type QueryController,
+	setIcon,
+} from "obsidian";
+import { resolvePrettyPropertiesColor } from "../../integrations/PrettyPropertiesAdapter";
+import type UnimianPlugin from "../../main";
+import {
+	computeRenderSignature,
+	type RenderSignatureInput,
+} from "../../platform/bases/changeDetection";
+import { normalizeValue } from "../../platform/bases/entrySnapshotAdapter";
+import { ViewConfigReader } from "../../platform/bases/ViewConfigReader";
+import { resolveColor } from "../../platform/colors/ColorResolver";
+import { resolveCoverImageSrc } from "../../platform/dom/CoverImageResolver";
+import { RenderScheduler } from "../../platform/dom/RenderScheduler";
+import { ViewRuntime } from "../../platform/dom/ViewRuntime";
+import { activateEntry, openPath } from "../../platform/navigation/NavigationService";
+import { buildCardExcerpt, isTextExcerptExtension } from "./content";
+import { getColumnCount, layoutMasonrySection } from "./masonry";
+import {
+	readStickyNoteOptions,
+	STICKY_NOTE_CSS_ONLY_KEYS,
+	type StickyNoteOptions,
+} from "./options";
+import { findOwningBaseFile } from "./ownerBaseFile";
+import { isPinned, togglePin } from "./pinStore";
 
-export const BASES_STICKY_NOTE_VIEW_ID = 'unimian-sticky-note';
+export const BASES_STICKY_NOTE_VIEW_ID = "unimian-sticky-note";
 
 /** Reads one property's value off a live entry as plain text, or `null` if unset/unreadable. */
 function propertyText(entry: BasesEntry, propertyId: BasesPropertyId | null): string | null {
 	if (!propertyId) return null;
 	const normalized = normalizeValue(entry.getValue(propertyId));
 	switch (normalized.kind) {
-		case 'text': return normalized.value;
-		case 'file': return normalized.path;
-		case 'link': return normalized.display ?? normalized.target;
-		case 'number': return String(normalized.value);
-		default: return null;
+		case "text":
+			return normalized.value;
+		case "file":
+			return normalized.path;
+		case "link":
+			return normalized.display ?? normalized.target;
+		case "number":
+			return String(normalized.value);
+		default:
+			return null;
 	}
 }
 
@@ -49,7 +69,7 @@ interface CardEntry {
 	component: Component | null;
 	/** `'placeholder'` cards are cheap, fixed-height boxes standing in for an entry outside the
 	 * initial render window (STICKY-009) — promoted to `'full'` as the user scrolls near them. */
-	kind: 'full' | 'placeholder';
+	kind: "full" | "placeholder";
 }
 
 /** Windowing constants (STICKY-009). Deliberately rough heuristics, not exact measurement —
@@ -137,14 +157,24 @@ export class BasesStickyNoteView extends BasesView {
 	 */
 	private readonly renderScheduler = new RenderScheduler();
 
-	constructor(controller: QueryController, private readonly containerEl: HTMLElement, private readonly plugin: UnimianPlugin) {
+	constructor(
+		controller: QueryController,
+		private readonly containerEl: HTMLElement,
+		private readonly plugin: UnimianPlugin,
+	) {
 		super(controller);
 		this.runtime = new ViewRuntime(containerEl);
-		this.containerEl.addClass('unimian-sticky-note');
-		this.pinnedHeadingEl = this.containerEl.createEl('h3', { text: 'Pinned', cls: 'unimian-sticky-note-section-heading' });
-		this.pinnedGridEl = this.containerEl.createDiv({ cls: 'unimian-sticky-note-grid' });
-		this.othersHeadingEl = this.containerEl.createEl('h3', { text: 'Others', cls: 'unimian-sticky-note-section-heading' });
-		this.othersGridEl = this.containerEl.createDiv({ cls: 'unimian-sticky-note-grid' });
+		this.containerEl.addClass("unimian-sticky-note");
+		this.pinnedHeadingEl = this.containerEl.createEl("h3", {
+			text: "Pinned",
+			cls: "unimian-sticky-note-section-heading",
+		});
+		this.pinnedGridEl = this.containerEl.createDiv({ cls: "unimian-sticky-note-grid" });
+		this.othersHeadingEl = this.containerEl.createEl("h3", {
+			text: "Others",
+			cls: "unimian-sticky-note-section-heading",
+		});
+		this.othersGridEl = this.containerEl.createDiv({ cls: "unimian-sticky-note-grid" });
 	}
 
 	onload(): void {
@@ -155,27 +185,33 @@ export class BasesStickyNoteView extends BasesView {
 		this.runtime.observe(this.cardResizeObserver);
 		// STICKY-009: promotes a placeholder to a full card once it comes within
 		// PLACEHOLDER_ROOT_MARGIN_PX of the viewport, regardless of scroll speed/distance.
-		this.placeholderObserver = new IntersectionObserver((entries) => {
-			for (const entry of entries) {
-				if (!entry.isIntersecting) continue;
-				const path = (entry.target as HTMLElement).dataset.stickyPath;
-				if (path) this.schedulePromote(path);
-				this.placeholderObserver?.unobserve(entry.target);
-			}
-		}, { root: this.containerEl, rootMargin: `${PLACEHOLDER_ROOT_MARGIN_PX}px 0px` });
+		this.placeholderObserver = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting) continue;
+					const path = (entry.target as HTMLElement).dataset.stickyPath;
+					if (path) this.schedulePromote(path);
+					this.placeholderObserver?.unobserve(entry.target);
+				}
+			},
+			{ root: this.containerEl, rootMargin: `${PLACEHOLDER_ROOT_MARGIN_PX}px 0px` },
+		);
 		this.runtime.observe(this.placeholderObserver);
 	}
 
 	onDataUpdated(): void {
-		const decision = this.renderScheduler.decide(computeRenderSignature(this.buildRenderSignatureInput()));
-		if (decision === 'skip') return;
+		const decision = this.renderScheduler.decide(
+			computeRenderSignature(this.buildRenderSignatureInput()),
+		);
+		if (decision === "skip") return;
 		void this.render();
 	}
 
 	/** Only the primitives that affect this view's rendered output (spec docs/specs/sticky-note.md §5.4). */
 	private buildRenderSignatureInput(): RenderSignatureInput {
 		const entries = (this.data?.groupedData ?? []).flatMap((group) =>
-			group.entries.map((entry) => ({ path: entry.file.path, mtime: entry.file.stat?.mtime ?? 0 })));
+			group.entries.map((entry) => ({ path: entry.file.path, mtime: entry.file.stat?.mtime ?? 0 })),
+		);
 		const options = readStickyNoteOptions(new ViewConfigReader(this.config));
 		return {
 			entries,
@@ -216,8 +252,8 @@ export class BasesStickyNoteView extends BasesView {
 			// left visible for every later relayout — not re-hidden on every update.
 			if (!this.hasCompletedFirstLayout) {
 				this.hasCompletedFirstLayout = true;
-				this.pinnedGridEl.addClass('is-ready');
-				this.othersGridEl.addClass('is-ready');
+				this.pinnedGridEl.addClass("is-ready");
+				this.othersGridEl.addClass("is-ready");
 			}
 		});
 	}
@@ -226,29 +262,46 @@ export class BasesStickyNoteView extends BasesView {
 		if (!options.colorProperty) return undefined;
 		const raw = propertyText(entry, options.colorProperty);
 		if (!raw) return undefined;
-		const propName = String(options.colorProperty).split('.').pop() || String(options.colorProperty);
+		const propName =
+			String(options.colorProperty).split(".").pop() || String(options.colorProperty);
 		const resolved = resolveColor({
 			explicitColor: raw,
 			categoryValue: raw,
-			resolvePrettyPropertiesColor: (categoryValue) => resolvePrettyPropertiesColor(this.runtime.win, this.runtime.doc, propName, categoryValue, 0.4),
-			valueStyleColor: this.plugin.settings.valueStyles[String(options.colorProperty)]?.[raw]?.color ?? null,
+			resolvePrettyPropertiesColor: (categoryValue) =>
+				resolvePrettyPropertiesColor(
+					this.runtime.win,
+					this.runtime.doc,
+					propName,
+					categoryValue,
+					0.4,
+				),
+			valueStyleColor:
+				this.plugin.settings.valueStyles[String(options.colorProperty)]?.[raw]?.color ?? null,
 		});
-		return resolved.source === 'fallback' ? undefined : resolved.background;
+		return resolved.source === "fallback" ? undefined : resolved.background;
 	}
 
-	private async renderCard(entry: BasesEntry, options: StickyNoteOptions, basePath: string, parent: HTMLElement): Promise<CardEntry> {
+	private async renderCard(
+		entry: BasesEntry,
+		options: StickyNoteOptions,
+		basePath: string,
+		parent: HTMLElement,
+	): Promise<CardEntry> {
 		const file = entry.file;
 		const title = propertyText(entry, options.titleProperty) ?? file.basename;
 		const pinned = isPinned(this.plugin.settings.stickyNote, basePath, file.path);
 		const child = new Component();
 		child.load();
 
-		const card = parent.createDiv({ cls: `unimian-sticky-note-card unimian-sticky-note-fit-${options.imageFit}` });
+		const card = parent.createDiv({
+			cls: `unimian-sticky-note-card unimian-sticky-note-fit-${options.imageFit}`,
+		});
 		const color = this.resolveCardColor(options, entry);
-		if (color) card.style.setProperty('--unimian-color-bg', color);
+		if (color) card.style.setProperty("--unimian-color-bg", color);
 
 		const open = (event: MouseEvent | KeyboardEvent) => {
-			if ((event.target as HTMLElement).closest('a, .internal-embed, .unimian-sticky-note-pin-btn')) return;
+			if ((event.target as HTMLElement).closest("a, .internal-embed, .unimian-sticky-note-pin-btn"))
+				return;
 			activateEntry({
 				app: this.plugin.app,
 				settings: this.plugin.settings,
@@ -257,21 +310,27 @@ export class BasesStickyNoteView extends BasesView {
 				openFull: (p, e) => openPath(this.plugin.app, p, e),
 			});
 		};
-		card.addEventListener('click', open);
-		card.addEventListener('keydown', (event) => {
-			if (event.key !== 'Enter' && event.key !== ' ') return;
+		card.addEventListener("click", open);
+		card.addEventListener("keydown", (event) => {
+			if (event.key !== "Enter" && event.key !== " ") return;
 			event.preventDefault();
 			open(event);
 		});
-		card.setAttribute('tabindex', '0');
-		card.setAttribute('role', 'button');
+		card.setAttribute("tabindex", "0");
+		card.setAttribute("role", "button");
 
-		const pinBtn = card.createDiv({ cls: `unimian-sticky-note-pin-btn${pinned ? ' is-pinned' : ''}` });
-		setIcon(pinBtn, 'pin');
-		pinBtn.setAttribute('aria-label', pinned ? 'Unpin note' : 'Pin note');
-		pinBtn.addEventListener('click', (event) => {
+		const pinBtn = card.createDiv({
+			cls: `unimian-sticky-note-pin-btn${pinned ? " is-pinned" : ""}`,
+		});
+		setIcon(pinBtn, "pin");
+		pinBtn.setAttribute("aria-label", pinned ? "Unpin note" : "Pin note");
+		pinBtn.addEventListener("click", (event) => {
 			event.stopPropagation();
-			this.plugin.settings.stickyNote = togglePin(this.plugin.settings.stickyNote, basePath, file.path);
+			this.plugin.settings.stickyNote = togglePin(
+				this.plugin.settings.stickyNote,
+				basePath,
+				file.path,
+			);
 			void this.plugin.saveSettings();
 			void this.render();
 		});
@@ -280,46 +339,64 @@ export class BasesStickyNoteView extends BasesView {
 		if (coverRaw) {
 			const coverSrc = resolveCoverImageSrc(this.plugin.app, coverRaw);
 			if (coverSrc) {
-				const cover = card.createDiv({ cls: 'unimian-sticky-note-cover' });
-				cover.createEl('img', { attr: { src: coverSrc, alt: '' } });
+				const cover = card.createDiv({ cls: "unimian-sticky-note-cover" });
+				cover.createEl("img", { attr: { src: coverSrc, alt: "" } });
 			}
 		}
 
-		card.createEl('h4', { text: title, cls: 'unimian-sticky-note-title' });
-		const body = card.createDiv({ cls: 'unimian-sticky-note-body' });
+		card.createEl("h4", { text: title, cls: "unimian-sticky-note-title" });
+		const body = card.createDiv({ cls: "unimian-sticky-note-body" });
 		try {
 			if (!isTextExcerptExtension(file.extension)) {
-				if (file.extension === 'canvas') {
+				if (file.extension === "canvas") {
 					// spec §5.4.2: a canvas has no meaningful bounded-height inline preview —
 					// embedding it via MarkdownRenderer renders nothing useful inside a small
 					// card (native testing, 2026-09-23; the real preview only appeared once
 					// opened in Quick Preview's own live leaf).
-					body.createDiv({ text: 'Canvas — open to view.', cls: 'unimian-sticky-note-embed-placeholder' });
-				} else if (file.extension === 'base' && file.path === basePath) {
+					body.createDiv({
+						text: "Canvas — open to view.",
+						cls: "unimian-sticky-note-embed-placeholder",
+					});
+				} else if (file.extension === "base" && file.path === basePath) {
 					// STICKY-008: a Base's own query can list the Base file itself as an entry
 					// (seen in native testing). Embedding it here would recurse into this same
 					// Sticky Note view rendering its own entries again — a real infinite-loop
 					// risk, not a hypothetical. Placeholder instead of an embed for this one
 					// case; every other non-text entry (other `.base` files, images, PDFs, ...)
 					// still embeds normally.
-					body.createDiv({ text: 'This Base — open to view.', cls: 'unimian-sticky-note-embed-placeholder' });
+					body.createDiv({
+						text: "This Base — open to view.",
+						cls: "unimian-sticky-note-embed-placeholder",
+					});
 				} else {
 					// A binary file's raw bytes are never meaningful as prose (spec §5.4.2 for
 					// `.base`/`.canvas`, generalized 2026-09-23 after native testing showed an
 					// image entry's raw PNG bytes rendered as garbled text) — embed instead of
 					// reading it as text.
-					await MarkdownRenderer.render(this.plugin.app, `![[${file.path}]]`, body, file.path, child);
+					await MarkdownRenderer.render(
+						this.plugin.app,
+						`![[${file.path}]]`,
+						body,
+						file.path,
+						child,
+					);
 				}
 			} else {
 				const raw = await this.plugin.app.vault.cachedRead(file);
 				const excerpt = buildCardExcerpt(raw, title, options.excerptBudget);
-				await MarkdownRenderer.render(this.plugin.app, excerpt || '*(empty note)*', body, file.path, child);
+				await MarkdownRenderer.render(
+					this.plugin.app,
+					excerpt || "*(empty note)*",
+					body,
+					file.path,
+					child,
+				);
 			}
 		} catch {
-			body.createDiv({ text: 'Could not render preview.', cls: 'unimian-sticky-note-error' });
+			body.createDiv({ text: "Could not render preview.", cls: "unimian-sticky-note-error" });
 		}
 
-		return { el: card, mtime: file.stat?.mtime ?? 0, pinned, component: child, kind: 'full' };
+		return { el: card, mtime: file.stat?.mtime ?? 0, pinned, component: child, kind: "full" };
 	}
 
 	/**
@@ -327,12 +404,24 @@ export class BasesStickyNoteView extends BasesView {
 	 * `data-sticky-path` is how the `IntersectionObserver` callback identifies which entry to
 	 * promote once this element nears the viewport — see `placeholderObserver`.
 	 */
-	private createPlaceholder(entry: BasesEntry, parent: HTMLElement, estimatedHeight: number): CardEntry {
-		const el = parent.createDiv({ cls: 'unimian-sticky-note-card unimian-sticky-note-card-placeholder' });
+	private createPlaceholder(
+		entry: BasesEntry,
+		parent: HTMLElement,
+		estimatedHeight: number,
+	): CardEntry {
+		const el = parent.createDiv({
+			cls: "unimian-sticky-note-card unimian-sticky-note-card-placeholder",
+		});
 		el.style.height = `${estimatedHeight}px`;
 		el.dataset.stickyPath = entry.file.path;
 		this.placeholderObserver?.observe(el);
-		return { el, mtime: entry.file.stat?.mtime ?? 0, pinned: false, component: null, kind: 'placeholder' };
+		return {
+			el,
+			mtime: entry.file.stat?.mtime ?? 0,
+			pinned: false,
+			component: null,
+			kind: "placeholder",
+		};
 	}
 
 	/**
@@ -349,7 +438,10 @@ export class BasesStickyNoteView extends BasesView {
 		const containerHeight = this.containerEl.clientHeight || 800;
 		const containerWidth = this.othersGridEl.clientWidth || this.containerEl.clientWidth || 800;
 		const columns = getColumnCount(containerWidth, this.currentCardWidth);
-		const rows = Math.max(1, Math.ceil((containerHeight * RENDER_WINDOW_SCREENS) / this.estimateCardHeight(cardMaxHeight)));
+		const rows = Math.max(
+			1,
+			Math.ceil((containerHeight * RENDER_WINDOW_SCREENS) / this.estimateCardHeight(cardMaxHeight)),
+		);
 		return Math.max(MIN_INITIAL_RENDER, columns * rows);
 	}
 
@@ -388,12 +480,12 @@ export class BasesStickyNoteView extends BasesView {
 			for (const path of batch) this.pendingPromotions.delete(path);
 
 			const options = readStickyNoteOptions(new ViewConfigReader(this.config));
-			const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? '';
+			const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? "";
 			const newlyObserved: HTMLElement[] = [];
 
 			for (const path of batch) {
 				const existing = this.cardsByPath.get(path);
-				if (existing?.kind === 'full') continue;
+				if (existing?.kind === "full") continue;
 				const entry = this.otherEntryByPath.get(path);
 				if (!entry) continue; // Stale — a re-render already dropped this entry.
 				existing?.el.remove();
@@ -413,7 +505,7 @@ export class BasesStickyNoteView extends BasesView {
 				// Contiguous-from-start recount — see the same logic in `render()`.
 				let fullCount = 0;
 				for (const entry of this.lastOtherEntries) {
-					if (this.cardsByPath.get(entry.file.path)?.kind !== 'full') break;
+					if (this.cardsByPath.get(entry.file.path)?.kind !== "full") break;
 					fullCount++;
 				}
 				this.othersRenderedCount = fullCount;
@@ -431,11 +523,11 @@ export class BasesStickyNoteView extends BasesView {
 		const config = new ViewConfigReader(this.config);
 		const options = readStickyNoteOptions(config);
 		this.currentCardWidth = options.cardWidth;
-		const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? '';
+		const basePath = findOwningBaseFile(this.plugin.app, this.containerEl)?.path ?? "";
 
 		if (this.safetyNetTimer !== null) this.runtime.win.clearTimeout(this.safetyNetTimer);
 		for (const gridEl of [this.pinnedGridEl, this.othersGridEl]) {
-			gridEl.style.setProperty('--unimian-sticky-note-max-height', `${options.cardMaxHeight}px`);
+			gridEl.style.setProperty("--unimian-sticky-note-max-height", `${options.cardMaxHeight}px`);
 		}
 
 		// Only content-affecting options invalidate cached cards — cardWidth/cardMaxHeight/
@@ -444,7 +536,10 @@ export class BasesStickyNoteView extends BasesView {
 		// card's markdown content, only reflows via masonry. The per-path mtime check below
 		// can't catch a content-option change on its own, since the file itself didn't change.
 		const contentOptions = Object.fromEntries(
-			Object.entries(options).filter(([key]) => !(STICKY_NOTE_CSS_ONLY_KEYS as readonly string[]).includes(key)));
+			Object.entries(options).filter(
+				([key]) => !(STICKY_NOTE_CSS_ONLY_KEYS as readonly string[]).includes(key),
+			),
+		);
 		const optionsKey = JSON.stringify(contentOptions);
 		if (optionsKey !== this.lastOptionsKey) {
 			this.lastOptionsKey = optionsKey;
@@ -469,13 +564,20 @@ export class BasesStickyNoteView extends BasesView {
 			this.lastOtherEntries = [];
 			this.otherEntryByPath.clear();
 			this.cardResizeObserver?.disconnect();
-			this.othersGridEl.addClass('is-ready'); // No relayout will run to add this — the empty state has no cards to hide behind a fade-in.
-			this.othersGridEl.createDiv({ text: 'No entries match this Base.', cls: 'unimian-sticky-note-empty' });
+			this.othersGridEl.addClass("is-ready"); // No relayout will run to add this — the empty state has no cards to hide behind a fade-in.
+			this.othersGridEl.createDiv({
+				text: "No entries match this Base.",
+				cls: "unimian-sticky-note-empty",
+			});
 			return;
 		}
 
-		const pinnedEntries = entries.filter((entry) => isPinned(this.plugin.settings.stickyNote, basePath, entry.file.path));
-		const otherEntries = entries.filter((entry) => !isPinned(this.plugin.settings.stickyNote, basePath, entry.file.path));
+		const pinnedEntries = entries.filter((entry) =>
+			isPinned(this.plugin.settings.stickyNote, basePath, entry.file.path),
+		);
+		const otherEntries = entries.filter(
+			(entry) => !isPinned(this.plugin.settings.stickyNote, basePath, entry.file.path),
+		);
 		this.lastOtherEntries = otherEntries;
 		this.otherEntryByPath = new Map(otherEntries.map((entry) => [entry.file.path, entry]));
 
@@ -500,7 +602,10 @@ export class BasesStickyNoteView extends BasesView {
 		const seenPaths = new Set<string>();
 		const newlyObserved: HTMLElement[] = [];
 
-		for (const [gridEl, list] of [[this.pinnedGridEl, pinnedEntries], [this.othersGridEl, otherEntries]] as const) {
+		for (const [gridEl, list] of [
+			[this.pinnedGridEl, pinnedEntries],
+			[this.othersGridEl, otherEntries],
+		] as const) {
 			const isOthers = gridEl === this.othersGridEl;
 			for (let i = 0; i < list.length; i++) {
 				const entry = list[i]!;
@@ -509,15 +614,18 @@ export class BasesStickyNoteView extends BasesView {
 				const mtime = entry.file.stat?.mtime ?? 0;
 				const pinned = gridEl === this.pinnedGridEl;
 				const existing = this.cardsByPath.get(path);
-				const wantFull = !isOthers || i < windowCount || existing?.kind === 'full';
+				const wantFull = !isOthers || i < windowCount || existing?.kind === "full";
 
-				if (existing && existing.mtime === mtime
-					&& ((wantFull && existing.kind === 'full') || (!wantFull && existing.kind === 'placeholder'))) {
-					if (existing.kind === 'full') {
+				if (
+					existing &&
+					existing.mtime === mtime &&
+					((wantFull && existing.kind === "full") || (!wantFull && existing.kind === "placeholder"))
+				) {
+					if (existing.kind === "full") {
 						if (existing.pinned !== pinned) {
-							const pinBtn = existing.el.querySelector('.unimian-sticky-note-pin-btn');
-							pinBtn?.classList.toggle('is-pinned', pinned);
-							pinBtn?.setAttribute('aria-label', pinned ? 'Unpin note' : 'Pin note');
+							const pinBtn = existing.el.querySelector(".unimian-sticky-note-pin-btn");
+							pinBtn?.classList.toggle("is-pinned", pinned);
+							pinBtn?.setAttribute("aria-label", pinned ? "Unpin note" : "Pin note");
 							existing.pinned = pinned;
 						}
 						// `imageFit` is excluded from the content-invalidation key above
@@ -547,7 +655,7 @@ export class BasesStickyNoteView extends BasesView {
 		// marks where placeholders begin.
 		let fullCount = 0;
 		for (const entry of otherEntries) {
-			if (this.cardsByPath.get(entry.file.path)?.kind !== 'full') break;
+			if (this.cardsByPath.get(entry.file.path)?.kind !== "full") break;
 			fullCount++;
 		}
 		this.othersRenderedCount = fullCount;

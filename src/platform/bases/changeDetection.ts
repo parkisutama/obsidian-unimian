@@ -38,9 +38,9 @@ export interface RenderSignature {
 
 export function computeRenderSignature(input: RenderSignatureInput): RenderSignature {
 	return {
-		entries: input.entries.map((e) => `${e.path}:${e.mtime}`).join('|'),
-		order: input.order.join('|'),
-		groups: input.groupKeys.join('|'),
+		entries: input.entries.map((e) => `${e.path}:${e.mtime}`).join("|"),
+		order: input.order.join("|"),
+		groups: input.groupKeys.join("|"),
 		config: JSON.stringify(input.config, Object.keys(input.config).sort()),
 	};
 }
@@ -54,9 +54,18 @@ export interface RenderSignatureDiff {
 }
 
 /** Compares two signatures layer by layer. `prev === null` (first render) reports every layer changed. */
-export function diffRenderSignatures(prev: RenderSignature | null, next: RenderSignature): RenderSignatureDiff {
+export function diffRenderSignatures(
+	prev: RenderSignature | null,
+	next: RenderSignature,
+): RenderSignatureDiff {
 	if (!prev) {
-		return { entriesChanged: true, orderChanged: true, groupsChanged: true, configChanged: true, identical: false };
+		return {
+			entriesChanged: true,
+			orderChanged: true,
+			groupsChanged: true,
+			configChanged: true,
+			identical: false,
+		};
 	}
 	const entriesChanged = prev.entries !== next.entries;
 	const orderChanged = prev.order !== next.order;

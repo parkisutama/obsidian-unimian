@@ -15,7 +15,7 @@
  * stable and scoped to *something* real, just one level up from the ideal in that one case.
  */
 
-import { FileView, type App, type TFile } from 'obsidian';
+import { type App, FileView, type TFile } from "obsidian";
 
 export function findOwningBaseFile(app: App, containerEl: HTMLElement): TFile | null {
 	let found: TFile | null = null;

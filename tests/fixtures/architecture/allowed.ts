@@ -10,6 +10,9 @@ export interface AllowedCardItem {
 	title: string;
 }
 
-export function renderCard(app: { workspace: { openLinkText(path: string): Promise<void> } }, item: AllowedCardItem): void {
+export function renderCard(
+	app: { workspace: { openLinkText(path: string): Promise<void> } },
+	item: AllowedCardItem,
+): void {
 	void app.workspace.openLinkText(item.path);
 }

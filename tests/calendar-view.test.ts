@@ -1,12 +1,12 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createCalendarViewRegistration } from "../src/views/BasesCalendarView";
-import { formatPeriodicTokens } from "../src/views/calendar/periodic/resolver";
-import { entryToEvent } from "../src/views/calendar/eventMapping";
-import { createCalendarEventNote } from "../src/views/calendar/eventNote";
+import type UnimianPlugin from "../src/main";
 import { NoteTemplateService } from "../src/services/NoteTemplateService";
 import { DEFAULT_SETTINGS } from "../src/types/settings";
-import type UnimianPlugin from "../src/main";
+import { createCalendarViewRegistration } from "../src/views/BasesCalendarView";
+import { entryToEvent } from "../src/views/calendar/eventMapping";
+import { createCalendarEventNote } from "../src/views/calendar/eventNote";
+import { formatPeriodicTokens } from "../src/views/calendar/periodic/resolver";
 import { type CalendarHarness, createCalendarHarness, dayOffset } from "./fixtures/calendar";
 
 let harness: CalendarHarness | null = null;
@@ -25,7 +25,13 @@ type ViewInternals = {
 	calendar: {
 		view: { type: string };
 		changeView(view: string): void;
-		getEvents(): Array<{ title: string; allDay: boolean; color: string; contrastColor: string; extendedProps: Record<string, unknown> }>;
+		getEvents(): Array<{
+			title: string;
+			allDay: boolean;
+			color: string;
+			contrastColor: string;
+			extendedProps: Record<string, unknown>;
+		}>;
 	};
 	handleEventDrop(info: unknown): Promise<void>;
 	handleEventResize(info: unknown): Promise<void>;
@@ -41,32 +47,41 @@ const button = (h: CalendarHarness, name: string) => {
 	return el;
 };
 const activeButtons = (h: CalendarHarness) =>
-	[...h.host.querySelectorAll(".planner-fc-button.is-active, .planner-fc-button[data-planner-active]")].map(
-		(el) => el.className.match(/planner-fc-button-(\w+)/)?.[1],
-	);
+	[
+		...h.host.querySelectorAll(
+			".planner-fc-button.is-active, .planner-fc-button[data-planner-active]",
+		),
+	].map((el) => el.className.match(/planner-fc-button-(\w+)/)?.[1]);
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe("Calendar extracted behavior", () => {
 	it("maps the configured date, title, and color fields into a FullCalendar event", () => {
 		const entry = {
-			file: { path: "Projects/Launch.md", basename: "Launch", parent: { path: "Projects", name: "Projects" } },
-			getValue: (id: string) => ({
-				"note.date_start": "2026-09-19T10:00:00",
-				"note.date_end": "2026-09-19T12:00:00",
-				"note.title": "Launch review",
-				"note.status": "active",
-			}[id] ?? null),
+			file: {
+				path: "Projects/Launch.md",
+				basename: "Launch",
+				parent: { path: "Projects", name: "Projects" },
+			},
+			getValue: (id: string) =>
+				({
+					"note.date_start": "2026-09-19T10:00:00",
+					"note.date_end": "2026-09-19T12:00:00",
+					"note.title": "Launch review",
+					"note.status": "active",
+				})[id] ?? null,
 		};
 
-		expect(entryToEvent(entry as never, {
-			dateStartField: "note.date_start",
-			dateEndField: "note.date_end",
-			titleField: "note.title",
-			allDayField: null,
-			colorByProp: "note.status",
-			valueStyleColor: () => "#123456",
-			resolvePrettyPropertiesColor: () => null,
-		})).toMatchObject({
+		expect(
+			entryToEvent(entry as never, {
+				dateStartField: "note.date_start",
+				dateEndField: "note.date_end",
+				titleField: "note.title",
+				allDayField: null,
+				colorByProp: "note.status",
+				valueStyleColor: () => "#123456",
+				resolvePrettyPropertiesColor: () => null,
+			}),
+		).toMatchObject({
 			title: "Launch review",
 			start: "2026-09-19T10:00:00",
 			end: "2026-09-19T12:00:00",
@@ -91,16 +106,19 @@ describe("Calendar extracted behavior", () => {
 			false,
 		);
 
-		expect(createNote).toHaveBeenCalledWith(view, expect.objectContaining({
-			title: "Event 2026-09-19 10.30",
-			start,
-			end,
-			allDay: false,
-			frontmatter: {
-				date_start: expect.stringMatching(/^2026-09-19T10:30:00[+-]\d{2}:\d{2}$/),
-				date_end: expect.stringMatching(/^2026-09-19T11:30:00[+-]\d{2}:\d{2}$/),
-			},
-		}));
+		expect(createNote).toHaveBeenCalledWith(
+			view,
+			expect.objectContaining({
+				title: "Event 2026-09-19 10.30",
+				start,
+				end,
+				allDay: false,
+				frontmatter: {
+					date_start: expect.stringMatching(/^2026-09-19T10:30:00[+-]\d{2}:\d{2}$/),
+					date_end: expect.stringMatching(/^2026-09-19T11:30:00[+-]\d{2}:\d{2}$/),
+				},
+			}),
+		);
 		createNote.mockRestore();
 	});
 });
@@ -114,7 +132,13 @@ describe("BasesCalendarView toolbar", () => {
 
 	it("switches views from the toolbar and tracks the active button", async () => {
 		const h = mount();
-		for (const view of ["timeGridWeek", "timeGridThreeDay", "timeGridDay", "listWeek", "dayGridMonth"]) {
+		for (const view of [
+			"timeGridWeek",
+			"timeGridThreeDay",
+			"timeGridDay",
+			"listWeek",
+			"dayGridMonth",
+		]) {
 			button(h, view).click();
 			await flush();
 			expect(internals(h).calendar.view.type).toBe(view);
@@ -124,7 +148,9 @@ describe("BasesCalendarView toolbar", () => {
 
 	it("sets Obsidian icons on the icon-only buttons", () => {
 		const h = mount();
-		expect(button(h, "todayButton").querySelector("svg")?.dataset.icon).toBe("square-split-horizontal");
+		expect(button(h, "todayButton").querySelector("svg")?.dataset.icon).toBe(
+			"square-split-horizontal",
+		);
 		expect(button(h, "refreshButton").querySelector("svg")?.dataset.icon).toBe("refresh-ccw");
 	});
 });
@@ -169,7 +195,9 @@ describe("BasesCalendarView year views", () => {
 	});
 
 	it("marks year view rows so the configured row heights apply", async () => {
-		const h = mount({ config: { defaultView: "dayGridYear", yearContinuousRowHeight: 120, yearSplitRowHeight: 80 } });
+		const h = mount({
+			config: { defaultView: "dayGridYear", yearContinuousRowHeight: 120, yearSplitRowHeight: 80 },
+		});
 		expect(q(h, ".planner-fc-view-dayGridYear .planner-fc-row")).not.toBeNull();
 		const container = q(h, ".planner-calendar-container");
 		expect(container?.style.getPropertyValue("--planner-year-continuous-row-height")).toBe("120px");
@@ -219,7 +247,10 @@ describe("BasesCalendarView day cells and daily notes", () => {
 	});
 
 	it("previews the daily note from week and list day headers", async () => {
-		const h = mount({ config: { ...daily, defaultView: "timeGridWeek" }, existingFiles: [`${today}.md`] });
+		const h = mount({
+			config: { ...daily, defaultView: "timeGridWeek" },
+			existingFiles: [`${today}.md`],
+		});
 		q(h, ".planner-fc-day-header.is-today")?.dispatchEvent(new MouseEvent("mouseenter"));
 		expect(h.hovered).toEqual([`${today}.md`]);
 
@@ -230,12 +261,14 @@ describe("BasesCalendarView day cells and daily notes", () => {
 		listHeaders[0]?.dispatchEvent(new MouseEvent("mouseenter"));
 		expect(h.hovered).toEqual([`${today}.md`, `${today}.md`]);
 	});
-
 });
 
 describe("BasesCalendarView property defaults", () => {
 	const registrationOptions = () => {
-		const plugin = { app: {}, settings: structuredClone(DEFAULT_SETTINGS) } as unknown as UnimianPlugin;
+		const plugin = {
+			app: {},
+			settings: structuredClone(DEFAULT_SETTINGS),
+		} as unknown as UnimianPlugin;
 		return createCalendarViewRegistration(plugin).options?.({} as never) ?? [];
 	};
 
@@ -247,16 +280,29 @@ describe("BasesCalendarView property defaults", () => {
 	});
 
 	it("offers an all-day property option instead of reading note.all_day", () => {
-		const allDay = registrationOptions().find((option) => "key" in option && option.key === "allDayField");
+		const allDay = registrationOptions().find(
+			(option) => "key" in option && option.key === "allDayField",
+		);
 		expect(allDay).toMatchObject({ type: "property", default: "" });
 	});
 
 	it("uses the file name as event title when Title field is unset", () => {
 		const h = mount({ config: { titleField: undefined } });
-		expect(internals(h).calendar.getEvents().map((e) => e.title).sort()).toEqual(["Launch", "Offsite", "Report"]);
+		expect(
+			internals(h)
+				.calendar.getEvents()
+				.map((e) => e.title)
+				.sort(),
+		).toEqual(["Launch", "Offsite", "Report"]);
 	});
 
-	const allDayNote = { path: "Standup.md", title: "Standup", date_start: dayOffset(0, 9), date_end: dayOffset(0, 10), all_day: "true" };
+	const allDayNote = {
+		path: "Standup.md",
+		title: "Standup",
+		date_start: dayOffset(0, 9),
+		date_end: dayOffset(0, 10),
+		all_day: "true",
+	};
 
 	it("decides all-day from the start time when no all-day property is set", () => {
 		const h = mount({ notes: [allDayNote] });
@@ -273,7 +319,11 @@ describe("BasesCalendarView events", () => {
 	it("maps notes to events with a color from the color-by property", () => {
 		const h = mount();
 		const events = internals(h).calendar.getEvents();
-		expect(events.map((e) => e.title).sort()).toEqual(["Launch review", "Quarterly report", "Team offsite"]);
+		expect(events.map((e) => e.title).sort()).toEqual([
+			"Launch review",
+			"Quarterly report",
+			"Team offsite",
+		]);
 		for (const event of events) {
 			expect(event.color).toMatch(/^#[0-9a-f]{6}$/i);
 			expect(event.contrastColor).toMatch(/^#(000000|ffffff)$/);
@@ -286,10 +336,16 @@ describe("BasesCalendarView events", () => {
 
 	it("writes moved dates back to the configured frontmatter fields", async () => {
 		const h = mount();
-		const path = internals(h).calendar.getEvents().find((e) => e.title === "Quarterly report")?.extendedProps.path;
+		const path = internals(h)
+			.calendar.getEvents()
+			.find((e) => e.title === "Quarterly report")?.extendedProps.path;
 		let reverted = false;
 		await internals(h).handleEventDrop({
-			event: { start: new Date(2026, 8, 23, 14), end: new Date(2026, 8, 23, 15), extendedProps: { path } },
+			event: {
+				start: new Date(2026, 8, 23, 14),
+				end: new Date(2026, 8, 23, 15),
+				extendedProps: { path },
+			},
 			revert: () => {
 				reverted = true;
 			},
@@ -303,18 +359,25 @@ describe("BasesCalendarView events", () => {
 
 	it("writes resized end times back to frontmatter", async () => {
 		const h = mount();
-		const path = internals(h).calendar.getEvents().find((e) => e.title === "Launch review")?.extendedProps.path;
+		const path = internals(h)
+			.calendar.getEvents()
+			.find((e) => e.title === "Launch review")?.extendedProps.path;
 		await internals(h).handleEventResize({
-			event: { start: new Date(2026, 8, 18, 10), end: new Date(2026, 8, 18, 13), extendedProps: { path } },
+			event: {
+				start: new Date(2026, 8, 18, 10),
+				end: new Date(2026, 8, 18, 13),
+				extendedProps: { path },
+			},
 			revert: () => {},
 		});
 		expect(h.frontmatter[0]?.values.date_end).toMatch(/^2026-09-18T13:00:00/);
 	});
 
 	it("reverts drops when the date fields are formulas", async () => {
-		const h = mount({ config: { dateStartField: "formula.start", dateEndField: "formula.end" }, notes: [
-			{ path: "Formula.md", title: "Computed", start: dayOffset(0), end: dayOffset(1) },
-		] });
+		const h = mount({
+			config: { dateStartField: "formula.start", dateEndField: "formula.end" },
+			notes: [{ path: "Formula.md", title: "Computed", start: dayOffset(0), end: dayOffset(1) }],
+		});
 		const path = internals(h).calendar.getEvents()[0]?.extendedProps.path;
 		let reverted = false;
 		await internals(h).handleEventDrop({
@@ -336,7 +399,9 @@ describe("BasesCalendarView events", () => {
 
 	it("trashes the note through the legacy mutation gateway when deleted", async () => {
 		const h = mount();
-		await internals(h).deleteEventNote({ file: { path: "Projects/Launch.md", basename: "Launch" } });
+		await internals(h).deleteEventNote({
+			file: { path: "Projects/Launch.md", basename: "Launch" },
+		});
 		expect(h.trashed).toEqual(["Projects/Launch.md"]);
 	});
 });
@@ -372,7 +437,9 @@ describe("BasesCalendarView periodic day notes", () => {
 
 	it("marks and previews days from the configured pattern, not from root-level notes", async () => {
 		const h = mount({ config, existingFiles: [`journal/${inThreeDays}.md`, `${today}.md`] });
-		expect(q(h, `[data-date="${inThreeDays}"]`)?.querySelector(".planner-journal-dot")).not.toBeNull();
+		expect(
+			q(h, `[data-date="${inThreeDays}"]`)?.querySelector(".planner-journal-dot"),
+		).not.toBeNull();
 		expect(q(h, `[data-date="${today}"] .planner-journal-dot`)).toBeNull();
 
 		const number = q(h, `[data-date="${inThreeDays}"] .planner-fc-day-number`);
@@ -387,7 +454,9 @@ describe("BasesCalendarView periodic day notes", () => {
 describe("BasesCalendarView week-number links", () => {
 	const week = { periodicWeekPath: "journal/GGGG-[W]WW" };
 	const isoWeekOfToday = () => formatPeriodicTokens("GGGG-[W]WW", new Date());
-	const cells = (h: CalendarHarness) => [...h.host.querySelectorAll<HTMLElement>(".planner-fc-week-number")];
+	const cells = (h: CalendarHarness) => [
+		...h.host.querySelectorAll<HTMLElement>(".planner-fc-week-number"),
+	];
 
 	it("shows no week numbers until weekly notes are configured", () => {
 		const h = mount();
@@ -419,10 +488,16 @@ describe("BasesCalendarView week-number links", () => {
 });
 
 describe("BasesCalendarView title links", () => {
-	const all = { periodicMonthPath: "j/YYYY-MM", periodicQuarterPath: "j/YYYY-[Q]Q", periodicYearPath: "j/YYYY" };
+	const all = {
+		periodicMonthPath: "j/YYYY-MM",
+		periodicQuarterPath: "j/YYYY-[Q]Q",
+		periodicYearPath: "j/YYYY",
+	};
 	const now = () => new Date();
 	const title = (h: CalendarHarness) => q(h, ".planner-fc-title");
-	const links = (h: CalendarHarness) => [...h.host.querySelectorAll<HTMLElement>(".planner-fc-title-link")];
+	const links = (h: CalendarHarness) => [
+		...h.host.querySelectorAll<HTMLElement>(".planner-fc-title-link"),
+	];
 	const monthTitle = (date: Date) =>
 		`${formatPeriodicTokens("MMMM YYYY", date)} (Q${formatPeriodicTokens("Q", date)})`;
 
@@ -449,7 +524,10 @@ describe("BasesCalendarView title links", () => {
 	});
 
 	it("marks a part whose note exists, and opens it on click", async () => {
-		const h = mount({ config: all, existingFiles: [`j/${formatPeriodicTokens("YYYY-MM", now())}.md`] });
+		const h = mount({
+			config: all,
+			existingFiles: [`j/${formatPeriodicTokens("YYYY-MM", now())}.md`],
+		});
 		const [month, year] = links(h);
 		expect(month?.querySelector(".planner-title-dot")).not.toBeNull();
 		expect(year?.querySelector(".planner-title-dot")).toBeNull();
@@ -497,7 +575,10 @@ describe("BasesCalendarView title links", () => {
 			const h = mount({ config: every });
 			await at(h, "timeGridWeek");
 			const anchor = weekThursday();
-			expect(links(h).map((el) => el.textContent)).toEqual([isoWeek(anchor), ...monthParts(anchor)]);
+			expect(links(h).map((el) => el.textContent)).toEqual([
+				isoWeek(anchor),
+				...monthParts(anchor),
+			]);
 			expect(title(h)?.textContent?.replace(/s+/g, " ").trim()).toBe(
 				`${isoWeek(anchor)} · ${monthTitle(anchor)}`,
 			);
@@ -507,7 +588,10 @@ describe("BasesCalendarView title links", () => {
 			const h = mount({ config: every });
 			await at(h, "timeGridThreeDay");
 			const middle = new Date(now().getFullYear(), now().getMonth(), now().getDate() + 1);
-			expect(links(h).map((el) => el.textContent)).toEqual([isoWeek(middle), ...monthParts(middle)]);
+			expect(links(h).map((el) => el.textContent)).toEqual([
+				isoWeek(middle),
+				...monthParts(middle),
+			]);
 		});
 
 		it("leads the day view with a day link, then the week, month, year, and quarter", async () => {
@@ -555,18 +639,39 @@ describe("BasesCalendarView title links", () => {
 
 describe("BasesCalendarView periodic notes as events", () => {
 	const notes = [
-		{ path: `journal/${dayOffset(0)}.md`, title: "Daily", date_start: dayOffset(0), date_end: dayOffset(0), status: "planned" },
-		{ path: "Projects/Meeting.md", title: "Meeting", date_start: dayOffset(0, 9), date_end: dayOffset(0, 10), status: "active" },
+		{
+			path: `journal/${dayOffset(0)}.md`,
+			title: "Daily",
+			date_start: dayOffset(0),
+			date_end: dayOffset(0),
+			status: "planned",
+		},
+		{
+			path: "Projects/Meeting.md",
+			title: "Meeting",
+			date_start: dayOffset(0, 9),
+			date_end: dayOffset(0, 10),
+			status: "active",
+		},
 	];
 
 	it("does not draw a period note as an event once its period is configured", () => {
 		const h = mount({ notes, config: { periodicDayPath: "journal/YYYY-MM-DD" } });
-		expect(internals(h).calendar.getEvents().map((e) => e.title)).toEqual(["Meeting"]);
+		expect(
+			internals(h)
+				.calendar.getEvents()
+				.map((e) => e.title),
+		).toEqual(["Meeting"]);
 	});
 
 	it("draws everything while no period is configured", () => {
 		const h = mount({ notes });
-		expect(internals(h).calendar.getEvents().map((e) => e.title).sort()).toEqual(["Daily", "Meeting"]);
+		expect(
+			internals(h)
+				.calendar.getEvents()
+				.map((e) => e.title)
+				.sort(),
+		).toEqual(["Daily", "Meeting"]);
 	});
 });
 
@@ -574,7 +679,9 @@ describe("BasesCalendarView time format", () => {
 	it("shows time-grid slot labels on a 24-hour clock", async () => {
 		const h = mount({ config: { defaultView: "timeGridWeek" } });
 		await flush();
-		const labels = [...h.host.querySelectorAll(".planner-fc-slot-label")].map((el) => el.textContent ?? "");
+		const labels = [...h.host.querySelectorAll(".planner-fc-slot-label")].map(
+			(el) => el.textContent ?? "",
+		);
 		expect(labels.join(" ")).not.toMatch(/\b(AM|PM)\b/i);
 		expect(labels.some((text) => /^(1[3-9]|2[0-3])(:|$)/.test(text.trim()))).toBe(true);
 	});

@@ -8,10 +8,10 @@
  * the only current consumer, not because a second consumer exists yet.
  */
 
-import { TFile, type App } from 'obsidian';
+import { type App, TFile } from "obsidian";
 
 const EXTERNAL_COVER_PREFIX = /^(https?:\/\/|app:\/\/)/;
-const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'];
+const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"];
 
 /**
  * Resolves a raw cover value (a wikilink, a bare vault path with or without extension, an
@@ -23,11 +23,11 @@ const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'];
 export function resolveCoverImageSrc(app: App, rawValue: string): string | null {
 	if (EXTERNAL_COVER_PREFIX.test(rawValue)) return rawValue;
 
-	const cleanPath = rawValue.replace(/\[\[/g, '').replace(/\]\]/g, '').replace(/\|.*$/, '').trim();
+	const cleanPath = rawValue.replace(/\[\[/g, "").replace(/\]\]/g, "").replace(/\|.*$/, "").trim();
 	if (!cleanPath) return null;
 
-	const normalizedPath = cleanPath.replace(/^(\.\.\/)+|^\.\//, '');
-	const filename = normalizedPath.split('/').pop() || normalizedPath;
+	const normalizedPath = cleanPath.replace(/^(\.\.\/)+|^\.\//, "");
+	const filename = normalizedPath.split("/").pop() || normalizedPath;
 
 	const direct = app.vault.getAbstractFileByPath(normalizedPath);
 	if (direct instanceof TFile) return app.vault.getResourcePath(direct);
@@ -39,11 +39,15 @@ export function resolveCoverImageSrc(app: App, rawValue: string): string | null 
 		}
 	}
 
-	const basenameWithoutExtension = filename.replace(/\.\w+$/, '');
-	const match = app.vault.getFiles().find((file) =>
-		file.path === normalizedPath
-		|| file.path.endsWith(`/${normalizedPath}`)
-		|| file.basename === basenameWithoutExtension
-		|| file.name === filename);
+	const basenameWithoutExtension = filename.replace(/\.\w+$/, "");
+	const match = app.vault
+		.getFiles()
+		.find(
+			(file) =>
+				file.path === normalizedPath ||
+				file.path.endsWith(`/${normalizedPath}`) ||
+				file.basename === basenameWithoutExtension ||
+				file.name === filename,
+		);
 	return match ? app.vault.getResourcePath(match) : null;
 }

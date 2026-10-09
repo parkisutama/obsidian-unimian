@@ -28,14 +28,14 @@ const IMAGE_EXTENSION = /\.(png|jpe?g|gif|webp|svg|bmp)(\|[^\]]*)?$/i;
  * PNG chunk data as card content). A positive list is deliberately safer here than an
  * ever-growing negative list of "extensions known to be binary".
  */
-export const TEXT_EXCERPT_EXTENSIONS = new Set(['md', 'markdown', 'txt']);
+export const TEXT_EXCERPT_EXTENSIONS = new Set(["md", "markdown", "txt"]);
 
 export function isTextExcerptExtension(extension: string): boolean {
 	return TEXT_EXCERPT_EXTENSIONS.has(extension.toLowerCase());
 }
 
 export function stripFrontmatter(raw: string): string {
-	return raw.replace(FRONTMATTER_BLOCK, '');
+	return raw.replace(FRONTMATTER_BLOCK, "");
 }
 
 /**
@@ -46,8 +46,10 @@ export function stripFrontmatter(raw: string): string {
  * whether a cover is configured, so there is never a duplicate.
  */
 export function stripInlineImages(text: string): string {
-	let result = text.replace(MARKDOWN_IMAGE, '');
-	result = result.replace(WIKILINK_EMBED, (match, target: string) => (IMAGE_EXTENSION.test(target.trim()) ? '' : match));
+	let result = text.replace(MARKDOWN_IMAGE, "");
+	result = result.replace(WIKILINK_EMBED, (match, target: string) =>
+		IMAGE_EXTENSION.test(target.trim()) ? "" : match,
+	);
 	return result;
 }
 
@@ -55,7 +57,7 @@ export function stripInlineImages(text: string): string {
 export function truncateExcerpt(text: string, budget: number = DEFAULT_EXCERPT_BUDGET): string {
 	if (text.length <= budget) return text;
 	const truncated = text.slice(0, budget);
-	const lastNewline = truncated.lastIndexOf('\n');
+	const lastNewline = truncated.lastIndexOf("\n");
 	return lastNewline > budget * 0.7 ? truncated.slice(0, lastNewline) : truncated;
 }
 
@@ -67,7 +69,11 @@ export function dedupeLeadingTitle(text: string, title: string): string {
 }
 
 /** Builds the bounded excerpt a card body should render: frontmatter-stripped, title-deduped, image-stripped, truncated. */
-export function buildCardExcerpt(rawContent: string, title: string, budget: number = DEFAULT_EXCERPT_BUDGET): string {
+export function buildCardExcerpt(
+	rawContent: string,
+	title: string,
+	budget: number = DEFAULT_EXCERPT_BUDGET,
+): string {
 	const withoutFrontmatter = stripFrontmatter(rawContent);
 	const deduped = dedupeLeadingTitle(withoutFrontmatter, title);
 	const withoutImages = stripInlineImages(deduped);

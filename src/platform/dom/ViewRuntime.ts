@@ -11,8 +11,8 @@
  * recognize it has been superseded.
  */
 
-import { DisposableScope, type Disposable } from './DisposableScope';
-import { ownerDocument, ownerWindow } from './ownerWindow';
+import { type Disposable, DisposableScope } from "./DisposableScope";
+import { ownerDocument, ownerWindow } from "./ownerWindow";
 
 export class ViewRuntime {
 	readonly scope = new DisposableScope();

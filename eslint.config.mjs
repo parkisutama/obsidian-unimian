@@ -6,7 +6,7 @@ import { PlainTextParser } from "eslint-plugin-obsidianmd/dist/lib/plainTextPars
 
 const obsidianRules = Object.fromEntries(
 	Object.entries(obsidianmd.configs.recommended).filter(([ruleId]) =>
-		ruleId.startsWith("obsidianmd/")
+		ruleId.startsWith("obsidianmd/"),
 	),
 );
 

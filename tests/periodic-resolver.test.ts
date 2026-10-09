@@ -4,8 +4,8 @@ import {
 	ISO_WEEK,
 	periodStart,
 	resolvePeriodicPath,
-	weekInfo,
 	type WeekRule,
+	weekInfo,
 } from "../src/views/calendar/periodic/resolver";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
@@ -54,10 +54,23 @@ describe("locale weeks (gggg / ww)", () => {
 describe("tokens", () => {
 	const date = d(2026, 9, 5); // Saturday
 	const allTokens: Array<[string, string]> = [
-		["YYYY", "2026"], ["GGGG", "2026"], ["gggg", "2026"], ["MMMM", "September"],
-		["dddd", "Saturday"], ["MMM", "Sep"], ["ddd", "Sat"], ["YY", "26"],
-		["MM", "09"], ["DD", "05"], ["WW", "36"], ["ww", "36"], ["M", "9"],
-		["D", "5"], ["Q", "3"], ["W", "36"], ["w", "36"],
+		["YYYY", "2026"],
+		["GGGG", "2026"],
+		["gggg", "2026"],
+		["MMMM", "September"],
+		["dddd", "Saturday"],
+		["MMM", "Sep"],
+		["ddd", "Sat"],
+		["YY", "26"],
+		["MM", "09"],
+		["DD", "05"],
+		["WW", "36"],
+		["ww", "36"],
+		["M", "9"],
+		["D", "5"],
+		["Q", "3"],
+		["W", "36"],
+		["w", "36"],
 	];
 
 	it.each([

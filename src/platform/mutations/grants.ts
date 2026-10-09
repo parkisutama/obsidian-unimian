@@ -10,17 +10,17 @@
  * `trash` or `moveToFolder`. Views obtain grants through `ViewRegistry.mutationsFor`.
  */
 
-import type { App } from 'obsidian';
-import { LegacyMutationGateway } from './LegacyMutationGateway';
+import type { App } from "obsidian";
+import { LegacyMutationGateway } from "./LegacyMutationGateway";
 import type {
 	DateMutationCapability,
 	DependencyMutationCapability,
 	FileCreateCapability,
 	PropertyMutationCapability,
-} from './types';
+} from "./types";
 
 /** The capabilities a scoped grant may include. Trash and move are deliberately not grantable. */
-export type MutationGrant = 'date' | 'property' | 'dependency' | 'fileCreate';
+export type MutationGrant = "date" | "property" | "dependency" | "fileCreate";
 
 export interface GrantedMutations {
 	readonly date?: DateMutationCapability;
@@ -30,7 +30,10 @@ export interface GrantedMutations {
 }
 
 /** Builds only the granted capabilities. An empty grant list yields an empty object and no gateway. */
-export function createGrantedMutations(app: App, grants: readonly MutationGrant[]): GrantedMutations {
+export function createGrantedMutations(
+	app: App,
+	grants: readonly MutationGrant[],
+): GrantedMutations {
 	if (grants.length === 0) return {};
 	const gateway = new LegacyMutationGateway(app);
 	const granted = new Set(grants);
@@ -41,24 +44,25 @@ export function createGrantedMutations(app: App, grants: readonly MutationGrant[
 		fileCreate?: FileCreateCapability;
 	} = {};
 
-	if (granted.has('date')) {
+	if (granted.has("date")) {
 		result.date = {
 			updateRange: (path, startPropertyId, start, endPropertyId, end) =>
 				gateway.updateRange(path, startPropertyId, start, endPropertyId, end),
 		};
 	}
-	if (granted.has('property')) {
+	if (granted.has("property")) {
 		result.property = {
 			setProperty: (path, propertyId, value) => gateway.setProperty(path, propertyId, value),
 			setProperties: (path, values) => gateway.setProperties(path, values),
 		};
 	}
-	if (granted.has('dependency')) {
+	if (granted.has("dependency")) {
 		result.dependency = {
-			setDependencies: (path, propertyId, dependencies) => gateway.setDependencies(path, propertyId, dependencies),
+			setDependencies: (path, propertyId, dependencies) =>
+				gateway.setDependencies(path, propertyId, dependencies),
 		};
 	}
-	if (granted.has('fileCreate')) {
+	if (granted.has("fileCreate")) {
 		result.fileCreate = {
 			createNote: (request) => gateway.createNote(request),
 		};

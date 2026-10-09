@@ -16,17 +16,23 @@ export function resolveVitestCli() {
 
 const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
 if (isDirectRun) {
-	const tempDir = process.env.VITEST_TMPDIR ?? (existsSync("/tmp") ? "/tmp" : (process.env.TEMP ?? process.env.TMP ?? os.tmpdir()));
+	const tempDir =
+		process.env.VITEST_TMPDIR ??
+		(existsSync("/tmp") ? "/tmp" : (process.env.TEMP ?? process.env.TMP ?? os.tmpdir()));
 
-	const result = spawnSync(process.execPath, [resolveVitestCli(), "run", ...process.argv.slice(2)], {
-		stdio: "inherit",
-		env: {
-			...process.env,
-			TMPDIR: tempDir,
-			TEMP: tempDir,
-			TMP: tempDir,
+	const result = spawnSync(
+		process.execPath,
+		[resolveVitestCli(), "run", ...process.argv.slice(2)],
+		{
+			stdio: "inherit",
+			env: {
+				...process.env,
+				TMPDIR: tempDir,
+				TEMP: tempDir,
+				TMP: tempDir,
+			},
 		},
-	});
+	);
 
 	if (result.error) {
 		console.error(`Failed to start vitest: ${result.error.message}`);

@@ -29,7 +29,11 @@ describe("resolveColor: priority order (spec §7.8)", () => {
 			resolvePrettyPropertiesColor: () => "#00ff00",
 			valueStyleColor: "#0000ff",
 		});
-		expect(resolved).toEqual({ background: "#ff0000", foreground: getContrastColor("#ff0000"), source: "explicit" });
+		expect(resolved).toEqual({
+			background: "#ff0000",
+			foreground: getContrastColor("#ff0000"),
+			source: "explicit",
+		});
 	});
 
 	it("accepts an explicit color missing its leading #", () => {
@@ -105,7 +109,10 @@ describe("expresses existing Calendar/Swimlane color scenarios", () => {
 			categoryValue: "High",
 			resolvePrettyPropertiesColor: () => "rgba(220, 50, 47, 0.4)",
 		});
-		expect(resolved).toMatchObject({ background: "rgba(220, 50, 47, 0.4)", source: "pretty-properties" });
+		expect(resolved).toMatchObject({
+			background: "rgba(220, 50, 47, 0.4)",
+			source: "pretty-properties",
+		});
 	});
 });
 

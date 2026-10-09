@@ -10,7 +10,8 @@ let nextLabelId = 0;
  * library's hover card says, plus the progress handle sitting on the bar. Labels on small controls
  * (link handles, delete dependency, close panel) stay: a tooltip helps there.
  */
-const GUARDED = '[role="treegrid"][aria-label], [role="gridcell"][aria-label], [role="slider"][aria-label]';
+const GUARDED =
+	'[role="treegrid"][aria-label], [role="gridcell"][aria-label], [role="slider"][aria-label]';
 
 /**
  * Moves each guarded label to `aria-labelledby` on a hidden element. Screen readers keep the name;
@@ -21,10 +22,19 @@ export class TooltipGuard {
 	private readonly observer: MutationObserver;
 	private readonly labels = new Map<Element, HTMLElement>();
 
-	constructor(private readonly root: HTMLElement, win: Window) {
-		const MutationObserverCtor = (win as Window & { MutationObserver: typeof MutationObserver }).MutationObserver;
+	constructor(
+		private readonly root: HTMLElement,
+		win: Window,
+	) {
+		const MutationObserverCtor = (win as Window & { MutationObserver: typeof MutationObserver })
+			.MutationObserver;
 		this.observer = new MutationObserverCtor(() => this.sweep());
-		this.observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-label'] });
+		this.observer.observe(root, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ["aria-label"],
+		});
 	}
 
 	/** Idempotent; safe to call after every render. */
@@ -35,21 +45,21 @@ export class TooltipGuard {
 			this.labels.delete(owner);
 		}
 		for (const element of Array.from(this.root.querySelectorAll<HTMLElement>(GUARDED))) {
-			const name = element.getAttribute('aria-label') ?? '';
-			element.removeAttribute('aria-label');
+			const name = element.getAttribute("aria-label") ?? "";
+			element.removeAttribute("aria-label");
 			if (!name) continue;
 			const label = this.labelFor(element);
 			label.textContent = name;
-			element.setAttribute('aria-labelledby', label.id);
+			element.setAttribute("aria-labelledby", label.id);
 		}
 	}
 
 	private labelFor(owner: HTMLElement): HTMLElement {
 		const existing = this.labels.get(owner);
 		if (existing?.isConnected) return existing;
-		const label = this.root.ownerDocument.createElement('span');
+		const label = this.root.ownerDocument.createElement("span");
 		label.id = `unimian-gantt-label-${nextLabelId++}`;
-		label.className = 'gantt-sr-only';
+		label.className = "gantt-sr-only";
 		this.root.appendChild(label);
 		this.labels.set(owner, label);
 		return label;

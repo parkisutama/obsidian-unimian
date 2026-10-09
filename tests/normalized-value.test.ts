@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { MISSING_VALUE, isMissing, type NormalizedValue } from "../src/core/entries/NormalizedValue";
-import { getValue, type EntrySnapshot } from "../src/core/entries/EntrySnapshot";
+import { type EntrySnapshot, getValue } from "../src/core/entries/EntrySnapshot";
+import {
+	isMissing,
+	MISSING_VALUE,
+	type NormalizedValue,
+} from "../src/core/entries/NormalizedValue";
 
 describe("NormalizedValue", () => {
 	it("distinguishes missing from a present-but-empty text value", () => {

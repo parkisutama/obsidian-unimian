@@ -56,13 +56,16 @@ export class EchoGate {
 	private arm(): void {
 		this.clearTimer();
 		const remaining = Math.max(0, this.maxHoldMs - (this.timers.now() - this.openedAt));
-		this.timer = this.timers.setTimeout(() => {
-			this.timer = null;
-			if (this.active > 0) return;
-			const flushNow = this.pending;
-			this.pending = false;
-			if (flushNow) this.flush();
-		}, Math.min(this.settleMs, remaining));
+		this.timer = this.timers.setTimeout(
+			() => {
+				this.timer = null;
+				if (this.active > 0) return;
+				const flushNow = this.pending;
+				this.pending = false;
+				if (flushNow) this.flush();
+			},
+			Math.min(this.settleMs, remaining),
+		);
 	}
 
 	private clearTimer(): void {

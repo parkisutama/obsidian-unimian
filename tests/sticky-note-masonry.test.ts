@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_TARGET_CARD_WIDTH, getColumnCount, MASONRY_GAP } from "../src/views/sticky-note/masonry";
+import {
+	DEFAULT_TARGET_CARD_WIDTH,
+	getColumnCount,
+	MASONRY_GAP,
+} from "../src/views/sticky-note/masonry";
 
 describe("sticky-note masonry getColumnCount", () => {
 	it("fits more columns as the container widens", () => {

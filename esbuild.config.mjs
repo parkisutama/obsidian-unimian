@@ -1,18 +1,18 @@
+import { builtinModules } from "node:module";
 import esbuild from "esbuild";
-import process from "process";
-import { builtinModules } from 'node:module';
 import fs from "fs";
 import path from "path";
+import process from "process";
+import { createCssMergePlugin } from "./scripts/css-merge.mjs";
 import {
 	BANNER_START,
 	buildLicenseBanner,
 	collectBundledPackages,
 	findUnlistedPackages,
 } from "./scripts/license-banner.mjs";
-import { createCssMergePlugin } from "./scripts/css-merge.mjs";
 import { UI_RUNTIME_ALIASES } from "./scripts/ui-runtime-aliases.mjs";
 
-const prod = (process.argv[2] === "production");
+const prod = process.argv[2] === "production";
 
 // Load environment variables from .env file for development copy targets.
 if (!prod && fs.existsSync(".env")) {
@@ -85,7 +85,7 @@ const licenseCheckPlugin = {
 
 // Plugin untuk menyalin file build ke vault Obsidian saat development.
 const copyToVaultPlugin = {
-	name: 'copy-to-vault',
+	name: "copy-to-vault",
 	setup(build) {
 		build.onEnd((result) => {
 			if (prod) return;
@@ -96,11 +96,11 @@ const copyToVaultPlugin = {
 
 			// Skip jika tidak ada environment variable (opsional untuk development)
 			if (!vaultPath) {
-				console.log('⚠ OBSIDIAN_VAULT_PLUGIN_PATH tidak diset, skip copy ke vault');
+				console.log("⚠ OBSIDIAN_VAULT_PLUGIN_PATH tidak diset, skip copy ke vault");
 				return;
 			}
 
-			const filesToCopy = ['manifest.json', 'main.js', 'styles.css'];
+			const filesToCopy = ["manifest.json", "main.js", "styles.css"];
 
 			// Buat direktori jika belum ada
 			if (!fs.existsSync(vaultPath)) {
@@ -153,7 +153,8 @@ const context = await esbuild.context({
 		"@lezer/common",
 		"@lezer/highlight",
 		"@lezer/lr",
-		...builtinModules],
+		...builtinModules,
+	],
 	format: "cjs",
 	target: "es2018",
 	logLevel: "info",

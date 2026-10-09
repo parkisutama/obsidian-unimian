@@ -16,14 +16,26 @@ interface PrettyPropertiesHsl {
 }
 
 interface PrettyPropertiesApi {
-	getPropertyBackgroundColorSetting(propName: string, propValue: string): string | PrettyPropertiesHsl | undefined;
+	getPropertyBackgroundColorSetting(
+		propName: string,
+		propValue: string,
+	): string | PrettyPropertiesHsl | undefined;
 }
 
 interface WindowWithPrettyProperties extends Window {
 	PrettyPropertiesApi?: PrettyPropertiesApi;
 }
 
-const NAMED_COLORS = ['red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple', 'pink'] as const;
+const NAMED_COLORS = [
+	"red",
+	"orange",
+	"yellow",
+	"green",
+	"cyan",
+	"blue",
+	"purple",
+	"pink",
+] as const;
 
 function getApi(win: Window): PrettyPropertiesApi | null {
 	return (win as WindowWithPrettyProperties).PrettyPropertiesApi ?? null;
@@ -51,9 +63,9 @@ export function resolvePrettyPropertiesColor(
 		// A named color string ("red", "blue", …), an HSL object, "none" (transparent), or
 		// "default" (no color assigned).
 		const setting = api.getPropertyBackgroundColorSetting(propName, propValue);
-		if (!setting || setting === 'default' || setting === 'none') return null;
+		if (!setting || setting === "default" || setting === "none") return null;
 
-		if (typeof setting === 'string' && (NAMED_COLORS as readonly string[]).includes(setting)) {
+		if (typeof setting === "string" && (NAMED_COLORS as readonly string[]).includes(setting)) {
 			// Resolve the Obsidian theme CSS variable (e.g. --color-red-rgb) to a concrete color.
 			const rgbStr = getComputedStyle(doc.body).getPropertyValue(`--color-${setting}-rgb`).trim();
 			if (!rgbStr) return null;
@@ -63,7 +75,7 @@ export function resolvePrettyPropertiesColor(
 			return alpha >= 1 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${alpha})`;
 		}
 
-		if (typeof setting === 'object' && setting != null && typeof setting.h === 'number') {
+		if (typeof setting === "object" && setting != null && typeof setting.h === "number") {
 			const { h, s, l } = setting;
 			return alpha >= 1 ? `hsl(${h}, ${s}%, ${l}%)` : `hsla(${h}, ${s}%, ${l}%, ${alpha})`;
 		}
