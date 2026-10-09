@@ -147,6 +147,20 @@ in your vault involve no network request.
 
 ## Upgrading
 
+### Version numbering restarted at 0.0.1
+
+Versions 1.0.1 to 1.0.3 were early learning releases. They have been withdrawn, and their tags and
+GitHub releases removed. Version numbering starts again at 0.0.1 and follows
+[Semantic Versioning](https://semver.org/). Before 1.0.0 anything may change between releases,
+including view options and the properties Unimian writes; the [changelog](CHANGELOG.md) says when
+it does.
+
+If you installed one of the withdrawn versions, Obsidian will not offer 0.0.1 as an update,
+because the number is lower than the one installed. Replace `main.js`, `manifest.json`, and
+`styles.css` in `<Vault>/.obsidian/plugins/unimian/` with the files from the new release, and keep
+`data.json`, which holds your plugin settings. View options are stored in your `.base` files and
+are not affected.
+
 ### Kanban view renamed to Swimlane
 
 The Kanban view is now the **Swimlane** view. The Unimian view type is `unimian-swimlane`.

@@ -5,6 +5,9 @@ import { accessSync, constants, readFileSync, statSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { requiredNoticeFragments } from "./license-banner.mjs";
+import { versionsMapProblem } from "./versions-map.mjs";
+
+export const PLUGIN_ID = "unimian";
 
 export const REQUIRED_BUILD_ARTIFACTS = ["main.js", "manifest.json", "styles.css"];
 
@@ -53,9 +56,36 @@ export function verifyBuildArtifacts({
 	};
 }
 
+/**
+ * Checks that the built manifest, package.json, and versions.json describe the same release.
+ * Returns a list of problems; an empty list means they agree.
+ */
+export function verifyReleaseMetadata({ rootDir = process.cwd() } = {}) {
+	const readJson = (file) => JSON.parse(readFileSync(path.join(rootDir, file), "utf8"));
+	const manifest = readJson("dist/manifest.json");
+	const pkg = readJson("package.json");
+	const versions = readJson("versions.json");
+
+	const problems = [];
+	if (manifest.id !== PLUGIN_ID) {
+		problems.push(`manifest.json: id is "${manifest.id}", expected "${PLUGIN_ID}"`);
+	}
+	if (manifest.version !== pkg.version) {
+		problems.push(
+			`manifest.json: version ${manifest.version} differs from package.json ${pkg.version}`,
+		);
+	}
+	const versionsProblem = versionsMapProblem(versions, manifest);
+	if (versionsProblem !== null) problems.push(versionsProblem);
+	return problems;
+}
+
 const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
 if (isDirectRun) {
 	const result = verifyBuildArtifacts({ cwd: path.join(process.cwd(), "dist") });
+	const metadataProblems = result.ok ? verifyReleaseMetadata() : [];
+	for (const problem of metadataProblems) console.error(`✗ ${problem}`);
+	if (metadataProblems.length > 0) process.exit(1);
 	if (!result.ok) {
 		console.error("Build artifact verification failed.");
 		if (result.missing.length > 0) {
