@@ -1,4 +1,7 @@
 // @vitest-environment happy-dom
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type UnimianPlugin from "../src/main";
 import { NoteTemplateService } from "../src/services/NoteTemplateService";

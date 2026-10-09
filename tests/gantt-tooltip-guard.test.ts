@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
 
 import { afterEach, describe, expect, it } from "vitest";
 import { TooltipGuard } from "../src/views/gantt/tooltipGuard";

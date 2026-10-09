@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import type { Task } from "@jaeungkim/gantt-chart";
 import { describe, expect, it } from "vitest";
 import { diffGanttTasks } from "../src/core/gantt/diff";

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import { spawnSync } from "child_process";
 import { existsSync } from "fs";
 import { createRequire } from "module";

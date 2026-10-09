@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import type { App } from "obsidian";
 import { describe, expect, it } from "vitest";
 import { createGrantedMutations } from "../src/platform/mutations/grants";

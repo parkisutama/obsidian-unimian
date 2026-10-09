@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Parkis Utama
+
 import { describe, expect, it } from "vitest";
 import { isSafeColor, resolveColor, toCssVariables } from "../src/platform/colors/ColorResolver";
 import { getContrastColor, stringToColor } from "../src/utils/colorUtils";
