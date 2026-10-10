@@ -57,8 +57,8 @@
 	},
 	"dependencies": {
 		"@jaeungkim/gantt-chart": "1.5.1",
-		"fullcalendar": "^7.1.0",
-		"preact": "^10.29.8",
+		"fullcalendar": "^7.1.1",
+		"preact": "^11.0.0",
 		"temporal-polyfill": "^1.0.5"
 	},
 	"private": true
