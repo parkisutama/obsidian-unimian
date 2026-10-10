@@ -25,3 +25,6 @@ lint-output.json
 
 # vitest coverage reports
 coverage/
+
+# Markdown lint cache
+.rumdl_cache
