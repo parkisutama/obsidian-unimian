@@ -49,7 +49,7 @@ whole project is then governed by GPL v3. The original MIT copyright notice is p
 ## Features
 
 - **Calendar view** — Month, Week, Day, and List layouts. Open and navigate your dated notes at a
-  glance. See the [Calendar View documentation](docs/calendar-view.md).
+  glance. See the [Calendar View documentation](https://github.com/parkisutama/obsidian-univeritas/blob/main/docs/unimian/calendar-view.md).
 - **Swimlane view** — Drag-and-drop board with columns and optional swimlane rows. You choose
   the property for columns (and rows); nothing is preselected. Formerly named "Kanban"; renamed
   because Obsidian now ships a core Kanban view.
@@ -58,10 +58,10 @@ whole project is then governed by GPL v3. The original MIT copyright notice is p
   grouping become phases, finish-to-start dependencies are drawn and edited on the chart, and
   moving, resizing, progress, links, order, and note creation are written back to your properties.
   Blocking and date conflicts are derived from Depends on. See the
-  [Gantt documentation](docs/gantt-view.md) for goal-based recipes and option relationships.
+  [Gantt documentation](https://github.com/parkisutama/obsidian-univeritas/blob/main/docs/unimian/gantt-view.md) for goal-based recipes and option relationships.
 - **Timeline view** — Grouped, virtualized date ranges plus quick placement of unscheduled notes
   into user-selected start/end properties, with no task-schema assumptions. See the
-  [Timeline View documentation](docs/timeline-view.md).
+  [Timeline View documentation](https://github.com/parkisutama/obsidian-univeritas/blob/main/docs/unimian/timeline-view.md).
 
 All views are **Obsidian Bases-native**: they use your selected frontmatter properties directly and
 introduce no hidden task schema.
