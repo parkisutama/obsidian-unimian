@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 Parkis Utama
 
+// This file writes the SPDX tag into build output; the markers keep the REUSE linter from
+// reading those strings as this file's own license.
+// REUSE-IgnoreStart
+
 // License notices prepended to the distributed plugin files.
 // Full license texts live in THIRD_PARTY_NOTICES.md; keep both in sync.
 
@@ -133,3 +137,4 @@ export function findUnlistedPackages(bundledPackages, noticesText) {
 	}
 	return problems;
 }
+// REUSE-IgnoreEnd

@@ -1,5 +1,8 @@
 # Plan: License Compliance & Dependency Hygiene
 
+<!-- This plan quotes SPDX tags as examples; the markers keep the REUSE linter from reading them as this file’s license. -->
+<!-- REUSE-IgnoreStart -->
+
 - **Branch:** `chore/license-compliance`
 - **Dibuat:** 2026-09-18
 - **Sumber:** audit dependency & atribusi (sesi Claude Code, 2026-09-18)
@@ -285,3 +288,5 @@ pnpm audit
 8. `chore(deps): bump vitest and esbuild, patch vulnerable transitive deps`
 9. `chore: untrack local lint output and Claude settings`
 10. `chore: release 1.0.4`
+
+<!-- REUSE-IgnoreEnd -->
