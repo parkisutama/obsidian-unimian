@@ -82,6 +82,8 @@ already organized by it works without moving files.
       day link first. A 3-day range resolves from its middle day (a range crossing a month is
       ambiguous; the middle day decides). List views keep FullCalendar's own title. When no part of
       a view's title is a configured period, FullCalendar's own title is shown unchanged.
+13. **24-hour clock.** Event times and time-grid slot labels use 24-hour format, never AM/PM.
+    Done 2026-09-21 as a fixed default (no new option key); list view already read well.
 14. **Unconfigured means no links.** A period with no path pattern set on the Base gets no link,
     no underline, no dot, and no created notes; the rest of the calendar is unchanged. There is no
     global fallback (decision 2).
@@ -95,8 +97,6 @@ already organized by it works without moving files.
       there. Period templates should therefore not move the note.
     - Unverified: whether Templater's own folder-template setting also fires on a note created
       through its API, which could apply a template twice. Check in native acceptance (PN-006).
-13. **24-hour clock.** Event times and time-grid slot labels use 24-hour format, never AM/PM.
-    Done 2026-09-21 as a fixed default (no new option key); list view already read well.
 
 ## 2a. Findings after Note Template landed (2026-09-21)
 

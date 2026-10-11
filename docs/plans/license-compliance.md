@@ -102,7 +102,7 @@ Urutan disusun agar setiap task = satu commit atomik yang lolos `pnpm run check`
 
 ### Task 1 — `THIRD_PARTY_NOTICES.md` + koreksi LICENSE
 
-**Perubahan**
+**Perubahan:**
 
 - Buat `THIRD_PARTY_NOTICES.md` berisi, per komponen di tabel atas: nama, URL, versi, SPDX,
   copyright line persis dari LICENSE upstream, dan teks lisensi lengkap (MIT/0BSD).
@@ -111,14 +111,14 @@ Urutan disusun agar setiap task = satu commit atomik yang lolos `pnpm run check`
 - `LICENSE`: ganti `Copyright (C) 2026  lhassa8` → `Copyright (c) 2026 Lars Tray` (verbatim upstream).
 - `LICENSE`: terapkan keputusan D1 pada paragraf pembuka (hapus klausul "or any later version" bila `GPL-3.0-only`).
 
-**Acceptance**
+**Acceptance:**
 
 - Setiap copyright line di `THIRD_PARTY_NOTICES.md` cocok verbatim dengan LICENSE upstream.
 - LICENSE tidak lagi memuat `lhassa8` sebagai pemegang hak cipta.
 
 ### Task 2 — Konsistensi metadata lisensi
 
-**Perubahan**
+**Perubahan:**
 
 - `package.json` `license` → sesuai D1 (`GPL-3.0-only` atau tetap `GPL-3.0-or-later`).
 - `README.md` bagian License: sesuaikan blok teks dengan D1.
@@ -126,14 +126,14 @@ Urutan disusun agar setiap task = satu commit atomik yang lolos `pnpm run check`
   tautkan ke `THIRD_PARTY_NOTICES.md`.
 - `README.md` "Gantt code attribution": sebut nama "Lars Tray (lhassa8)".
 
-**Acceptance**
+**Acceptance:**
 
 - `grep -rn "or-later\|any later version"` hanya muncul bila D1 = or-later.
 - `pnpm run lint:obsidian` (memeriksa LICENSE & manifest) lolos.
 
 ### Task 3 — Investigasi & rapikan CSS Frappe yang dibundel
 
-**Perubahan**
+**Perubahan:**
 
 - Pastikan apakah Gantt masih butuh blok `/* === BUNDLED CSS IMPORTS === */` (tidak ada lagi
   `import '*.css'` di `src/`). Periksa perilaku `cssPlugin` di `esbuild.config.mjs` saat tidak ada
@@ -144,14 +144,14 @@ Urutan disusun agar setiap task = satu commit atomik yang lolos `pnpm run check`
   - **Impor ulang:** `import 'frappe-gantt/dist/frappe-gantt.css'` di `BasesGanttView.ts` dan
     biarkan `cssPlugin` menulis ulang blok dengan notice otomatis (lihat Task 4).
 
-**Acceptance**
+**Acceptance:**
 
 - Gantt view tampil identik sebelum/sesudah (cek manual di vault uji: bar, header, popup, dark mode).
 - Blok CSS Frappe di `styles.css` diawali notice lisensi.
 
 ### Task 4 — Notice lisensi di artefak build
 
-**Perubahan**
+**Perubahan:**
 
 - `esbuild.config.mjs`: ganti banner JS dengan banner legal (`/*! ... */` agar tahan minify):
 
@@ -169,20 +169,20 @@ Urutan disusun agar setiap task = satu commit atomik yang lolos `pnpm run check`
 - `scripts/verify-build-artifacts.mjs`: gagal bila `main.js` / `styles.css` tidak diawali notice
   yang memuat `SPDX-License-Identifier` dan nama setiap komponen terbundel.
 
-**Acceptance**
+**Acceptance:**
 
 - `pnpm run build` → baris pertama `main.js` (minified) memuat notice lengkap.
 - `pnpm run verify:artifacts` gagal jika banner dihapus (uji negatif manual sekali).
 
 ### Task 5 — Sertakan dokumen lisensi di rilis
 
-**Perubahan**
+**Perubahan:**
 
 - `.github/workflows/release.yml`: tambahkan `LICENSE` dan `THIRD_PARTY_NOTICES.md` ke
   `wise-view.zip` dan ke daftar aset release.
 - `main.js`, `manifest.json`, `styles.css` tetap diunggah terpisah (kebutuhan Obsidian community plugins).
 
-**Acceptance**
+**Acceptance:**
 
 - Dry-run: jalankan perintah `zip` lokal, `unzip -l` menampilkan 5 file.
 
@@ -214,14 +214,14 @@ Urutan disusun agar setiap task = satu commit atomik yang lolos `pnpm run check`
 - Pastikan header tidak bentrok dengan blok JSDoc yang sudah ada (`BasesGanttView.ts`,
   `ganttUtils.ts`, `frappe-gantt.d.ts`) — letakkan di atasnya.
 
-**Acceptance**
+**Acceptance:**
 
 - `grep -L "SPDX-License-Identifier" src -r` kosong.
 - `pnpm run lint` & `lint:obsidian` lolos (Biome tidak mengeluh soal komentar header).
 
 ### Task 7 — Update devDependencies yang rentan
 
-**Perubahan**
+**Perubahan:**
 
 - `vitest` → `>=4.1.11` (menutup vitest, @vitest/mocker, vite, postcss, nanoid).
 - `esbuild` → `>=0.28.1`.
@@ -229,7 +229,7 @@ Urutan disusun agar setiap task = satu commit atomik yang lolos `pnpm run check`
   tambahkan `pnpm.overrides` dengan versi patched minimum.
 - Pin `obsidian` dari `latest` ke versi eksplisit yang saat ini terpasang di lockfile.
 
-**Acceptance**
+**Acceptance:**
 
 - `pnpm audit` → 0 high, 0 moderate (low boleh bila tidak ada patch).
 - `pnpm audit --prod` tetap 0.
@@ -237,18 +237,18 @@ Urutan disusun agar setiap task = satu commit atomik yang lolos `pnpm run check`
 
 ### Task 8 — Kebersihan repo
 
-**Perubahan**
+**Perubahan:**
 
 - `git rm --cached lint-output.json .claude/settings.local.json` (sudah ada di `.gitignore`;
   `lint-output.json` memuat path lokal `C:\GitHub\...`).
 
-**Acceptance**
+**Acceptance:**
 
 - `git ls-files | grep -E "lint-output|settings.local"` kosong.
 
 ### Task 9 — Changelog & versi
 
-**Perubahan**
+**Perubahan:**
 
 - Catat perubahan di catatan rilis 1.0.4: koreksi atribusi, notice lisensi di artefak, D1, update devDeps.
 - `pnpm version patch` (menjalankan `version-bump.mjs`).

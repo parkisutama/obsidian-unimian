@@ -1,7 +1,7 @@
 # Upstream provenance ledger
 
 Status: Active  
-Specification: [Code quality, organization, and performance](../specs/code-quality-and-performance.md)
+Specification: the per-workstream specifications under [`docs/specs/`](../specs/), which replaced the single code quality, organization, and performance specification
 
 This ledger records every upstream repository assessed for Unimian's adopted-view work (the
 now-retired extensible-view-platform program, and any future adoption work), the exact snapshot
