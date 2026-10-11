@@ -11,11 +11,3 @@ respect-gitignore = true
 # Documents carry `title` in frontmatter and repeat it as the single H1.
 [MD025]
 front-matter-title = ""
-
-# Existing documents with findings that need an author's decision, not an automatic fix.
-# Tracked in the workspace open-items register (DOC-01 to DOC-04); remove an entry once fixed.
-[per-file-ignores]
-"docs/specs/gantt.md" = ["MD075"]
-"docs/specs/periodic-notes.md" = ["MD029"]
-"docs/architecture/upstream-provenance.md" = ["MD057"]
-"docs/plans/license-compliance.md" = ["MD036"]
