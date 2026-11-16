@@ -214,6 +214,39 @@ describe("LegacyMutationGateway.createNote", () => {
 	});
 });
 
+describe("frontmatter property key validation", () => {
+	it.each(["__proto__", "constructor", "prototype"])(
+		"rejects %s before any frontmatter change",
+		async (key) => {
+			const { app, frontmatterWrites } = makeApp({ existingFiles: ["A.md"] });
+			const gateway = new LegacyMutationGateway(app);
+			const invalidId = `note.${key}`;
+			expect((await gateway.setProperty("A.md", invalidId, { injected: true })).ok).toBe(false);
+			expect((await gateway.setProperties("A.md", { "note.status": "Done", [invalidId]: {} })).ok).toBe(false);
+			expect((await gateway.updateRange("A.md", "note.start", "2026-11-16", invalidId, "2026-11-17")).ok).toBe(false);
+			expect(frontmatterWrites).toEqual([]);
+		},
+	);
+});
+
+describe("move collision exhaustion", () => {
+	it("reports exhaustion without renaming onto an occupied path", async () => {
+		const existingFiles = [
+			"A.md",
+			"Target/A.md",
+			...Array.from({ length: 99 }, (_, index) => `Target/A ${index + 1}.md`),
+		];
+		const { app, renamed } = makeApp({ existingFiles, existingFolders: ["Target"] });
+		const result = await new LegacyMutationGateway(app).moveToFolder("A.md", "Target");
+		expect(result).toMatchObject({
+			ok: false,
+			reason: "error",
+			message: expect.stringContaining("No available filename"),
+		});
+		expect(renamed).toEqual([]);
+	});
+});
+
 describe("createGrantedMutations (GBETA-003)", () => {
 	it("builds nothing for an empty grant list", () => {
 		const { app } = makeApp();

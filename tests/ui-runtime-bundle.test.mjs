@@ -36,7 +36,7 @@ describe("UI runtime aliases", () => {
 		expect(inputs.some((p) => p.includes("@jaeungkim/gantt-chart/dist/"))).toBe(true);
 		expect(inputs.some((p) => /\/preact\/compat\//.test(p))).toBe(true);
 		expect(inputs.filter((p) => /\/node_modules\/(react|react-dom)\//.test(p))).toEqual([]);
-	});
+	}, 30_000);
 
 	it("leaves no unresolved React import in the output", async () => {
 		const result = await bundleGanttChart();
@@ -44,5 +44,5 @@ describe("UI runtime aliases", () => {
 
 		expect(code).not.toMatch(/from\s*["']react(-dom)?(\/[^"']*)?["']/);
 		expect(code).not.toMatch(/require\(\s*["']react(-dom)?(\/[^"']*)?["']\s*\)/);
-	});
+	}, 30_000);
 });

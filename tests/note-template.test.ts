@@ -101,6 +101,24 @@ describe("template engine detection", () => {
 	});
 });
 
+describe("template frontmatter property key validation", () => {
+	it.each(["__proto__", "constructor", "prototype"])(
+		"rejects %s before running the template or creating a note",
+		async (key) => {
+			const f = createApp({ templater: true });
+			const result = await new LegacyMutationGateway(f.app).createNote({
+				path: "Events/Unsafe.md",
+				templatePath: "Templates/Event.md",
+				frontmatter: { status: "Todo", [key]: { injected: true } },
+			});
+			expect(result.ok).toBe(false);
+			expect(f.templater).not.toHaveBeenCalled();
+			expect(f.processFrontMatter).not.toHaveBeenCalled();
+			expect(f.files.has("Events/Unsafe.md")).toBe(false);
+		},
+	);
+});
+
 describe("NoteTemplateService", () => {
 	it("creates the note through Templater's own API and merges the view's frontmatter over it", async () => {
 		const f = createApp({ templater: true });
