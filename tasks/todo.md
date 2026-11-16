@@ -5,15 +5,15 @@ Sizes refer to expected hand-edited files, excluding generated lockfile churn.
 
 ## Current execution state (2026-11-16)
 
-- Work branch: `fix/repository-remediation`, based on `a53bfe9`; verified code checkpoint `ea2ded22bef00ad9994be5da4b4e62110e3e8816`.
+- Work branch: `fix/repository-remediation`; integrated verified code checkpoint `2c7c1f59f16f9dfea2545c3e8358fcdc22c3f522`.
 - Ubuntu fnm Node 24.15.0 and exact pnpm 12.10.1 are active. A maintainer-approved `pnpm install --frozen-lockfile` provisioned 429 Linux packages from the committed lockfile; Windows dependencies were not copied.
 - T01 bundle tests pass independently and in the 733-test full suite.
 - T05-T07 completed an observed red/green cycle. Before the source fix, the focused regressions failed 18 cases; the direct template-boundary regression also failed. After the fix, focused and aggregate checks pass.
 - All target-controlled checks ran in bubblewrap without network or host credentials, with a cleared allowlisted environment, read-only source/toolchain, tmpfs outputs, and explicit memory/process/file/CPU/wall-time bounds.
 - Aggregate verification passes: typecheck, Biome, ESLint, Markdown lint, 60 Vitest files/733 tests with coverage, production build, artifact verification, and 20 conformance tests. Coverage is 71.4% statements, 64.44% branches, 74.89% functions, and 72.99% lines.
-- Full audit reports 14 development-only advisories (3 low, 8 moderate, 3 high, 0 critical); production audit reports zero. Dependabot alert 46 still needs authenticated inspection before its exact package/applicability can be claimed.
-- Existing PR #25 targets the current stable `pnpm/action-setup` v6.1.1 SHA and PR #24 targets current stable `happy-dom` 21.0.4. Their current heads and checks were reviewed; neither was duplicated, merged, or applied to this branch.
-- No preview behavior, TypeScript exception, version, tag, release, or remote branch was changed. See `docs/handoff/current.md` for exact evidence and remaining ownership.
+- PR #25 merged as `410e670`; refreshed PR #24 passed Linux/Windows/commit checks and merged as `b254cba`. Dependabot alert 46 identifies direct development dependency `happy-dom` and changed to `fixed` after 21.0.4 reached `main`.
+- Post-integration full audit reports 11 development-only advisories (3 low, 7 moderate, 1 high, 0 critical); production audit reports zero. The remaining high is transitive Vite 8.3.0 and belongs to T08c.
+- No preview behavior, TypeScript exception, plugin version, tag, release, or publication was changed. See `docs/handoff/current.md` for exact evidence and remaining ownership.
 
 ## T01: stabilize bundle tests (XS)
 
@@ -25,33 +25,33 @@ Verification: `pnpm run test -- tests/ui-runtime-bundle.test.mjs`, then full sui
 
 ## T02: establish baseline (S; diagnosis first)
 
-- [ ] Capture current heads, exact application resolutions, full/production advisory applicability, and alert 46's affected package.
+- [x] Capture current heads, exact application resolutions, full/production advisory applicability, and alert 46's affected package.
 - [x] Explain the lockfile layout: pnpm 12 uses a two-document YAML stream; application resolutions exist in the second document. No missing-resolution defect was established.
-- [ ] Prove frozen-install reproducibility in a disposable prepared environment; repair only an actually demonstrated defect.
-- [ ] Establish compliant validation execution and refresh relevant PR head checks; record blockers without calling checks passed.
+- [x] Prove frozen-install reproducibility in a disposable prepared environment; repair only an actually demonstrated defect.
+- [x] Establish compliant validation execution and refresh relevant PR head checks; record blockers without calling checks passed.
 
 Files: audit evidence; lockfile/workspace config only if diagnosis justifies a follow-up fix.
 Dependencies: T01 for reliable full-suite baseline. Verification: clean frozen installation, existing `pnpm run verify`, audit output with exact source/ref. No live-vault actions.
 
 ## T03: action setup (#25, S)
 
-- [ ] Confirm stable target and SHA pin; review existing PR rather than duplicate it.
-- [ ] Current-head Linux/Windows workflow checks pass; existing permissions and release gate remain intact.
+- [x] Confirm stable target and SHA pin; review existing PR rather than duplicate it.
+- [x] Current-head Linux/Windows workflow checks pass; existing permissions and release gate remain intact.
 
 Files: `.github/workflows/ci.yml`, `.github/workflows/release.yml`. Dependency: T02.
 Verification: review workflow diff and GitHub checks. Merge remains a separate authorized action.
 
 ## T04: happy-dom (#24, S)
 
-- [ ] Upgrade the isolated dev dependency to refreshed stable; preserve the test environment behavior.
-- [ ] Full suite and coverage pass; reconcile #26's overlapping change after integration.
+- [x] Upgrade the isolated dev dependency to refreshed stable; preserve the test environment behavior.
+- [x] Full suite and coverage pass; reconcile #26's overlapping change after integration.
 
 Files: `package.json`, application lockfile. Dependency: T02.
 Verification: existing test/coverage commands and final advisory reconciliation.
 
 ## Checkpoint A
 
-- [ ] Reproducible baseline, current-head CI evidence, and `pnpm run verify` pass after accepted T01-T04 slices; unresolved failures stay explicit.
+- [x] Reproducible baseline, current-head CI evidence, and `pnpm run verify` pass after accepted T01-T04 slices; unresolved failures stay explicit.
 
 ## T05: vault paths (S)
 

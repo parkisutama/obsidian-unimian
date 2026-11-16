@@ -2,11 +2,11 @@
 
 Date: 2026-11-16.
 Branch: `fix/repository-remediation`.
-State: Ubuntu environment ready; T01 and T05-T07 verified locally; T02-T04 integration remains open.
+State: Checkpoints A and B complete; T01-T07 integrated and verified; T08 is next.
 Current owner: Ubuntu development agent.
 Next owner: Ubuntu development agent for dependency slices; Windows agent only for a later native checkpoint.
 Source base: `a53bfe9a01d1cda7c2c9ab162259c9538c33e7cb`.
-Code checkpoint: `ea2ded22bef00ad9994be5da4b4e62110e3e8816` (`fix: harden mutation boundaries`). This commit passed the repository hook and the stricter aggregate verification described below.
+Code checkpoint: `2c7c1f59f16f9dfea2545c3e8358fcdc22c3f522` (merged `main` after T03/T04 into the T01/T05-T07 branch). This exact tree passed the strict aggregate verification below.
 
 ## Read first
 
@@ -23,7 +23,8 @@ Code checkpoint: `ea2ded22bef00ad9994be5da4b4e62110e3e8816` (`fix: harden mutati
 - The shared vault guard now rejects rooted Unix/backslash, drive, drive-relative, and UNC-shaped inputs while retaining valid relative paths.
 - Move collision exhaustion now returns an existing-compatible error before any occupied destination can be overwritten.
 - A shared frontmatter-key guard rejects `__proto__`, `constructor`, and `prototype` at gateway and template write boundaries. Bulk/date inputs are validated before mutation; ordinary names and formula rejection remain unchanged.
-- Dependencies, lockfile, plugin version, TypeScript exception, and preview behavior are unchanged by the code checkpoint.
+- PR #25 updated all workflow pins to `pnpm/action-setup` v6.1.1; PR #24 updated only `happy-dom` and its lockfile snapshots to 21.0.4.
+- Plugin version, TypeScript exception, and preview behavior are unchanged.
 - The earlier audit's missing-lockfile-resolutions claim was corrected: pnpm 12's lockfile has two YAML documents and application resolutions are in the second.
 - Eleven integrated local branches, obsolete remote `dev`, and a clean documentation worktree were removed earlier with maintainer authorization. Two local historical spikes remain in Windows and are not prerequisites; they were not transferred through GitHub.
 
@@ -33,6 +34,8 @@ The workspace and three plugin repositories are independent clones under `/home/
 
 Ubuntu fnm Node 24.15.0 and exact pnpm 12.10.1 are active. The repository initially had no `node_modules`; the local pnpm store lacked Rolldown's Linux binding. After one explicit provisioning approval, `corepack install --global pnpm@12.10.1 && pnpm install --frozen-lockfile` installed 429 packages from the committed lockfile. Windows `node_modules` was not copied.
 
+Merging refreshed `main` triggered an automatic dependency synchronization that downloaded one package outside bubblewrap. It changed only ignored `node_modules` and installed the committed `happy-dom` 21.0.4 graph, but it did not meet the target-lifecycle isolation policy and is not accepted as verification evidence. The integrated tree was subsequently verified from read-only source/toolchain inside the strict sandbox.
+
 Bubblewrap, prlimit, timeout, and unshare provide the validation boundary. Target-controlled runs use no network or host credentials, a cleared allowlisted environment, read-only source/toolchain, tmpfs scratch/output, and bounded heap/address space/process/file/disk/CPU/wall time. The hook initially hit worker contention with a 512-process limit; its two affected files passed 97/97 in focused reproduction. Raising the still-bounded process/file ceilings to 1024/4096 let the unchanged full hook pass 733/733.
 
 ## Checks
@@ -41,16 +44,17 @@ Bubblewrap, prlimit, timeout, and unshare provide the validation boundary. Targe
 - Repository hook passes in strict isolation: typecheck, Biome, ESLint, Markdown lint, 60 Vitest files and 733 tests.
 - Aggregate verification passes in strict isolation: hook checks plus coverage, production build, artifact verification, and 20/20 conformance tests.
 - Coverage: 71.4% statements (4161/5827), 64.44% branches (2463/3822), 74.89% functions (883/1179), 72.99% lines (3838/5258).
-- `pnpm audit --prod --json`: zero advisories. Full development audit: 14 advisories (3 low, 8 moderate, 3 high, 0 critical), centered on test/build dependencies.
+- `pnpm audit --prod --json`: zero advisories. Post-integration development audit: 11 advisories (3 low, 7 moderate, 1 high, 0 critical). The remaining high is Vite 8.3.0 through Vitest and is assigned to T08c.
 - No sandbox build or coverage artifact was promoted; outputs stayed on tmpfs. `git diff --check` passes.
-- Native Ubuntu/Windows Obsidian acceptance and current remote CI for `ea2ded2` have not run. Automated checks do not replace them.
+- PR #24's refreshed head passed Linux Verify, Windows tests, and commit-message checks. Native Obsidian acceptance for the hardening checkpoint has not run; automated checks do not replace it.
 
 ## Dependency and remote evidence
 
-- PR #25 head `064ece3cc19163d06cc4b5ea247c293849b96804` updates only four workflow uses from `pnpm/action-setup` v6.1.0 to v6.1.1 SHA `73e46992e05b19abd31f2f3c20e0e7370d762115`; current public checks are green. Official releases confirm v6.1.1 is the stable target.
-- PR #24 head `508d0906788633112f1ec088d44a62a68ec1f8ec` updates only `happy-dom` 20.14.5 to stable 21.0.4 and lockfile peer snapshots; current public checks are green. npm confirms 21.0.4 is latest.
+- PR #25 passed its current-head checks and squash-merged as `410e6706474b468ad85a3477f225e26ccada6dfd`. It updates four workflow uses to the official v6.1.1 SHA `73e46992e05b19abd31f2f3c20e0e7370d762115`; permissions and release gate remain intact.
+- PR #24 was refreshed onto that `main`; head `8b439facc6bc963befd17dbaa88bbcb8a10ad1f3` passed Linux Verify, Windows tests, and commit-message checks before squash-merging as `b254cba366bab6207e10ca52b0e6543f965db6e8`.
+- Dependabot alert 46 is `GHSA-834v-8h66-3h79` / `CVE-2026-115895`, affecting direct development dependency `happy-dom` 17.0.0 through 21.0.3. GitHub marked it `fixed` at 2026-11-16T16:37:38Z after 21.0.4 reached `main`.
 - PRs #23 and #26 still have failing current-head Verify checks and remain unsuitable unchanged. Release PR #14 was not touched.
-- GitHub authentication is unavailable in this Ubuntu session. Dependabot alert 46 therefore remains an exact-package/applicability blocker; do not infer its identity solely from the aggregate audit.
+- GitHub CLI is authenticated as `parkisutama`; this was used only for the explicitly authorized PR review, refresh, merge, and read-only alert verification.
 
 ## Decisions and authorization
 
@@ -60,12 +64,11 @@ Bubblewrap, prlimit, timeout, and unshare provide the validation boundary. Targe
 - Keep all target-controlled test/build/lifecycle execution isolated: no network, no host credentials/home, read-only source/toolchain, bounded scratch-only output, explicit CPU/memory/process/file/disk/time limits. Provisioning and audit execution are separate activities.
 - Latest stable is the dependency goal; retain the documented TypeScript exception pending official stable typescript-eslint support. Track [#10940](https://github.com/typescript-eslint/typescript-eslint/issues/10940) and published peers. Do not suppress lint or install dual compilers.
 - No preview change is requested. Current quick-preview setting and Gantt detail interaction remain as inspected.
-- The verified code checkpoint is local only and one commit ahead of `origin/fix/repository-remediation`. No push, PR mutation, merge, force-push, tag, publication, or Release PR change occurred. Obtain explicit authorization before any remote mutation.
+- The maintainer authorized merging PRs #25/#24, synchronizing, pushing, and opening/updating the remediation PR. No force-push, tag, publication, manual version bump, or Release PR merge is authorized.
 
 ## Next actions for Ubuntu
 
-1. Finish T02 by inspecting Dependabot alert 46 with authenticated, read-only GitHub access and record exact applicability. The frozen Linux install and local aggregate baseline are already established.
-2. Integrate T03/T04 through their existing GitHub Flow PRs only when authorized; do not duplicate them on this branch. Re-run the same strict verification after the accepted heads land and reconcile #26 overlap.
-3. Continue T08a-c only after T04/T07 prerequisites. Shared workspace policy changes need their own writable scope and must preserve the tracked TypeScript exception for typescript-eslint/typescript-eslint#10940.
-4. Keep preview behavior unchanged. Request native Windows testing only at a coherent later checkpoint, with exact SHA and dummy-vault steps.
-5. Before remote work, resolve the current documentation-only working tree, then request explicit push/PR authorization. Do not merge, force-push, tag, publish, or modify Release PR #14.
+1. Continue T08a-c. Shared workspace policy changes need their own writable scope and must preserve the tracked TypeScript exception for typescript-eslint/typescript-eslint#10940.
+2. Resolve the remaining transitive Vite, fast-uri, and minimatch advisories through supported dependency updates; do not add overrides before proving the owning direct-package path.
+3. Keep preview behavior unchanged. Request native Windows testing only at a coherent later checkpoint, with exact SHA and dummy-vault steps.
+4. Do not merge the remediation PR, force-push, tag, publish, manually bump the plugin version, or merge Release PR #14.
