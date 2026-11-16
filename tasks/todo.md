@@ -1,24 +1,24 @@
 # Repository remediation tasks
 
-Plan and branch decisions: [plan.md](plan.md). All implementation tasks remain open.
+Plan and branch decisions: [plan.md](plan.md).
 Sizes refer to expected hand-edited files, excluding generated lockfile churn.
 
 ## Current execution state (2026-11-16)
 
-- Work branch: `fix/repository-remediation`, based on `a53bfe9`.
-- Maintainer explicitly requires the Cloudflare skill's strict sandbox, including for implementation validation; local Windows development execution was declined.
-- T01's two per-test timeout changes are prepared, but not executed or verified.
-- Regression tests for T05-T07 are drafted only. Their expected failures have not been observed; production fixes have not been applied. Do not treat these drafts as completed TDD or a passing branch.
-- Correction after maintainer clarification: fnm already provides Linux Node 24.15.0 and 22.22.3 under `/home/park_is_/.local/share/fnm/node-versions/`. Node 24.15.0 successfully executed inside bubblewrap; no runtime installation was needed.
-- A focused Vitest launch ran under bubblewrap with all namespaces unshared, capabilities dropped, cleared environment, read-only source/toolchain and hidden Git metadata, 512 MiB scratch tmpfs, 512 MiB Node heap, 12 GiB address-space limit, process/file/CPU limits, and a 45-second wall-clock limit. Source was mounted at its original WSL path to resolve Windows junctions. No host home/credentials or network were exposed. No retained sandbox files were promoted.
-- Vitest failed during startup before collecting tests: installed Rolldown 1.2.9 lacks its Linux native binding, and its WASI fallback is also absent. Existing Windows `node_modules` cannot establish a usable Linux test environment. This is an environment failure, not an observed regression-test failure.
-- Blocker: provide matching Linux dependencies through a maintainer-prepared trusted environment. The skill prohibits installing dependencies during this run; do not use the error's generic reinstall suggestion or Windows execution as a workaround. Strict sandbox remains required. No packages were installed or source files changed by the sandbox.
-- Other remaining tasks are pending, not completed. An unverified checkpoint is being committed and pushed for Ubuntu handoff with maintainer authorization. No PR is opened and no merge, tag, release, or publication is authorized by this transfer. `git diff --check` passes; that is only a whitespace check. See `docs/handoff/current.md` for the receiving agent's instructions.
+- Work branch: `fix/repository-remediation`, based on `a53bfe9`; verified code checkpoint `ea2ded22bef00ad9994be5da4b4e62110e3e8816`.
+- Ubuntu fnm Node 24.15.0 and exact pnpm 12.10.1 are active. A maintainer-approved `pnpm install --frozen-lockfile` provisioned 429 Linux packages from the committed lockfile; Windows dependencies were not copied.
+- T01 bundle tests pass independently and in the 733-test full suite.
+- T05-T07 completed an observed red/green cycle. Before the source fix, the focused regressions failed 18 cases; the direct template-boundary regression also failed. After the fix, focused and aggregate checks pass.
+- All target-controlled checks ran in bubblewrap without network or host credentials, with a cleared allowlisted environment, read-only source/toolchain, tmpfs outputs, and explicit memory/process/file/CPU/wall-time bounds.
+- Aggregate verification passes: typecheck, Biome, ESLint, Markdown lint, 60 Vitest files/733 tests with coverage, production build, artifact verification, and 20 conformance tests. Coverage is 71.4% statements, 64.44% branches, 74.89% functions, and 72.99% lines.
+- Full audit reports 14 development-only advisories (3 low, 8 moderate, 3 high, 0 critical); production audit reports zero. Dependabot alert 46 still needs authenticated inspection before its exact package/applicability can be claimed.
+- Existing PR #25 targets the current stable `pnpm/action-setup` v6.1.1 SHA and PR #24 targets current stable `happy-dom` 21.0.4. Their current heads and checks were reviewed; neither was duplicated, merged, or applied to this branch.
+- No preview behavior, TypeScript exception, version, tag, release, or remote branch was changed. See `docs/handoff/current.md` for exact evidence and remaining ownership.
 
 ## T01: stabilize bundle tests (XS)
 
-- [ ] Give each esbuild integration test an explicit bounded timeout, initially 30 seconds; preserve assertions and global timeout.
-- [ ] Verify both tests independently and under full-suite load; investigate failures that persist.
+- [x] Give each esbuild integration test an explicit bounded timeout, initially 30 seconds; preserve assertions and global timeout.
+- [x] Verify both tests independently and under full-suite load; investigate failures that persist.
 
 Files: `tests/ui-runtime-bundle.test.mjs`. Dependencies: none.
 Verification: `pnpm run test -- tests/ui-runtime-bundle.test.mjs`, then full suite at checkpoint.
@@ -55,32 +55,32 @@ Verification: existing test/coverage commands and final advisory reconciliation.
 
 ## T05: vault paths (S)
 
-- [ ] Add failing regression cases for absolute Unix paths, backslash roots, drive/UNC paths, and drive-relative paths; retain valid-path fixtures.
-- [ ] Fix only the shared guard and verify all create/move/template/periodic callers; document adapter/symlink limitations separately.
+- [x] Add failing regression cases for absolute Unix paths, backslash roots, drive/UNC paths, and drive-relative paths; retain valid-path fixtures.
+- [x] Fix only the shared guard and verify all create/move/template/periodic callers; document adapter/symlink limitations separately.
 
 Files: `src/core/paths/vaultPath.ts`, `tests/vault-path.test.ts`; existing caller tests as needed. Dependency: T02.
 Verification: focused vault-path, frontmatter-create, template, and periodic-note tests; guard failure must occur before writes.
 
 ## T06: move collision limit (S)
 
-- [ ] Reproduce exhaustion with a bounded mock fixture and assert no rename onto an occupied destination.
-- [ ] Return a specific existing-compatible failure/message, preserving normal collision numbering and success behavior.
+- [x] Reproduce exhaustion with a bounded mock fixture and assert no rename onto an occupied destination.
+- [x] Return a specific existing-compatible failure/message, preserving normal collision numbering and success behavior.
 
 Files: `src/platform/mutations/LegacyMutationGateway.ts`, `tests/mutation-capability.test.ts`. Dependency: T02.
 Verification: existing gateway tests plus exhaustion regression. Avoid a new result type unless callers require it.
 
 ## T07: frontmatter property keys (M)
 
-- [ ] Define compatible handling of dangerous keys from actual frontmatter behavior; test single/bulk/date writes and template merge before changing behavior.
-- [ ] Apply the smallest common policy at gateway and template write boundaries; invalid bulk input must be rejected before partial mutation.
-- [ ] Preserve normal user property names, formula rejection, and serialization; do not claim global prototype pollution without evidence.
+- [x] Define compatible handling of dangerous keys from actual frontmatter behavior; test single/bulk/date writes and template merge before changing behavior.
+- [x] Apply the smallest common policy at gateway and template write boundaries; invalid bulk input must be rejected before partial mutation.
+- [x] Preserve normal user property names, formula rejection, and serialization; do not claim global prototype pollution without evidence.
 
 Files: gateway, template engine, their existing tests; one shared helper only if both paths need it (maximum five hand-edited files per slice). Dependencies: T05, T06.
 Verification: mutation-capability, note-template, and create-note-frontmatter tests with dummy objects.
 
 ## Checkpoint B
 
-- [ ] `pnpm run verify` passes after T05-T07; no valid-path regression, partial rejected write, or grant expansion.
+- [x] `pnpm run verify` passes after T05-T07; no valid-path regression, partial rejected write, or grant expansion.
 
 ## T08a-c: development tooling (three S/M slices)
 
