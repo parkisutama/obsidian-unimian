@@ -222,8 +222,12 @@ describe("frontmatter property key validation", () => {
 			const gateway = new LegacyMutationGateway(app);
 			const invalidId = `note.${key}`;
 			expect((await gateway.setProperty("A.md", invalidId, { injected: true })).ok).toBe(false);
-			expect((await gateway.setProperties("A.md", { "note.status": "Done", [invalidId]: {} })).ok).toBe(false);
-			expect((await gateway.updateRange("A.md", "note.start", "2026-11-16", invalidId, "2026-11-17")).ok).toBe(false);
+			expect(
+				(await gateway.setProperties("A.md", { "note.status": "Done", [invalidId]: {} })).ok,
+			).toBe(false);
+			expect(
+				(await gateway.updateRange("A.md", "note.start", "2026-11-16", invalidId, "2026-11-17")).ok,
+			).toBe(false);
 			expect(frontmatterWrites).toEqual([]);
 		},
 	);

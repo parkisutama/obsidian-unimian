@@ -11,6 +11,10 @@
  */
 
 import { type App, stringifyYaml, TFile } from "obsidian";
+import {
+	assertSafeFrontmatterKey,
+	assertSafeFrontmatterKeys,
+} from "../../core/frontmatter/propertyKeys";
 import { assertInsideVault } from "../../core/paths/vaultPath";
 import { createNoteFromTemplate, detectTemplateEngine } from "../../services/templateEngine";
 import type {
@@ -32,7 +36,7 @@ function isFormulaProperty(propertyId: string): boolean {
 /** The frontmatter key for a `note.status`/`file.status`-shaped property id. */
 function propertyName(propertyId: string): string {
 	const dot = propertyId.indexOf(".");
-	return dot >= 0 ? propertyId.slice(dot + 1) : propertyId;
+	return assertSafeFrontmatterKey(dot >= 0 ? propertyId.slice(dot + 1) : propertyId);
 }
 
 function errorResult(error: unknown): MutationResult {
@@ -67,11 +71,16 @@ export class LegacyMutationGateway
 				message: `"${propertyId}" is a formula property and cannot be written.`,
 			};
 		}
+		let name: string;
+		try {
+			name = propertyName(propertyId);
+		} catch (error) {
+			return errorResult(error);
+		}
 		const file = this.resolveFile(path);
 		if (!file) return { ok: false, reason: "file-not-found", message: `No file at "${path}".` };
 
 		try {
-			const name = propertyName(propertyId);
 			await this.app.fileManager.processFrontMatter(
 				file,
 				(frontmatter: Record<string, unknown>) => {
@@ -99,14 +108,22 @@ export class LegacyMutationGateway
 				message: "Formula properties cannot be written.",
 			};
 		}
+		let properties: ReadonlyArray<readonly [string, unknown]>;
+		try {
+			properties = Object.entries(values).map(
+				([propertyId, value]) => [propertyName(propertyId), value] as const,
+			);
+		} catch (error) {
+			return errorResult(error);
+		}
 		const file = this.resolveFile(path);
 		if (!file) return { ok: false, reason: "file-not-found", message: `No file at "${path}".` };
 		try {
 			await this.app.fileManager.processFrontMatter(
 				file,
 				(frontmatter: Record<string, unknown>) => {
-					for (const [propertyId, value] of Object.entries(values)) {
-						frontmatter[propertyName(propertyId)] = value;
+					for (const [name, value] of properties) {
+						frontmatter[name] = value;
 					}
 				},
 			);
@@ -130,6 +147,14 @@ export class LegacyMutationGateway
 				message: "Date range properties cannot be formulas.",
 			};
 		}
+		let startName: string;
+		let endName: string | null = null;
+		try {
+			startName = propertyName(startPropertyId);
+			if (endPropertyId) endName = propertyName(endPropertyId);
+		} catch (error) {
+			return errorResult(error);
+		}
 		const file = this.resolveFile(path);
 		if (!file) return { ok: false, reason: "file-not-found", message: `No file at "${path}".` };
 
@@ -137,9 +162,9 @@ export class LegacyMutationGateway
 			await this.app.fileManager.processFrontMatter(
 				file,
 				(frontmatter: Record<string, unknown>) => {
-					frontmatter[propertyName(startPropertyId)] = start;
-					if (endPropertyId && end != null) {
-						frontmatter[propertyName(endPropertyId)] = end;
+					frontmatter[startName] = start;
+					if (endName && end != null) {
+						frontmatter[endName] = end;
 					}
 				},
 			);
@@ -173,6 +198,13 @@ export class LegacyMutationGateway
 				nextPath = `${prefix}${file.basename} ${counter}.${file.extension}`;
 				counter++;
 			}
+			if (this.app.vault.getAbstractFileByPath(nextPath) && nextPath !== path) {
+				return {
+					ok: false,
+					reason: "error",
+					message: `No available filename for "${file.name}" in "${targetFolder}".`,
+				};
+			}
 			if (nextPath !== path) await this.app.fileManager.renameFile(file, nextPath);
 			return { ok: true, path: nextPath };
 		} catch (error) {
@@ -198,6 +230,7 @@ export class LegacyMutationGateway
 
 	async createNote(request: NoteCreationRequest): Promise<MutationResult> {
 		try {
+			assertSafeFrontmatterKeys(request.frontmatter);
 			assertInsideVault(request.path);
 			const template = request.templatePath ? this.resolveFile(request.templatePath) : null;
 			const engine = detectTemplateEngine(this.app);

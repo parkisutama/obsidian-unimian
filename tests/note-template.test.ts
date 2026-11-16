@@ -5,7 +5,11 @@ import type { TFile } from "obsidian";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LegacyMutationGateway } from "../src/platform/mutations/LegacyMutationGateway";
 import { NoteTemplateService } from "../src/services/NoteTemplateService";
-import { detectTemplateEngine, PLAIN_TEMPLATE_NOTICE } from "../src/services/templateEngine";
+import {
+	createNoteFromTemplate,
+	detectTemplateEngine,
+	PLAIN_TEMPLATE_NOTICE,
+} from "../src/services/templateEngine";
 import { TFile as FakeFile, notices } from "./fixtures/obsidian";
 
 vi.mock("../src/utils/openFile", () => ({ openFileInNewTab: vi.fn() }));
@@ -117,6 +121,18 @@ describe("template frontmatter property key validation", () => {
 			expect(f.files.has("Events/Unsafe.md")).toBe(false);
 		},
 	);
+
+	it("rejects dangerous keys at the template engine boundary", async () => {
+		const f = createApp({ templater: true });
+		await expect(
+			createNoteFromTemplate(f.app, "templater", {
+				template: new FakeFile("Templates/Event.md") as unknown as TFile,
+				path: "Events/Unsafe.md",
+				frontmatter: { ["__proto__"]: { injected: true } },
+			}),
+		).rejects.toThrow("not allowed");
+		expect(f.templater).not.toHaveBeenCalled();
+	});
 });
 
 describe("NoteTemplateService", () => {
