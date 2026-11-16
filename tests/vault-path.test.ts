@@ -14,6 +14,13 @@ describe("escapesVault", () => {
 		"Notes/..",
 		"..",
 		"Notes\\..\\..\\Outside.md",
+		"/Outside.md",
+		"\\Outside.md",
+		"C:\\Outside.md",
+		"C:/Outside.md",
+		"C:Outside.md",
+		"\\\\server\\share\\Outside.md",
+		"//server/share/Outside.md",
 	])("flags %s", (path) => {
 		expect(escapesVault(path)).toBe(true);
 	});
@@ -72,6 +79,16 @@ function makeApp(existingFiles: string[] = []) {
 }
 
 describe("LegacyMutationGateway refuses paths that leave the vault", () => {
+	it.each(["/Outside.md", "C:/Outside.md", "C:Outside.md", "\\\\server\\share\\Outside.md"])(
+		"does not write an absolute or drive-relative destination: %s",
+		async (path) => {
+			const { app, calls } = makeApp(["A.md"]);
+			const gateway = new LegacyMutationGateway(app);
+			expect((await gateway.createNote({ path })).ok).toBe(false);
+			expect((await gateway.moveToFolder("A.md", path)).ok).toBe(false);
+			expect(calls).toEqual([]);
+		},
+	);
 	it("does not create a note outside the vault", async () => {
 		const { app, calls } = makeApp();
 		const result = await new LegacyMutationGateway(app).createNote({ path: "../Outside.md" });

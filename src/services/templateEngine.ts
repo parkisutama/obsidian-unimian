@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Parkis Utama
 
 import { type App, Notice, normalizePath, type TFile, type TFolder } from "obsidian";
+import { assertSafeFrontmatterKeys } from "../core/frontmatter/propertyKeys";
 import { assertInsideVault } from "../core/paths/vaultPath";
 
 /**
@@ -105,6 +106,7 @@ export async function createNoteFromTemplate(
 	engine: Exclude<TemplateEngine, "plain">,
 	request: TemplateNoteRequest,
 ): Promise<TFile> {
+	assertSafeFrontmatterKeys(request.frontmatter);
 	assertInsideVault(request.path);
 	const slash = request.path.lastIndexOf("/");
 	const folderPath = slash >= 0 ? request.path.slice(0, slash) : "";

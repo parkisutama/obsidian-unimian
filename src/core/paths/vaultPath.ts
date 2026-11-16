@@ -10,9 +10,9 @@
  * write goes through `assertInsideVault` first.
  */
 
-/** True when a path contains a `..` segment, with either slash style. */
+/** True when a path is non-relative or contains a `..` segment, with either slash style. */
 export function escapesVault(path: string): boolean {
-	return path.split(/[\\/]/).includes("..");
+	return /^[\\/]|^[A-Za-z]:/.test(path) || path.split(/[\\/]/).includes("..");
 }
 
 /** Returns `path` unchanged, or throws when it would leave the vault. */

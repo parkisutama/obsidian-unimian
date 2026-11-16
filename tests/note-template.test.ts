@@ -5,7 +5,11 @@ import type { TFile } from "obsidian";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LegacyMutationGateway } from "../src/platform/mutations/LegacyMutationGateway";
 import { NoteTemplateService } from "../src/services/NoteTemplateService";
-import { detectTemplateEngine, PLAIN_TEMPLATE_NOTICE } from "../src/services/templateEngine";
+import {
+	createNoteFromTemplate,
+	detectTemplateEngine,
+	PLAIN_TEMPLATE_NOTICE,
+} from "../src/services/templateEngine";
 import { TFile as FakeFile, notices } from "./fixtures/obsidian";
 
 vi.mock("../src/utils/openFile", () => ({ openFileInNewTab: vi.fn() }));
@@ -98,6 +102,36 @@ describe("template engine detection", () => {
 		expect(detectTemplateEngine(createApp({ templater: true, core: true }).app)).toBe("templater");
 		expect(detectTemplateEngine(createApp({ core: true }).app)).toBe("core-templates");
 		expect(detectTemplateEngine(createApp().app)).toBe("plain");
+	});
+});
+
+describe("template frontmatter property key validation", () => {
+	it.each(["__proto__", "constructor", "prototype"])(
+		"rejects %s before running the template or creating a note",
+		async (key) => {
+			const f = createApp({ templater: true });
+			const result = await new LegacyMutationGateway(f.app).createNote({
+				path: "Events/Unsafe.md",
+				templatePath: "Templates/Event.md",
+				frontmatter: { status: "Todo", [key]: { injected: true } },
+			});
+			expect(result.ok).toBe(false);
+			expect(f.templater).not.toHaveBeenCalled();
+			expect(f.processFrontMatter).not.toHaveBeenCalled();
+			expect(f.files.has("Events/Unsafe.md")).toBe(false);
+		},
+	);
+
+	it("rejects dangerous keys at the template engine boundary", async () => {
+		const f = createApp({ templater: true });
+		await expect(
+			createNoteFromTemplate(f.app, "templater", {
+				template: new FakeFile("Templates/Event.md") as unknown as TFile,
+				path: "Events/Unsafe.md",
+				frontmatter: { ["__proto__"]: { injected: true } },
+			}),
+		).rejects.toThrow("not allowed");
+		expect(f.templater).not.toHaveBeenCalled();
 	});
 });
 

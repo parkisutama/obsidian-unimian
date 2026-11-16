@@ -65,6 +65,14 @@ This project is a heavily modified derivative work. When generating or modifying
 - Ensure all views remain responsive to Obsidian's pane resizing.
 - Delegate UI styling to the CSS modules under `src/styles/` (merged into `dist/styles.css`) using Obsidian's standard CSS variables (`var(--background-primary)`, `var(--text-normal)`, etc.) combined with `pretty-properties` variables.
 
+## Agent handoff
+
+- Before starting work, read `docs/handoff/README.md` and `docs/handoff/current.md` when present on the current branch, then inspect the actual Git status and HEAD.
+- Ubuntu is the primary development environment; Windows is for native Windows acceptance on the same feature branch and an explicitly recorded code commit.
+- Use one active writer per handoff turn. Fetch and fast-forward before taking a turn; stop on divergence or unrelated dirty work.
+- Record commands, results, blockers, tested code SHA, and the next owner in the handoff. A handoff-only commit does not establish that its parent code passed tests.
+- Keep credentials, session transcripts, local caches, dependencies, and private vault content out of handoff documents and Git.
+
 ## Release
 
 Releases follow the workspace engineering standard. The human release gate is merging the Release PR.
