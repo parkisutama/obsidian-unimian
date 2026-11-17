@@ -3,16 +3,16 @@
 Plan and branch decisions: [plan.md](plan.md).
 Sizes refer to expected hand-edited files, excluding generated lockfile churn.
 
-## Current execution state (2026-11-16)
+## Current execution state (2026-11-17)
 
-- Work branch: `fix/repository-remediation`; integrated verified code checkpoint `2c7c1f59f16f9dfea2545c3e8358fcdc22c3f522`.
+- Work branch: `chore/lint-tooling-alignment`; verified T08b code checkpoint `9c70669fa41f9b628a4175e48d7fc07905807ea6`.
 - Ubuntu fnm Node 24.15.0 and exact pnpm 12.10.1 are active. A maintainer-approved `pnpm install --frozen-lockfile` provisioned 429 Linux packages from the committed lockfile; Windows dependencies were not copied.
 - T01 bundle tests pass independently and in the 733-test full suite.
 - T05-T07 completed an observed red/green cycle. Before the source fix, the focused regressions failed 18 cases; the direct template-boundary regression also failed. After the fix, focused and aggregate checks pass.
 - All target-controlled checks ran in bubblewrap without network or host credentials, with a cleared allowlisted environment, read-only source/toolchain, tmpfs outputs, and explicit memory/process/file/CPU/wall-time bounds.
 - Aggregate verification passes: typecheck, Biome, ESLint, Markdown lint, 60 Vitest files/733 tests with coverage, production build, artifact verification, and 20 conformance tests. Coverage is 71.4% statements, 64.44% branches, 74.89% functions, and 72.99% lines.
 - PR #25 merged as `410e670`; refreshed PR #24 passed Linux/Windows/commit checks and merged as `b254cba`. Dependabot alert 46 identifies direct development dependency `happy-dom` and changed to `fixed` after 21.0.4 reached `main`.
-- Post-integration full audit reports 11 development-only advisories (3 low, 7 moderate, 1 high, 0 critical); production audit reports zero. The remaining high is transitive Vite 8.3.0 and belongs to T08c.
+- The T08b full audit reports 11 development-only advisories (3 low, 7 moderate, 1 high, 0 critical) through Vite 8.3.0, `fast-uri` 3.1.8, and `minimatch` 9.0.9/10.2.6; production audit reports zero. Resolve them through their owning direct packages in T08c rather than adding overrides here.
 - No preview behavior, TypeScript exception, plugin version, tag, release, or publication was changed. See `docs/handoff/current.md` for exact evidence and remaining ownership.
 
 ## T01: stabilize bundle tests (XS)
@@ -84,8 +84,8 @@ Verification: mutation-capability, note-template, and create-note-frontmatter te
 
 ## T08a-c: development tooling (three S/M slices)
 
-- [ ] T08a: update shared engineering pins and policy in the workspace first, including lint/Node compatibility and explicit TS6 exception; preserve the quality bar. No changes to other plugin repos in this plan.
-- [ ] T08b: adopt supported stable lint packages and public license-parser API; preserve manifest/license rules and typed linting. Sync approved conformance baseline.
+- [x] T08a: update shared engineering pins and policy in the workspace first, including lint/Node compatibility and explicit TS6 exception; preserve the quality bar. No changes to other plugin repos in this plan.
+- [x] T08b: adopt supported stable lint packages and public license-parser API; preserve manifest/license rules and typed linting. Sync approved conformance baseline.
 - [ ] T08c: upgrade Vitest/coverage together and remaining small tools to refreshed stable; reconcile #26 and transitive advisories with evidence.
 
 Likely files by slice: workspace template/policy (outside this writable root); then `eslint.config.mjs`, `package.json`, lockfile, conformance file, workspace config as needed. Split further if more than five hand-edited files.
