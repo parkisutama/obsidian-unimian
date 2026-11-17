@@ -83,22 +83,24 @@ const REQUIRED_FILES = [
 ];
 // Exact pins: these decide lint output, format output, or the API the code compiles against.
 const EXACT_VERSIONS = {
-	"@biomejs/biome": "2.5.15",
-	"@eslint/json": "0.14.0",
+	"@biomejs/biome": "2.6.8",
+	"@eslint/json": "2.1.1",
 	obsidian: "1.14.4",
 };
 // Major lines; the lockfile holds the exact version.
 const VERSION_LINES = {
+	// TypeScript 7 stays deferred until the stable parser peer allows it:
+	// https://github.com/typescript-eslint/typescript-eslint/issues/10940
 	typescript: /^\^6\./,
-	// Not 10: eslint-plugin-obsidianmd depends on plugins whose eslint peer stops at 9.
+	// Not 10: transitive plugins bundled by eslint-plugin-obsidianmd still stop at 9.
 	eslint: /^\^9\./,
 	"typescript-eslint": /^\^8\./,
 	"@typescript-eslint/parser": /^\^8\./,
-	"eslint-plugin-obsidianmd": /^\^0\.4\./,
+	"eslint-plugin-obsidianmd": /^\^0\.6\./,
 	esbuild: /^\^0\.28\./,
 	vitest: /^\^5\./,
 	"@vitest/coverage-v8": /^\^5\./,
-	rumdl: /^\^0\.2\./,
+	rumdl: /^\^0\.3\./,
 	"@types/node": /^\^24\./,
 	husky: /^\^9\./,
 	"@commitlint/cli": /^\^21\./,

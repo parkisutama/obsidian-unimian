@@ -1,0 +1,22 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.6.8/schema.json",
+	"formatter": {
+		"lineWidth": 100
+	},
+	"markdown": {
+		"formatter": {
+			"enabled": false
+		},
+		"linter": {
+			"enabled": false
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["tests/fixtures/css-merge/**"],
+			"formatter": {
+				"enabled": false
+			}
+		}
+	]
+}

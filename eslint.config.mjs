@@ -2,7 +2,6 @@ import json from "@eslint/json";
 import tsParser from "@typescript-eslint/parser";
 import { defineConfig } from "eslint/config";
 import obsidianmd from "eslint-plugin-obsidianmd";
-import { PlainTextParser } from "eslint-plugin-obsidianmd/dist/lib/plainTextParser.js";
 
 const obsidianRules = Object.fromEntries(
 	Object.entries(obsidianmd.configs.recommended).filter(([ruleId]) =>
@@ -41,12 +40,7 @@ export default defineConfig([
 	},
 	{
 		files: ["LICENSE"],
-		languageOptions: {
-			parser: PlainTextParser,
-			parserOptions: {
-				extraFileExtensions: [""],
-			},
-		},
+		language: "obsidianmd/plain-text",
 		plugins: {
 			obsidianmd,
 		},
