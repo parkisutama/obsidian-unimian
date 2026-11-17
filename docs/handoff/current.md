@@ -1,12 +1,12 @@
 # Current handoff
 
-Date: 2026-11-16.
-Branch: `fix/repository-remediation`.
-State: Checkpoints A and B complete; T01-T07 integrated and verified; T08 is next.
+Date: 2026-11-17.
+Branch: `chore/lint-tooling-alignment`.
+State: Checkpoints A and B complete; T01-T07 integrated; T08a merged in the workspace and T08b implemented and verified; T08c is next after review.
 Current owner: Ubuntu development agent.
-Next owner: Ubuntu development agent for dependency slices; Windows agent only for a later native checkpoint.
-Source base: `a53bfe9a01d1cda7c2c9ab162259c9538c33e7cb`.
-Code checkpoint: `2c7c1f59f16f9dfea2545c3e8358fcdc22c3f522` (merged `main` after T03/T04 into the T01/T05-T07 branch). This exact tree passed the strict aggregate verification below.
+Next owner: maintainer for T08b PR review/merge, then Ubuntu development agent for T08c; Windows agent only for a later native checkpoint.
+Source base: `883ad6b7ba17b5be6d94cae15ca509bcca7f0bf4`.
+Code checkpoint: `9c70669fa41f9b628a4175e48d7fc07905807ea6` (T08b lint-tooling alignment). This exact code tree passed the strict checks below before this handoff-only documentation update.
 
 ## Read first
 
@@ -24,6 +24,7 @@ Code checkpoint: `2c7c1f59f16f9dfea2545c3e8358fcdc22c3f522` (merged `main` after
 - Move collision exhaustion now returns an existing-compatible error before any occupied destination can be overwritten.
 - A shared frontmatter-key guard rejects `__proto__`, `constructor`, and `prototype` at gateway and template write boundaries. Bulk/date inputs are validated before mutation; ordinary names and formula rejection remain unchanged.
 - PR #25 updated all workflow pins to `pnpm/action-setup` v6.1.1; PR #24 updated only `happy-dom` and its lockfile snapshots to 21.0.4.
+- Workspace PR #4 merged as `5e75af7`, retaining ESLint 9 until the transitive plugins bundled by `eslint-plugin-obsidianmd` support ESLint 10. T08b updates Biome to 2.6.8, `@eslint/json` to 2.1.1, the Obsidian Markdown plugin to 0.6.0, typescript-eslint/parser to 8.72.2, and rumdl to 0.3.4. The LICENSE parser now uses the plugin's public `obsidianmd/plain-text` language API.
 - Plugin version, TypeScript exception, and preview behavior are unchanged.
 - The earlier audit's missing-lockfile-resolutions claim was corrected: pnpm 12's lockfile has two YAML documents and application resolutions are in the second.
 - Eleven integrated local branches, obsolete remote `dev`, and a clean documentation worktree were removed earlier with maintainer authorization. Two local historical spikes remain in Windows and are not prerequisites; they were not transferred through GitHub.
@@ -44,7 +45,7 @@ Bubblewrap, prlimit, timeout, and unshare provide the validation boundary. Targe
 - Repository hook passes in strict isolation: typecheck, Biome, ESLint, Markdown lint, 60 Vitest files and 733 tests.
 - Aggregate verification passes in strict isolation: hook checks plus coverage, production build, artifact verification, and 20/20 conformance tests.
 - Coverage: 71.4% statements (4161/5827), 64.44% branches (2463/3822), 74.89% functions (883/1179), 72.99% lines (3838/5258).
-- `pnpm audit --prod --json`: zero advisories. Post-integration development audit: 11 advisories (3 low, 7 moderate, 1 high, 0 critical). The remaining high is Vite 8.3.0 through Vitest and is assigned to T08c.
+- `pnpm audit --prod --json`: zero advisories. T08b development audit: 11 advisories (3 low, 7 moderate, 1 high, 0 critical) through Vite 8.3.0, `fast-uri` 3.1.8, and `minimatch` 9.0.9/10.2.6. Their patched versions are assigned to T08c through supported owning-package updates; T08b adds no override.
 - No sandbox build or coverage artifact was promoted; outputs stayed on tmpfs. `git diff --check` passes.
 - PR #24's refreshed head passed Linux Verify, Windows tests, and commit-message checks. Native Obsidian acceptance for the hardening checkpoint has not run; automated checks do not replace it.
 
@@ -68,7 +69,7 @@ Bubblewrap, prlimit, timeout, and unshare provide the validation boundary. Targe
 
 ## Next actions for Ubuntu
 
-1. Continue T08a-c. Shared workspace policy changes need their own writable scope and must preserve the tracked TypeScript exception for typescript-eslint/typescript-eslint#10940.
-2. Resolve the remaining transitive Vite, fast-uri, and minimatch advisories through supported dependency updates; do not add overrides before proving the owning direct-package path.
+1. Review and merge the T08b PR without squash-title drift; then refresh `main` before T08c.
+2. In T08c, upgrade Vitest/coverage together and resolve the remaining transitive Vite, fast-uri, and minimatch advisories through supported dependency updates; do not add overrides before proving the owning direct-package path.
 3. Keep preview behavior unchanged. Request native Windows testing only at a coherent later checkpoint, with exact SHA and dummy-vault steps.
 4. Do not merge the remediation PR, force-push, tag, publish, manually bump the plugin version, or merge Release PR #14.
